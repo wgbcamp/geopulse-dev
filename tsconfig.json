@@ -1,5 +1,6 @@
 {
   "files": [],
+  "include": ["src", "*.ts"], // added for arcgis
   "references": [
     {
       "path": "./tsconfig.app.json"
@@ -9,10 +10,17 @@
     }
   ],
   "compilerOptions": {
+    "esModuleInterop": true, // added for arcgis
+    "lib": ["DOM", "DOM.Iterable", "ES2023"], // added for arcgis
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
-    "jsx": "react-jsx"
-  }
+    "jsx": "react-jsx", // added for jsx interface functionality
+    "module": "ES2022", // added for arcgis
+    "moduleResolution": "Bundler", // added for arcgis
+    "resolveJsonModule": true, // added for arcgis
+    "target": "ES2023", // added for arcgis
+     "skipLibCheck": true, // added for arcgis
+  },
 }
