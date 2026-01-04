@@ -8,38 +8,29 @@ import Extent from "@arcgis/core/geometry/Extent.js";
 import SpatialReference from "@arcgis/core/geometry/SpatialReference.js";
 
 type FlatMapProps = {
-    globePosition: object
+    globePosition: object,
+    currentTime: {time: string, url: string},
     setFlatPosition: React.Dispatch<React.SetStateAction<any>>
 }
 
-export const FlatMap = ({globePosition, setFlatPosition}: FlatMapProps) => {
+type MapObject = any;
+
+export const FlatMap = ({globePosition, currentTime, setFlatPosition}: FlatMapProps) => {
 
     const ref = useRef(null);
-
+    let map = useRef<Map | null>(null);
+    let vtlayer: MapObject;
+    
     useEffect(() => {
         if (ref.current) {
 
-            let map = new Map({
+            map.current = new Map({
                 basemap: 'dark-gray'
-            })
-
-            let vtlayer = new VectorTileLayer({
-                url: "https://tiles.arcgis.com/tiles/weJ1QsnbMYJlCHdG/arcgis/rest/services/riverine_flood_grid_people_historical_1980/VectorTileServer"
-            });
-
-            map.add(vtlayer);
-
-            const extent = new Extent({
-                xmin: -13056650,
-                ymin: 6077558,
-                xmax: -13055709,
-                ymax: 6077938,
-                spatialReference: new SpatialReference({ wkid: 3857 })
             })
 
             var view = new MapView({
                 container: ref.current,
-                map: map,
+                map: map.current,
                 zoom: 3,
                 center: [-40.9465, 0.775],
                 constraints: {
@@ -56,10 +47,9 @@ export const FlatMap = ({globePosition, setFlatPosition}: FlatMapProps) => {
                 spatialReference: {
                     wkid: 3857,
                 },
-                // wrapAroundMode: "disabled"
+                viewpoint: globePosition
             });
 
-            view.viewpoint = globePosition;
             view.ui.components = [];
 
             reactiveUtils.watch(() =>
@@ -79,6 +69,14 @@ export const FlatMap = ({globePosition, setFlatPosition}: FlatMapProps) => {
             view.destroy();
         }
     }, []);
+
+    useEffect(() => {
+        map.current!.remove(vtlayer);
+        vtlayer = new VectorTileLayer({
+                url: currentTime.url
+            });
+        map.current!.add(vtlayer);
+    }, [currentTime])
 
     return(
       <div className='w-full h-full bg-[#1D2224]' ref={ref}></div>

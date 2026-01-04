@@ -15,14 +15,16 @@ import { ChevronUpIcon } from '../components/icons/lucide-chevron-up';
 
 type HeaderProps = {
     currentDimension: string,
-    setDimension: React.Dispatch<React.SetStateAction<string>>;
+    setDimension: React.Dispatch<React.SetStateAction<string>>,
+    currentTime: {time: string, url: string},
+    setTime: React.Dispatch<React.SetStateAction<{time: string, url: string}>>
 };
 
 // type HeaderProps = {
 //     dimension: Dimension
 // }
 
-export const Header = ({ currentDimension, setDimension }: HeaderProps) => {
+export const Header = ({ currentDimension, currentTime, setDimension, setTime }: HeaderProps) => {
 
   type Factor = Array<string>;
 
@@ -58,7 +60,6 @@ export const Header = ({ currentDimension, setDimension }: HeaderProps) => {
   const [currentView, setView] = useState("Grid");
   const [currentHazard, setHazard] = useState("Riverine Flooding");
   const [currentExposure, setExposure] = useState("Population");
-  const [currentTime, setTime] = useState("1980-2014");
   const [currentScenario, setScenario] = useState("Baseline");
 //   const [currentDimension, setDimension] = useState("2D");
   const [hovering, setHovering] = useState("");

@@ -6,31 +6,29 @@ import VectorTileLayer from "@arcgis/core/layers/VectorTileLayer.js";
 import SceneView from "@arcgis/core/views/SceneView.js";
 
 type GlobeMapProps = {
-    flatPosition: object;
+    flatPosition: object,
+    currentTime: {time: string, url: string},
     setGlobePosition: React.Dispatch<React.SetStateAction<any>>;
 }
 
-export const GlobeMap = ({flatPosition, setGlobePosition}: GlobeMapProps) => {
+type MapObject = any;
 
+export const GlobeMap = ({flatPosition, currentTime, setGlobePosition}: GlobeMapProps) => {
 
     const ref = useRef(null);  
+    let map = useRef<Map | null>(null);
+    let vtlayer: MapObject;
 
     useEffect(() => {
         if (ref.current) {
 
-            let map = new Map({
+            map.current = new Map({
                 basemap: 'dark-gray'
             })
 
-            let vtlayer = new VectorTileLayer({
-                url: "https://tiles.arcgis.com/tiles/weJ1QsnbMYJlCHdG/arcgis/rest/services/riverine_flood_grid_people_historical_1980/VectorTileServer"
-            });
-
-            map.add(vtlayer);
-
             var view = new SceneView({
 
-                map: map,
+                map: map.current,
                 container: ref.current,
                 center: [-38.9465, 7.775],
                 zoom: 4,
@@ -41,8 +39,10 @@ export const GlobeMap = ({flatPosition, setGlobePosition}: GlobeMapProps) => {
                 },
                 viewpoint: flatPosition
             });
-            
+
+            view.viewpoint = flatPosition;
             view.ui.components = [];
+
             reactiveUtils.watch(() =>
                 [view.interacting, view.viewpoint],
                 ([interacting, viewpoint]) => {
@@ -57,16 +57,18 @@ export const GlobeMap = ({flatPosition, setGlobePosition}: GlobeMapProps) => {
             )
 
         }
-
-
-
         return () => {
-
             view.destroy();
         }
-
     }, []);
 
+    useEffect(() => {
+        map.current!.remove(vtlayer);
+        vtlayer = new VectorTileLayer({
+            url: currentTime.url
+        });
+        map.current!.add(vtlayer);
+    }, [currentTime])
 
     return(
       <div className='w-full h-full pt-[152px] bg-[#1D2224]' ref={ref}></div>
