@@ -13,23 +13,34 @@ import { InfoIcon } from '../components/icons/lucide-info';
 import { ChevronDownIcon } from '../components/icons/lucide-chevron-down';
 import { ChevronUpIcon } from '../components/icons/lucide-chevron-up';
 
-export const Header = () => {
+type HeaderProps = {
+    currentDimension: string,
+    setDimension: React.Dispatch<React.SetStateAction<string>>;
+};
 
-  type Risk = Array<string>;
+// type HeaderProps = {
+//     dimension: Dimension
+// }
 
-  let hazards: Risk = ["Heat Stress", "Urban Heatwave", "Riverine Flooding", "Coastal Flooding", "Drought", "Sea Level"];
-  let exposures: Risk = ["Buildings", "Cropland", "GDP", "Urban GDP", "Population"];
-  let scenarios: Risk = ["Baseline", "Orderly", "Disorderly", "Hot House"];
+export const Header = ({ currentDimension, setDimension }: HeaderProps) => {
+
+  type Factor = Array<string>;
+
+  let hazards: Factor = ["Heat Stress", "Urban Heatwave", "Riverine Flooding", "Coastal Flooding", "Drought", "Sea Level"];
+  let exposures: Factor = ["Buildings", "Cropland", "GDP", "Urban GDP", "Population"];
+  let scenarios: Factor = ["Baseline", "Orderly", "Disorderly", "Hot House"];
+  let spatialDimensions: Factor = ["2D", "3D"];
 
   type HeaderTypes = Array<{
     title: string,
-    risk: string[]
+    factor: string[]
   }>
 
   const headerOptions: HeaderTypes = [
-    { title: "Hazards", risk: hazards },
-    { title: "Exposures", risk: exposures },
-    { title: "Scenarios", risk: scenarios }
+    { title: "Hazards", factor: hazards },
+    { title: "Exposures", factor: exposures },
+    { title: "Scenarios", factor: scenarios },
+    { title: "Spatial Dimensions", factor: spatialDimensions }
   ];
 
   const approaches: View = [
@@ -49,11 +60,12 @@ export const Header = () => {
   const [currentExposure, setExposure] = useState("Population");
   const [currentTime, setTime] = useState("1980-2014");
   const [currentScenario, setScenario] = useState("Baseline");
+//   const [currentDimension, setDimension] = useState("2D");
   const [hovering, setHovering] = useState("");
   const [headerState, setHeader] = useState(true);
 
     return (
-        <div className={`${headerState == true ? 'h-38' : 'h-88'} w-full select-none overflow-y-hidden flex flex-row absolute items-start gap-x-5 bg-white border-b pt-8`} onMouseEnter={() => setHeader(false)} onMouseLeave={() => setHeader(true)}>
+        <div className={`${headerState == true ? 'h-38' : 'h-88'} z-2 w-full select-none overflow-y-hidden flex flex-row absolute items-start gap-x-5 bg-white border-b pt-8`} onMouseEnter={() => setHeader(false)} onMouseLeave={() => setHeader(true)}>
             <Navigation menu={additionalInfo} />
             <Container
                 title={"Views"}
@@ -74,19 +86,22 @@ export const Header = () => {
                     title={x.title}
                     element={
                         <Options
-                            risk={x.risk}
+                            factor={x.factor}
                             title={x.title}
                             headerState={headerState}
                             currentScenario={currentScenario}
                             currentHazard={currentHazard}
                             currentExposure={currentExposure}
+                            currentDimension={currentDimension}
                             hovering={hovering}
                             setHazard={setHazard}
                             setExposure={setExposure}
                             setScenario={setScenario}
                             setHovering={setHovering}
+                            setDimension={setDimension}
                         />}
                     headerState={headerState}
+                    key={x.title}
                 />
             )}
             <Container

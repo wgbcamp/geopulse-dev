@@ -23,7 +23,7 @@ export type Menu = Array<{
     b: React.ReactElement 
 }>;
 
-export type NavigationProps = {
+type NavigationProps = {
     menu: Menu
 };
 
