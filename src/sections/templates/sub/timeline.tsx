@@ -65,11 +65,11 @@ export const Timeline = ({currentTime, headerState, setTime}: TimelineProps) => 
               <Label htmlFor="option-one">Decades</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="option-two" id="option-two" />
+              <RadioGroupItem value="option-two" id="option-two" disabled={true}/>
               <Label htmlFor="option-two">Years</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="option-three" id="option-three" />
+              <RadioGroupItem value="option-three" id="option-three" disabled={true}/>
               <Label htmlFor="option-three">Months</Label>
             </div>
           </RadioGroup>

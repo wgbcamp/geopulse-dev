@@ -1,9 +1,7 @@
 import './App.css'
 import { Header } from './sections/header';
-import { Grid } from './sections/Grid';
 import { useState } from 'react'
-import { GlobeMap } from './sections/templates/GlobeMap'
-
+import { ViewContainer } from './sections/ViewContainer';
 
 function App() {
 
@@ -17,7 +15,7 @@ const [currentTime, setTime] = useState({ time: "1980-2014", url: "https://tiles
       currentTime={currentTime}
       setTime={setTime}
       />
-      <Grid currentDimension={currentDimension} currentTime={currentTime}/>
+      <ViewContainer currentTime={currentTime} currentDimension={currentDimension}/>
     </div>
 
   )

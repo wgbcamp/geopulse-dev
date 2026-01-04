@@ -61,7 +61,6 @@ export const Header = ({ currentDimension, currentTime, setDimension, setTime }:
   const [currentHazard, setHazard] = useState("Riverine Flooding");
   const [currentExposure, setExposure] = useState("Population");
   const [currentScenario, setScenario] = useState("Baseline");
-//   const [currentDimension, setDimension] = useState("2D");
   const [hovering, setHovering] = useState("");
   const [headerState, setHeader] = useState(true);
 
