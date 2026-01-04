@@ -7,17 +7,15 @@ import SceneView from "@arcgis/core/views/SceneView.js";
 
 type GlobeMapProps = {
     flatPosition: object,
-    currentTime: {time: string, url: string},
+    currentTime: { time: string, url: string },
     setGlobePosition: React.Dispatch<React.SetStateAction<any>>;
 }
 
-type MapObject = any;
+export const GlobeMap = ({ flatPosition, currentTime, setGlobePosition }: GlobeMapProps) => {
 
-export const GlobeMap = ({flatPosition, currentTime, setGlobePosition}: GlobeMapProps) => {
-
-    const ref = useRef(null);  
+    const ref = useRef(null);
     let map = useRef<Map | null>(null);
-    let vtlayer: MapObject;
+    const vtlayer = useRef<VectorTileLayer | null>(null);
 
     useEffect(() => {
         if (ref.current) {
@@ -40,17 +38,14 @@ export const GlobeMap = ({flatPosition, currentTime, setGlobePosition}: GlobeMap
                 viewpoint: flatPosition
             });
 
-            view.viewpoint = flatPosition;
             view.ui.components = [];
 
             reactiveUtils.watch(() =>
                 [view.interacting, view.viewpoint],
                 ([interacting, viewpoint]) => {
                     if (interacting) {
-                        console.log(interacting);
                     }
                     if (viewpoint) {
-                        console.log(viewpoint);
                         setGlobePosition(viewpoint);
                     }
                 }
@@ -63,15 +58,23 @@ export const GlobeMap = ({flatPosition, currentTime, setGlobePosition}: GlobeMap
     }, []);
 
     useEffect(() => {
-        map.current!.remove(vtlayer);
-        vtlayer = new VectorTileLayer({
+
+        if (!map.current) return;
+
+        if (vtlayer.current) {
+            map.current.remove(vtlayer.current);
+            vtlayer.current.destroy();
+        }
+
+        vtlayer.current = new VectorTileLayer({
             url: currentTime.url
         });
-        map.current!.add(vtlayer);
+
+        map.current.add(vtlayer.current);
     }, [currentTime])
 
-    return(
-      <div className='w-full h-full pt-[152px] bg-[#1D2224]' ref={ref}></div>
+    return (
+        <div className='w-full h-full pt-[152px] bg-[#1D2224]' ref={ref}></div>
 
     )
 }

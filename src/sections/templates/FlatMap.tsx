@@ -9,18 +9,17 @@ import SpatialReference from "@arcgis/core/geometry/SpatialReference.js";
 
 type FlatMapProps = {
     globePosition: object,
-    currentTime: {time: string, url: string},
+    currentTime: { time: string, url: string },
     setFlatPosition: React.Dispatch<React.SetStateAction<any>>
 }
 
-type MapObject = any;
 
-export const FlatMap = ({globePosition, currentTime, setFlatPosition}: FlatMapProps) => {
+export const FlatMap = ({ globePosition, currentTime, setFlatPosition }: FlatMapProps) => {
 
     const ref = useRef(null);
     let map = useRef<Map | null>(null);
-    let vtlayer: MapObject;
-    
+    const vtlayer = useRef<VectorTileLayer | null>(null);
+
     useEffect(() => {
         if (ref.current) {
 
@@ -56,10 +55,8 @@ export const FlatMap = ({globePosition, currentTime, setFlatPosition}: FlatMapPr
                 [view.interacting, view.viewpoint],
                 ([interacting, viewpoint]) => {
                     if (interacting) {
-                        console.log(interacting);
                     }
                     if (viewpoint) {
-                        console.log(viewpoint);
                         setFlatPosition(viewpoint);
                     }
                 }
@@ -71,14 +68,22 @@ export const FlatMap = ({globePosition, currentTime, setFlatPosition}: FlatMapPr
     }, []);
 
     useEffect(() => {
-        map.current!.remove(vtlayer);
-        vtlayer = new VectorTileLayer({
-                url: currentTime.url
-            });
-        map.current!.add(vtlayer);
+
+        if (!map.current) return;
+
+        if (vtlayer.current) {
+            map.current.remove(vtlayer.current);
+            vtlayer.current.destroy();
+        }
+
+        vtlayer.current = new VectorTileLayer({
+            url: currentTime.url
+        });
+
+        map.current.add(vtlayer.current);
     }, [currentTime])
 
-    return(
-      <div className='w-full h-full bg-[#1D2224]' ref={ref}></div>
+    return (
+        <div className='w-full h-full bg-[#1D2224]' ref={ref}></div>
     )
 }
