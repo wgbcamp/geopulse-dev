@@ -3,10 +3,6 @@ import React from 'react'
 import {
   Item,
   ItemContent,
-  ItemDescription,
-  ItemGroup,
-  ItemHeader,
-  ItemTitle,
 } from "@/components/ui/item"
 
 import { Slider } from "@/components/ui/slider"

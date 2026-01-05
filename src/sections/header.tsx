@@ -1,5 +1,5 @@
 import React from "react"
-import { useState, useRef, useEffect } from 'react'
+import { useState } from 'react'
 
 import { Navigation, type Menu } from './templates/navigation';
 import { Views, type View } from './templates/views';
@@ -17,14 +17,16 @@ type HeaderProps = {
     currentDimension: string,
     setDimension: React.Dispatch<React.SetStateAction<string>>,
     currentTime: {time: string, url: string},
-    setTime: React.Dispatch<React.SetStateAction<{time: string, url: string}>>
+    setTime: React.Dispatch<React.SetStateAction<{time: string, url: string}>>,
+    currentView: string,
+    setView: React.Dispatch<React.SetStateAction<string>>
 };
 
 // type HeaderProps = {
 //     dimension: Dimension
 // }
 
-export const Header = ({ currentDimension, currentTime, setDimension, setTime }: HeaderProps) => {
+export const Header = ({ currentDimension, currentTime, currentView, setDimension, setTime, setView }: HeaderProps) => {
 
   type Factor = Array<string>;
 
@@ -57,7 +59,6 @@ export const Header = ({ currentDimension, currentTime, setDimension, setTime }:
     { a: "About", b: <InfoIcon /> }
   ];
 
-  const [currentView, setView] = useState("Grid");
   const [currentHazard, setHazard] = useState("Riverine Flooding");
   const [currentExposure, setExposure] = useState("Population");
   const [currentScenario, setScenario] = useState("Baseline");
