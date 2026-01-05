@@ -6,12 +6,12 @@ import { Compare } from './sections/compare';
 
  function App() {
 
-    type ObjectID = {
-      objectIds: number
-    };
+    // type ObjectID = {
+    //   objectIds: number
+    // };
 
-    const whereClause = `Admin_Filter IN ('gadm0', 'gadm1')`;
-    var queryString = `where=${encodeURIComponent(whereClause)}`;
+    // const whereClause = `Admin_Filter IN ('gadm0', 'gadm1')`;
+    // var queryString = `where=${encodeURIComponent(whereClause)}`;
 
     // async function test() {
 
