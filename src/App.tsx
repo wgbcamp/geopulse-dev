@@ -65,7 +65,7 @@ import { Compare } from './sections/compare';
     // test();
 
 
-  const [currentView, setView] = useState("Grid");
+  const [currentView, setView] = useState("Compare");
   const [currentDimension, setDimension] = useState("2D");
   const [currentTime, setTime] = useState({ time: "1980-2014", url: "https://tiles.arcgis.com/tiles/weJ1QsnbMYJlCHdG/arcgis/rest/services/riverine_flood_grid_people_historical_1980/VectorTileServer" });
 
