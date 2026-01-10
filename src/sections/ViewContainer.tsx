@@ -7,7 +7,7 @@ import MapView from "@arcgis/core/views/MapView.js";
 import SceneView from "@arcgis/core/views/SceneView.js";
 
 type MapProps = {
-    currentTime: { time: string, url: string },
+    currentTime: { time: number, url: string },
     currentDimension: string
 }
 

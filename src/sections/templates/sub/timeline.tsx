@@ -10,26 +10,33 @@ import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 type TimelineProps = {
-    currentTime: {time: string, url: string},
+    currentTime: {time: number, url: string},
     headerState: boolean,
-    setTime: React.Dispatch<React.SetStateAction<{time: string, url: string}>>
+    setTime: React.Dispatch<React.SetStateAction<{time: number, url: string}>>
 }    
+
+var timeFlip = [
+  {frontend: "1980-2014", data: 1980},
+  {frontend: "2030", data: 2030},
+  {frontend: "2050", data: 2050},
+  {frontend: "2100", data: 2080},
+]
 
 export const Timeline = ({currentTime, headerState, setTime}: TimelineProps) => {
     const handleValueChange = (value: number[]) => {
       value.forEach(number => {
         switch (number)  {
           case 1: 
-            setTime({time: "1980-2014", url: "https://tiles.arcgis.com/tiles/weJ1QsnbMYJlCHdG/arcgis/rest/services/riverine_flood_grid_people_historical_1980/VectorTileServer"});
+            setTime({time: 1980, url: "https://tiles.arcgis.com/tiles/weJ1QsnbMYJlCHdG/arcgis/rest/services/riverine_flood_grid_people_historical_1980/VectorTileServer"});
             break;
           case 2:
-            setTime({time: "2030", url: "https://tiles.arcgis.com/tiles/weJ1QsnbMYJlCHdG/arcgis/rest/services/riverine_flood_grid_people_rcp4p5_2030/VectorTileServer"});
+            setTime({time: 2030, url: "https://tiles.arcgis.com/tiles/weJ1QsnbMYJlCHdG/arcgis/rest/services/riverine_flood_grid_people_rcp4p5_2030/VectorTileServer"});
             break;
           case 3:
-            setTime({time: "2050", url: "https://tiles.arcgis.com/tiles/weJ1QsnbMYJlCHdG/arcgis/rest/services/riverine_flood_grid_people_rcp4p5_2050/VectorTileServer"});
+            setTime({time: 2050, url: "https://tiles.arcgis.com/tiles/weJ1QsnbMYJlCHdG/arcgis/rest/services/riverine_flood_grid_people_rcp4p5_2050/VectorTileServer"});
             break;
           case 4:
-            setTime({time: "2080", url: "https://tiles.arcgis.com/tiles/weJ1QsnbMYJlCHdG/arcgis/rest/services/riverine_flood_grid_people_rcp4p5_2080/VectorTileServer"});
+            setTime({time: 2080, url: "https://tiles.arcgis.com/tiles/weJ1QsnbMYJlCHdG/arcgis/rest/services/riverine_flood_grid_people_rcp4p5_2080/VectorTileServer"});
             break;
         }
       })
@@ -49,7 +56,7 @@ export const Timeline = ({currentTime, headerState, setTime}: TimelineProps) => 
           />
           <Item variant='muted' className='w-35 px-0 ml-4 py-0'>
             <ItemContent>
-              <div className='flex items-center justify-center' style={{paddingBottom: '4px', paddingTop: '4px'}}>{currentTime.time}</div>
+              <div className='flex items-center justify-center' style={{paddingBottom: '4px', paddingTop: '4px'}}>{timeFlip.filter(item => item.data === currentTime.time)[0].data}</div>
             </ItemContent>
           </Item>
         </div>  

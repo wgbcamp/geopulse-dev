@@ -16,23 +16,25 @@ import { ChevronUpIcon } from '../components/icons/lucide-chevron-up';
 type HeaderProps = {
     currentDimension: string,
     setDimension: React.Dispatch<React.SetStateAction<string>>,
-    currentTime: {time: string, url: string},
-    setTime: React.Dispatch<React.SetStateAction<{time: string, url: string}>>,
+    currentTime: {time: number, url: string},
+    setTime: React.Dispatch<React.SetStateAction<{time: number, url: string}>>,
     currentView: string,
     setView: React.Dispatch<React.SetStateAction<string>>
+    currentScenario: string,
+    setScenario: React.Dispatch<React.SetStateAction<string>>
 };
 
 // type HeaderProps = {
 //     dimension: Dimension
 // }
 
-export const Header = ({ currentDimension, currentTime, currentView, setDimension, setTime, setView }: HeaderProps) => {
+export const Header = ({ currentDimension, currentTime, currentView, currentScenario, setDimension, setTime, setView, setScenario }: HeaderProps) => {
 
   type Factor = Array<string>;
 
   let hazards: Factor = ["Heat Stress", "Urban Heatwave", "Riverine Flooding", "Coastal Flooding", "Drought", "Sea Level"];
   let exposures: Factor = ["Buildings", "Cropland", "GDP", "Urban GDP", "Population"];
-  let scenarios: Factor = ["Baseline", "Orderly", "Disorderly", "Hot House"];
+  let scenarios: Factor = ["historical", "rcp4p5", "rcp8p5", "Hot House"];
   let spatialDimensions: Factor = ["2D", "3D"];
 
   type HeaderTypes = Array<{
@@ -61,7 +63,6 @@ export const Header = ({ currentDimension, currentTime, currentView, setDimensio
 
   const [currentHazard, setHazard] = useState("Riverine Flooding");
   const [currentExposure, setExposure] = useState("Population");
-  const [currentScenario, setScenario] = useState("Baseline");
   const [hovering, setHovering] = useState("");
   const [headerState, setHeader] = useState(true);
 
@@ -111,7 +112,8 @@ export const Header = ({ currentDimension, currentTime, currentView, setDimensio
                     <Timeline
                         currentTime={currentTime}
                         headerState={headerState}
-                        setTime={setTime} />}
+                        setTime={setTime} 
+                    />}
                 headerState={headerState}
             />
             <div style={{ height: '96px' }} className='flex items-center justify-center'>

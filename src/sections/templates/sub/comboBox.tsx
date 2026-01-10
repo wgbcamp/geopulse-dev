@@ -1,4 +1,6 @@
 import * as React from "react"
+import { useState } from 'react';
+
 
 import { Button } from "@/components/ui/button"
 import { Check, ChevronsUpDown } from "lucide-react"
@@ -228,10 +230,25 @@ const isoCountries = [
   {"alpha2": "ZW", "alpha3": "ZWE", "name": "Zimbabwe"}
 ];
 
-export const ComboBox = () => {
+interface CountryName {
+  selection: (data: string) => string;
+}
+
+type CountryString = {
+  alpha2: string,
+  alpha3: string,
+  name: string
+};
+
+type ComboBoxProps = {
+  loadGeoJson(value: CountryString): Promise<void>; 
+}
+
+export const ComboBox = ({ loadGeoJson}: ComboBoxProps) => {
 
     const [open, setOpen] = React.useState(false);
-    const [value, setValue] = React.useState("");
+    const [value, setValue] = useState("");
+
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -257,8 +274,9 @@ export const ComboBox = () => {
                       key={country.alpha3}
                       value={country.name}
                       onSelect={(currentValue) => {
-                        setValue(currentValue === value ? "" : currentValue)
+                        loadGeoJson(country)
                         setOpen(false)
+                        setValue(currentValue)
                       }}
                     >
                       {country.name}
