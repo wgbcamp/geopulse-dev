@@ -111,7 +111,7 @@ export const Region = ({
 
         const parameters = new URLSearchParams({
             returnIdsOnly: 'true',
-            outFields: '*',
+            cacheHint: 'true',
             f: 'json'
         });
         const url = `https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/Floods_riverine_people_all/FeatureServer/0/query?${queryString}`;
@@ -140,7 +140,7 @@ export const Region = ({
 
             const params = new URLSearchParams({
                 objectIds: y.slice(start, end).join(","),
-                outFields: '*',
+                outFields: 'Admin_Filter,period,scenario,country_abr,wExposed,NAME_1',
                 f: 'json',
                 maxRecordCountFactor: '5'
             });
