@@ -5,6 +5,7 @@ import Map from "@arcgis/core/Map.js";
 import VectorTileLayer from "@arcgis/core/layers/VectorTileLayer.js";
 import MapView from "@arcgis/core/views/MapView.js";
 import SceneView from "@arcgis/core/views/SceneView.js";
+import Polygon from "@arcgis/core/geometry/Polygon.js";
 
 type MapProps = {
     currentTime: { time: number, url: string },
@@ -38,13 +39,6 @@ export const ViewContainer = ({ currentTime, currentDimension }: MapProps) => {
                         constraints: {
                             minZoom: 2,
                             maxZoom: 10,
-                            geometry: { // Constrain lateral movement to Lower Manhattan
-                                type: "extent",
-                                xmin: -360,
-                                ymin: -65.700,
-                                xmax: 360,
-                                ymax: 80.73,
-                            },
                         },
                         spatialReference: {
                             wkid: 3857,
@@ -67,20 +61,12 @@ export const ViewContainer = ({ currentTime, currentDimension }: MapProps) => {
                     });
             }
 
-
-
             view.current.ui.components = [];
 
-            reactiveUtils.watch(() =>
-                [view.current.interacting, view.current.viewpoint],
-                ([interacting, viewpoint]) => {
-                    if (interacting) {
-                    }
-                    if (viewpoint) {
-                        setPosition(viewpoint);
-                    }
-                }
-            )
+            view.current.when(() => {
+                view.current.constraints.geometry = view.current.extent.clone();
+                view.current.constraints.minScale = view.scale;
+            })
         }
         return () => {
             view.current.destroy();

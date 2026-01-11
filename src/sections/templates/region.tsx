@@ -307,6 +307,9 @@ export const Region = ({
                                 color: "white"
                             },
                         },
+                        credits: {
+                            enabled: false
+                        }
                     }}
                 >
                     <MapSeries
