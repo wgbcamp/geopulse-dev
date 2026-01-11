@@ -64,8 +64,11 @@ export const ViewContainer = ({ currentTime, currentDimension }: MapProps) => {
             view.current.ui.components = [];
 
             view.current.when(() => {
-                view.current.constraints.geometry = view.current.extent.clone();
-                view.current.constraints.minScale = view.scale;
+                if (currentDimension === "2D") {
+                    view.current.constraints.geometry = view.current.extent.clone();
+                    view.current.constraints.minScale = view.scale;
+                }
+
             })
         }
         return () => {
