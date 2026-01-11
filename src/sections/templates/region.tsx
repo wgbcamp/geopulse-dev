@@ -20,60 +20,42 @@ import {
     Title,
 } from '@highcharts/react';
 import { useState } from 'react';
-
-type Filters = {
-    currentTime: {
-        time: number,
-        url: string
-    },
-    currentScenario: string
-}
-
-type JsonShape = {
-    features: Array<{
-        properties: {
-            GID_0: string
-        }
-    }>
-};
+import { type Filters } from '../compare'
+import { type Maximum } from '../../App'
 
 type DataString = {
     alpha2: string,
     alpha3: string,
     name: string,
-    iso3: string
+    iso3: string,
 };
 
-var geoJson: JsonShape;
-var getData = await fetch('/geopulse/GADM_ADMIN1.json');
-geoJson = await getData.json();
-console.log(geoJson);
+type ExposureShape = [string, number, number, string][];
 
-export const Region = ({currentTime, currentScenario}: Filters) => {
-
-    const [country, setCountry] = React.useState({
-        type: "",
-        features: [{}],
-        name: "",
-        iso3: ""
-    });
-    // const [countryData, setCountryData] = React.useState({});
-    const [series, setSeries] = React.useState(Array<[string, number, number, string]>);
-    const [exposureState, setExposureState] = React.useState(Array<[string, number, number, string]>);
-    const [maxValue, setMaxValue] = React.useState(0);
-
-    type ExposureShape = [string, number, number, string][];
+export const Region = ({
+    currentTime, 
+    currentScenario, 
+    country, 
+    setCountry, 
+    mapPolygon, 
+    position, 
+    series, 
+    setSeries, 
+    exposureState, 
+    setExposureState,
+    maxValue,
+    setMaxValue
+}: Filters) => {
 
     var exposure: ExposureShape = [];
 
     useEffect(() => {
             applyFilter();
-        
     }, [exposureState, currentTime, currentScenario]);
 
-    useEffect(() => {
-        console.log(series);
-    }, [series]);
+    // useEffect(() => {
+    //     console.log(series);
+    // }, [series]);
 
     var loadGeoJson = async (data: DataString) => {
         var temp = {
@@ -82,12 +64,20 @@ export const Region = ({currentTime, currentScenario}: Filters) => {
             name: data.name,
             iso3: data.alpha3
         };
-        for (var i = 0; i < geoJson.features.length; i++) {
-            if (data.alpha3 == geoJson.features[i].properties.GID_0) {
-                temp.features.push(geoJson.features[i]);
+        for (var i = 0; i < mapPolygon.features.length; i++) {
+            if (data.alpha3 == mapPolygon.features[i].properties.GID_0) {
+                temp.features.push(mapPolygon.features[i]);
             }
         }
-        setCountry(temp);
+
+        const updateCountryGeo = (position: number) => {
+            const newItems = country;
+            newItems.splice(position, 1, temp);
+            setCountry(newItems);
+        }
+
+        console.log(country)
+        updateCountryGeo(position);
         return test(temp);
     }
 
@@ -144,8 +134,6 @@ export const Region = ({currentTime, currentScenario}: Filters) => {
             end: number
         };
 
-  
-
         var tableData: TableArray = [];
 
         function counter({ start, end }: SliceNumber) {
@@ -182,8 +170,10 @@ export const Region = ({currentTime, currentScenario}: Filters) => {
         counter({ start: 0, end: 10000 });
     }
 
+    var tempMaxValue: number;
+
     const sumWeightedExposure = async (tableData: TableArray) => {
-        var tempMaxValue = 0;
+        tempMaxValue = 0;
         console.log(tableData);
         for (var a = 0; a < tableData.length; a++) {
             for (var b = 0; b < tableData[a].features.length; b++) {
@@ -223,13 +213,39 @@ export const Region = ({currentTime, currentScenario}: Filters) => {
             }
         }
         console.log(exposure);
-        setMaxValue(tempMaxValue);
-        setExposureState(exposure);
+
+        const updateMaxValue = (position: number) => {
+            setMaxValue(prev => {
+                const next = [...prev];
+                next[position] = tempMaxValue;
+                return next;
+            })
+        }
+        updateMaxValue(position);
+
+        const updateExposureValues = (position: number) => {
+            setExposureState(prev => {
+                const next = [...prev];
+                next[position] = exposure;
+                return next;
+            })
+        }
+        updateExposureValues(position);
     }
 
     function applyFilter() {
         console.log(exposureState);
-            setSeries(exposureState.filter((value) => (value[2] === currentTime.time)).filter((value) => (value[3] === currentScenario)));
+        console.log(series);
+
+        const updateSeriesValues = (position: number) => {
+            console.log(series);
+            setSeries(prev => {
+                const next = [...prev];
+                next[position] = exposureState[position].filter((value) => (value[2] === currentTime.time)).filter((value) => (value[3] === currentScenario));
+                return next;
+            })
+       }
+        updateSeriesValues(position);
     }
 
     return (
@@ -238,7 +254,7 @@ export const Region = ({currentTime, currentScenario}: Filters) => {
                 <MapsChart
                     options={{
                         chart: {
-                            map: country,
+                            map: country[position],
                             backgroundColor: '#1E1E1E',
                             animation: false
                         },
@@ -251,7 +267,7 @@ export const Region = ({currentTime, currentScenario}: Filters) => {
                         },
                         colorAxis: {
                             min: 0,
-                            max: maxValue,
+                            max: maxValue[position],
                             minColor: '#F1A882',
                             maxColor: '#E35205',
                             labels: {
@@ -294,7 +310,7 @@ export const Region = ({currentTime, currentScenario}: Filters) => {
                     }}
                 >
                     <MapSeries
-                        data={series}
+                        data={series[position]}
                         joinBy={['NAME_1', 0]}
                         keys={['NAME_1', 'value']}
                     />

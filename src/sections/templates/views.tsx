@@ -9,10 +9,7 @@ import {
   ItemTitle,
 } from "@/components/ui/item"
 
-export type View = Array<{ 
-    a: string, 
-    b: string 
-}>;
+import { type View } from '../header'
 
 export type ViewProps = {
     list: View,

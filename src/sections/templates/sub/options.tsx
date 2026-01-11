@@ -31,7 +31,7 @@ var scenarioFlip = [
   {frontend: 'Baseline', data: 'historical'},
   {frontend: 'Hot House', data: 'Hot House'} 
 ];
-var test = 1;
+
 export const Options = ({
     factor,
     title,

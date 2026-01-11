@@ -241,7 +241,7 @@ type CountryString = {
 };
 
 type ComboBoxProps = {
-  loadGeoJson(value: CountryString): Promise<void>; 
+  loadGeoJson(value: CountryString): Promise<void>
 }
 
 export const ComboBox = ({ loadGeoJson}: ComboBoxProps) => {

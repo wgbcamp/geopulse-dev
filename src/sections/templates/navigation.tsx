@@ -17,11 +17,7 @@ import {
 
 import { SquareMenuIcon } from '../../components/icons/lucide-square-menu';
 
-
-export type Menu = Array<{ 
-    a: string, 
-    b: React.ReactElement 
-}>;
+import { type Menu } from '../header';
 
 type NavigationProps = {
     menu: Menu

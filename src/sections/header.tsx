@@ -1,8 +1,8 @@
 import React from "react"
 import { useState } from 'react'
 
-import { Navigation, type Menu } from './templates/navigation';
-import { Views, type View } from './templates/views';
+import { Navigation } from './templates/navigation';
+import { Views } from './templates/views';
 import { Container } from './templates/container';
 import { Options } from './templates/sub/options';
 import { Timeline } from './templates/sub/timeline';
@@ -24,23 +24,29 @@ type HeaderProps = {
     setScenario: React.Dispatch<React.SetStateAction<string>>
 };
 
-// type HeaderProps = {
-//     dimension: Dimension
-// }
+export type Menu = Array<{ 
+    a: string, 
+    b: React.ReactElement 
+}>;
 
-export const Header = ({ currentDimension, currentTime, currentView, currentScenario, setDimension, setTime, setView, setScenario }: HeaderProps) => {
+export type View = Array<{ 
+    a: string, 
+    b: string 
+}>;
 
-  type Factor = Array<string>;
+type Factor = Array<string>;
 
-  let hazards: Factor = ["Heat Stress", "Urban Heatwave", "Riverine Flooding", "Coastal Flooding", "Drought", "Sea Level"];
-  let exposures: Factor = ["Buildings", "Cropland", "GDP", "Urban GDP", "Population"];
-  let scenarios: Factor = ["historical", "rcp4p5", "rcp8p5", "Hot House"];
-  let spatialDimensions: Factor = ["2D", "3D"];
+let hazards: Factor = ["Heat Stress", "Urban Heatwave", "Riverine Flooding", "Coastal Flooding", "Drought", "Sea Level"];
+let exposures: Factor = ["Buildings", "Cropland", "GDP", "Urban GDP", "Population"];
+let scenarios: Factor = ["historical", "rcp4p5", "rcp8p5", "Hot House"];
+let spatialDimensions: Factor = ["2D", "3D"];
 
-  type HeaderTypes = Array<{
+type HeaderTypes = Array<{
     title: string,
     factor: string[]
-  }>
+}>
+
+export const Header = ({ currentDimension, currentTime, currentView, currentScenario, setDimension, setTime, setView, setScenario }: HeaderProps) => {
 
   const headerOptions: HeaderTypes = [
     { title: "Hazards", factor: hazards },

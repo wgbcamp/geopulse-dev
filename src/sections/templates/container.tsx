@@ -9,10 +9,6 @@ import {
   ItemTitle,
 } from "@/components/ui/item"
 
-// export type Title = string;
-
-// export type Element = React.ReactElement;
-
 type ContainerProps = {
     title: string,
     element: React.ReactElement,
