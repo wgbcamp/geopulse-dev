@@ -73,7 +73,7 @@ export const Header = ({ currentDimension, currentTime, currentView, currentScen
   const [headerState, setHeader] = useState(true);
 
     return (
-        <div className={`${headerState == true ? 'h-38' : 'h-88'} z-2 w-full select-none overflow-y-hidden flex flex-row absolute items-start gap-x-5 bg-white border-b pt-8`} onMouseEnter={() => setHeader(false)} onMouseLeave={() => setHeader(true)}>
+        <div className={`${headerState == true ? 'h-38' : 'h-88'} z-2 w-98/100 select-none overflow-y-hidden flex flex-row absolute items-start gap-x-5 bg-white border-b pt-8`} onMouseEnter={() => setHeader(false)} onMouseLeave={() => setHeader(true)}>
             <Navigation menu={additionalInfo} />
             <Container
                 title={"Views"}

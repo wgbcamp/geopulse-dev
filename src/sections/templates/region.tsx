@@ -321,7 +321,7 @@ export const Region = ({
                         chart: {
                             map: country[position],
                             backgroundColor: '#1E1E1E',
-                            animation: false
+                            animation: false,
                         },
                         mapView: {
                             projection: {
@@ -374,6 +374,49 @@ export const Region = ({
                         },
                         credits: {
                             enabled: false
+                        },
+                        plotOptions: {
+                            series: {
+                                point: {
+                                    events: {
+                                        click: function () {
+                                            var tempGadm1 = 
+                                                [
+                                                    { data: [0, 0, 0, 0], name: "Orderly trajectory" },
+                                                    { data: [0, 0, 0, 0], name: "Disorderly trajectory" }
+                                                ];
+                                            exposureState[position].forEach((element) => {
+                                                if (this.NAME_1 === element[0]) {
+                                                   lineChartOrder.forEach((index) => {
+                                                       if (element[2] === index.period) {
+                                                            scenarioModel.forEach((item) => {
+                                                                if (element[3] === item.scenario) {
+                                                                    tempGadm1.forEach((i) => {
+                                                                        if (item.name === i.name) {
+                                                                            i.data[index.position] += element[1]
+                                                                        }
+                                                                    })
+                                                                }
+                                                            })
+                                                       }
+                                                   })
+                                                }
+                                            })
+                                            // console.log(exposureState[position]);
+                                            console.log(tempGadm1);
+                                            const loadSubnationalArea = (position: number) => {
+                                                setAreaSeries(prev => {
+                                                    const next = [...prev];
+                                                    next[position] = tempGadm1;
+                                                    return next;
+                                                });
+                                                console.log(areaSeries);
+                                            }
+                                            loadSubnationalArea(position);
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }}
                 >

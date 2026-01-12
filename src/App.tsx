@@ -57,7 +57,8 @@ function App() {
     }
   ]);
 
-  const [exposureState, setExposureState] = React.useState<Series>([[],[]]);
+ 
+  const [exposureState, setExposureState] = React.useState<Series>([[],[]]);  //8
   const [series, setSeries] = React.useState<Series>([[],[]]);
   const [maxValue, setMaxValue] = React.useState<Maximum>([0, 0]);
 
