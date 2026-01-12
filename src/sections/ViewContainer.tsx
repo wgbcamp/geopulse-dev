@@ -63,13 +63,18 @@ export const ViewContainer = ({ currentTime, currentDimension }: MapProps) => {
 
             view.current.ui.components = [];
 
-            view.current.when(() => {
-                if (currentDimension === "2D") {
-                    view.current.constraints.geometry = view.current.extent.clone();
-                    view.current.constraints.minScale = view.scale;
-                }
 
-            })
+            reactiveUtils.watch(() =>
+                [view.current.interacting, view.current.viewpoint],
+                ([interacting, viewpoint]) => {
+                    if (interacting) {
+                    }
+                    if (viewpoint) {
+                        setPosition(viewpoint);
+                    }
+                }
+            )
+
         }
         return () => {
             view.current.destroy();
