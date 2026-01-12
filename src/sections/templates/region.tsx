@@ -402,7 +402,7 @@ export const Region = ({
                             layout: 'vertical',
                             symbolWidth: 1,
                             symbolPadding: 15,
-                            itemMarginBottom: 3
+                            itemMarginBottom: 3,
                         },
                         tooltip: {
                             backgroundColor: "#212121",
@@ -453,6 +453,7 @@ export const Region = ({
                         }}
                     />
                     <YAxis
+                        title={{ text: "" }}
                         lineWidth={1}
                         gridLineWidth={0}
                         tickWidth={1}
