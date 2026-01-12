@@ -19,9 +19,13 @@ export type Series = SeriesTuple[][];
 
 export type Maximum = number[];
 
+export type RegionSeries = object[];
+
+export type AreaSeries = object[][];
+
 function App() {
 
-  const [currentView, setView] = useState("Grid");
+  const [currentView, setView] = useState("Compare");
   const [currentDimension, setDimension] = useState("2D");
   const [currentTime, setTime] = useState({ time: 1980, url: "https://tiles.arcgis.com/tiles/weJ1QsnbMYJlCHdG/arcgis/rest/services/riverine_flood_grid_people_historical_1980/VectorTileServer" });
   const [currentScenario, setScenario] = useState("rcp4p5");
@@ -57,6 +61,21 @@ function App() {
   const [series, setSeries] = React.useState<Series>([[],[]]);
   const [maxValue, setMaxValue] = React.useState<Maximum>([0, 0]);
 
+  const [regionExposure, setRegionExposure] = React.useState<RegionSeries>([{}]);
+
+  const [areaSeries, setAreaSeries] = React.useState<AreaSeries>(
+    [
+      [
+        { data: [0, 0, 0, 0], name: "Orderly trajectory" },
+        { data: [0, 0, 0, 0], name: "Disorderly trajectory" }
+      ],
+      [
+        { data: [0, 0, 0, 0], name: "Orderly trajectory" },
+        { data: [0, 0, 0, 0], name: "Disorderly trajectory" }
+      ],
+    ]
+  );
+
   return (
     <div className='h-full'>
       <Header
@@ -86,6 +105,10 @@ function App() {
           setExposureState={setExposureState}
           maxValue={maxValue}
           setMaxValue={setMaxValue}
+          regionExposure={regionExposure}
+          setRegionExposure={setRegionExposure}
+          areaSeries={areaSeries}
+          setAreaSeries={setAreaSeries}
         />
       }
 

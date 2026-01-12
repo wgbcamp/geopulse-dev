@@ -1,6 +1,12 @@
 import React from 'react';
 import { Region } from './templates/region';
-import { type JsonShape, type Series, type Maximum } from '../App'
+import { 
+    type JsonShape, 
+    type Series, 
+    type Maximum, 
+    type RegionSeries,
+    type AreaSeries
+} from '../App'
 
 export type Filters = {
     currentTime: {
@@ -17,25 +23,33 @@ export type Filters = {
     exposureState: Array<Array<[string, number, number, string]>>,
     setExposureState: React.Dispatch<React.SetStateAction<Array<Array<[string, number, number, string]>>>>,
     maxValue: Maximum,
-    setMaxValue: React.Dispatch<React.SetStateAction<Maximum>>
+    setMaxValue: React.Dispatch<React.SetStateAction<Maximum>>,
+    regionExposure: RegionSeries,
+    setRegionExposure: React.Dispatch<React.SetStateAction<RegionSeries>>,
+    areaSeries: AreaSeries,
+    setAreaSeries: React.Dispatch<React.SetStateAction<AreaSeries>>
 }
 
 const regionCount = [0, 1];
 
 export const Compare = ({
-    currentTime, 
-    currentScenario, 
-    country, 
-    setCountry, 
-    mapPolygon, 
-    series, 
-    setSeries, 
-    exposureState, 
+    currentTime,
+    currentScenario,
+    country,
+    setCountry,
+    mapPolygon,
+    series,
+    setSeries,
+    exposureState,
     setExposureState,
     maxValue,
-    setMaxValue
+    setMaxValue,
+    regionExposure,
+    setRegionExposure,
+    areaSeries,
+    setAreaSeries
 }: Filters) => {
-    return(
+    return (
         <div className="bg-[#1E1E1E] w-full h-full flex justify-center pt-[152px]">
             <div className=" w-9/10 h-full dark flex flex-row gap-x-5 pt-18">
                 {regionCount.map((i) =>
@@ -53,6 +67,10 @@ export const Compare = ({
                         setExposureState={setExposureState}
                         maxValue={maxValue}
                         setMaxValue={setMaxValue}
+                        regionExposure={regionExposure}
+                        setRegionExposure={setRegionExposure}
+                        areaSeries={areaSeries}
+                        setAreaSeries={setAreaSeries}
                     />
                 )}
             </div>

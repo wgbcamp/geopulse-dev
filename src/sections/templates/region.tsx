@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { ComboBox } from './sub/comboBox';
+import { type RegionSeries } from '../../App';
 
 import {
     Card,
@@ -18,6 +19,12 @@ import {
     Chart,
     Series,
     Title,
+    Subtitle,
+    YAxis,
+    XAxis,
+    Legend,
+    Credits,
+    Highcharts
 } from '@highcharts/react';
 import { useState } from 'react';
 import { type Filters } from '../compare'
@@ -44,18 +51,31 @@ export const Region = ({
     exposureState, 
     setExposureState,
     maxValue,
-    setMaxValue
+    setMaxValue,
+    regionExposure,
+    setRegionExposure,
+    areaSeries,
+    setAreaSeries
 }: Filters) => {
 
     var exposure: ExposureShape = [];
+    var gadm0exposure: RegionSeries = [];
+
+    Highcharts.setOptions({
+    chart: {
+        backgroundColor: 'transparent',
+        plotBackgroundColor: 'transparent',
+            style: {
+              color: '#ffffff',
+              fontFamily: 'Arial'
+            },
+
+    }
+});
 
     useEffect(() => {
             applyFilter();
     }, [exposureState, currentTime, currentScenario]);
-
-    // useEffect(() => {
-    //     console.log(series);
-    // }, [series]);
 
     var loadGeoJson = async (data: DataString) => {
         var temp = {
@@ -171,6 +191,17 @@ export const Region = ({
     }
 
     var tempMaxValue: number;
+    var tempGadm0 = [{data: [0,0,0,0], name: "Orderly trajectory"}, {data: [0,0,0,0], name: "Disorderly trajectory"}];
+    var lineChartOrder = [
+        {period: 1980, position: 0},
+        {period: 2030, position: 1},
+        {period: 2050, position: 2},
+        {period: 2080, position: 3}
+    ];
+    var scenarioModel = [
+        {scenario: 'rcp4p5', name: 'Orderly trajectory'},
+        {scenario: 'rcp8p5', name: 'Disorderly trajectory'}
+    ];
 
     const sumWeightedExposure = async (tableData: TableArray) => {
         tempMaxValue = 0;
@@ -209,10 +240,43 @@ export const Region = ({
                             tableData[a].features[b].attributes.scenario
                         ]);
                     }
+                    // organize only regional (gadm0) results
+                } else if (tableData[a].features[b].attributes.Admin_Filter === "gadm0") {
+                        // loop through scenario model
+                        scenarioModel.forEach((item) => {
+                            // reference matching scenario from scenarioModel object
+                            if (item.scenario === tableData[a].features[b].attributes.scenario) {
+                                // loop through temporary gadm0 array
+                                tempGadm0.forEach((element) => {
+                                    // reference matching name from temporary gadm0 array
+                                    if (element.name === item.name) {
+                                        // loop through lineChartOrder object
+                                        lineChartOrder.forEach((index) => {
+                                            // reference matching period from lineChartOrder object
+                                            if (index.period === tableData[a].features[b].attributes.period) {
+                                                // add values to temporary gadm0 array
+                                                element.data[index.position] += tableData[a].features[b].attributes.wExposed;
+                                            }
+                                        })
+                                    }
+                                })
+                            }
+                        });
                 }
             }
         }
+        console.log(tempGadm0);
         console.log(exposure);
+
+        const updateAreaValues = (position: number) => {
+            setAreaSeries(prev => {
+                const next = [...prev];
+                next[position] = tempGadm0;
+                return next;
+            });
+                console.log(areaSeries);
+        }
+        updateAreaValues(position);
 
         const updateMaxValue = (position: number) => {
             setMaxValue(prev => {
@@ -249,8 +313,9 @@ export const Region = ({
     }
 
     return (
-        <Card className="bg-[#1E1E1E] w-full h-7/10 dark flex items-center shadow-md">
-            <ComboBox loadGeoJson={loadGeoJson} />                
+        <Card className="bg-[#1E1E1E] w-full h-9/10 overflow-y-auto overflow-x-hidden dark flex items-center shadow-md">
+            <ComboBox loadGeoJson={loadGeoJson} />
+            <div className='flex flex-col '>
                 <MapsChart
                     options={{
                         chart: {
@@ -318,6 +383,115 @@ export const Region = ({
                         keys={['NAME_1', 'value']}
                     />
                 </MapsChart>
+                <Chart
+                    options={{
+                        legend: {
+                            itemStyle: {
+                                color: '#ffffff',
+                                fontWeight: "700",
+                            },
+                            itemHoverStyle: {
+                                fontWeight: "900",
+                                color: '#ffffff'
+                            },
+                            align: 'left',
+                            verticalAlign: 'top',
+                            x: 100,
+                            y: -15,
+                            floating: true,
+                            layout: 'vertical',
+                            symbolWidth: 1,
+                            symbolPadding: 15,
+                            itemMarginBottom: 3
+                        },
+                        tooltip: {
+                            backgroundColor: "#212121",
+                            style: {
+                                color: "white"
+                            },
+                            valueDecimals: 0,
+                        },
+                        colors: [
+                            { 
+                                linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
+                                stops: [[0, '#FF9500'], [1, '#FF950000']]
+                            },
+                            { 
+                                linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
+                                stops: [[0, '#0098FF'], [1, '#0098FF00']]
+                            }
+                        ],
+                        series: [
+             
+                        ],
+                        plotOptions: {
+                            series: {
+                                lineWidth: 3.5,
+                            },
+                            area: {
+                                marker: {
+                                    lineWidth: 2,
+                                    lineColor: 'white',
+                                },
+                                
+                            }
+                        }
+                    }}
+                >
+                    <Credits enabled={false}/>
+                    <XAxis 
+                        categories={["1980", "2030", "2050", "2080"]}
+                        tickmarkPlacement={'on'}
+                        lineWidth={1}
+                        lineColor={'#555555'}
+                        startOnTick={false}
+                        labels={{
+                            style: {
+                                color: '#ffffff',
+                                fontSize: '14px'
+                            }
+                        }}
+                    />
+                    <YAxis
+                        lineWidth={1}
+                        gridLineWidth={0}
+                        tickWidth={1}
+                        tickPosition={'inside'}
+                        tickLength={5}
+                        lineColor={'#555555'}
+                        tickColor={'#555555'}
+                        labels={{
+                            reserveSpace: true,
+                            style: {
+                                color: '#ffffff',
+                                fontSize: '14px'
+                            },
+                            formatter: function () {
+                                if (this.value >= 1000000) {
+                                    return this.value / 1000000 + 'M';
+                                } else if (this.value < 1000000 && this.value >= 1000) {
+                                    return this.value / 1000 + 'k';
+                                } else {
+                                    return this.value;
+                                }
+                            }
+                        }}
+                    />
+
+                    {country[position].name === "string" ? null : areaSeries.map((i, index) =>
+                        <Series
+                            type="area"
+                            name={areaSeries[position][index].name}
+                            data={areaSeries[position][index].data}
+                            marker={{
+                                radius: 6,
+                                lineWidth: 2,
+                                lineColor: 'white',
+                            }}
+                        />
+                    )}
+                </Chart>
+            </div> 
         </Card>
     )
 }
