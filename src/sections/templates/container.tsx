@@ -17,7 +17,7 @@ type ContainerProps = {
 
 export const Container = ({title, element, headerState}: ContainerProps) => {
     return (
-        <Item variant='outline' className={`${headerState == false ? 'h-70' : 'h-24'} shadow-sm`}>
+        <Item variant='outline' className={`${headerState == false ? 'h-80' : 'h-24'} shadow-sm`}>
             <ItemContent className='h-full'>
                 <ItemTitle className='pb-1'>
                     <div className='font-extrabold'>{title}</div>

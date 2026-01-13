@@ -21,8 +21,16 @@ type HeaderProps = {
     currentView: string,
     setView: React.Dispatch<React.SetStateAction<string>>
     currentScenario: string,
-    setScenario: React.Dispatch<React.SetStateAction<string>>
+    setScenario: React.Dispatch<React.SetStateAction<string>>,
+    currentHazard: string,
+    setHazard: React.Dispatch<React.SetStateAction<string>>,
+    currentExposure: string,
+    setExposure: React.Dispatch<React.SetStateAction<string>>,
+    currentExposureFilter: string,
+    setExposureFilter: React.Dispatch<React.SetStateAction<string>>
 };
+
+
 
 export type Menu = Array<{ 
     a: string, 
@@ -36,23 +44,32 @@ export type View = Array<{
 
 type Factor = Array<string>;
 
-let hazards: Factor = ["Heat Stress", "Urban Heatwave", "Riverine Flooding", "Coastal Flooding", "Drought", "Sea Level"];
+let hazards: Factor = ["Temperature Extremes", "Urban Heatwave", "Riverine Flooding", "Coastal Flooding", "Drought", "Draught", "Sea Level"];
 let exposures: Factor = ["Buildings", "Cropland", "GDP", "Urban GDP", "Population"];
 let scenarios: Factor = ["historical", "rcp4p5", "rcp8p5", "Hot House"];
 let spatialDimensions: Factor = ["2D", "3D"];
+let subExposures: Factor = ["Dry Days", "SPEI Index", "Hot Days", "Tropical Nights", "Icing Days" ];
+let inequalitySymbols = [
+    {category: "Hot Days", symbols: ["> 30*", "> 35*", "> 40*"]},
+    {category: "Tropical Nights", symbols: ["> 20*", "> 26", "> 32"]},
+    {category: "Hot Days", symbols: ["> 30", "> 35", "> 40"]}
+];
 
 type HeaderTypes = Array<{
     title: string,
     factor: string[]
 }>
 
-export const Header = ({ currentDimension, currentTime, currentView, currentScenario, setDimension, setTime, setView, setScenario }: HeaderProps) => {
+export const Header = ({ currentDimension, currentTime, currentView, currentScenario, currentHazard, currentExposure, currentExposureFilter,
+    setExposure, setHazard, setDimension, setTime, setView, setScenario, setExposureFilter 
+}: HeaderProps) => {
 
   const headerOptions: HeaderTypes = [
     { title: "Hazards", factor: hazards },
     { title: "Exposures", factor: exposures },
     { title: "Scenarios", factor: scenarios },
-    { title: "Spatial Dimensions", factor: spatialDimensions }
+    { title: "Spatial Dimensions", factor: spatialDimensions },
+    { title: "Exposure Filter", factor: subExposures},
   ];
 
   const approaches: View = [
@@ -67,13 +84,11 @@ export const Header = ({ currentDimension, currentTime, currentView, currentScen
     { a: "About", b: <InfoIcon /> }
   ];
 
-  const [currentHazard, setHazard] = useState("Riverine Flooding");
-  const [currentExposure, setExposure] = useState("Population");
   const [hovering, setHovering] = useState("");
   const [headerState, setHeader] = useState(true);
 
     return (
-        <div className={`${headerState == true ? 'h-38' : 'h-88'} z-2 w-98/100 select-none overflow-y-hidden flex flex-row absolute items-start gap-x-5 bg-white border-b pt-8`} onMouseEnter={() => setHeader(false)} onMouseLeave={() => setHeader(true)}>
+        <div className={`${headerState == true ? 'h-38' : 'h-95'} z-2 w-98/100 select-none overflow-y-hidden flex flex-row absolute items-start gap-x-5 bg-white border-b pt-8`} onMouseEnter={() => setHeader(false)} onMouseLeave={() => setHeader(true)}>
             <Navigation menu={additionalInfo} />
             <Container
                 title={"Views"}
@@ -101,12 +116,14 @@ export const Header = ({ currentDimension, currentTime, currentView, currentScen
                             currentHazard={currentHazard}
                             currentExposure={currentExposure}
                             currentDimension={currentDimension}
+                            currentExposureFilter={currentExposureFilter}
                             hovering={hovering}
                             setHazard={setHazard}
                             setExposure={setExposure}
                             setScenario={setScenario}
                             setHovering={setHovering}
                             setDimension={setDimension}
+                            setExposureFilter={setExposureFilter}
                         />}
                     headerState={headerState}
                     key={x.title}

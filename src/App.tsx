@@ -29,6 +29,9 @@ function App() {
   const [currentDimension, setDimension] = useState("2D");
   const [currentTime, setTime] = useState({ time: 1980, url: "https://tiles.arcgis.com/tiles/weJ1QsnbMYJlCHdG/arcgis/rest/services/riverine_flood_grid_people_historical_1980/VectorTileServer" });
   const [currentScenario, setScenario] = useState("rcp4p5");
+  const [currentHazard, setHazard] = useState("Riverine Flooding");
+  const [currentExposure, setExposure] = useState("Population");
+  const [currentExposureFilter, setExposureFilter] = useState("Dry Days");
 
   let [geoJson, setGeoJson] = React.useState<JsonShape | any>(null)
 
@@ -88,6 +91,12 @@ function App() {
         setView={setView}
         currentScenario={currentScenario}
         setScenario={setScenario}
+        currentHazard={currentHazard}
+        setHazard={setHazard}
+        currentExposure={currentExposure}
+        setExposure={setExposure}
+        currentExposureFilter={currentExposureFilter}
+        setExposureFilter={setExposureFilter}
       />
       {currentView == "Grid"
         ?
@@ -110,6 +119,10 @@ function App() {
           setRegionExposure={setRegionExposure}
           areaSeries={areaSeries}
           setAreaSeries={setAreaSeries}
+          currentExposure={currentExposure}
+          setExposure={setExposure}
+          currentHazard={currentHazard}
+          setHazard={setHazard}
         />
       }
 

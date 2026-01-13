@@ -27,7 +27,11 @@ export type Filters = {
     regionExposure: RegionSeries,
     setRegionExposure: React.Dispatch<React.SetStateAction<RegionSeries>>,
     areaSeries: AreaSeries,
-    setAreaSeries: React.Dispatch<React.SetStateAction<AreaSeries>>
+    setAreaSeries: React.Dispatch<React.SetStateAction<AreaSeries>>,
+    currentExposure: string
+    setExposure: React.Dispatch<React.SetStateAction<string>>,
+    currentHazard: string,
+    setHazard: React.Dispatch<React.SetStateAction<string>>
 }
 
 const regionCount = [0, 1];
@@ -47,7 +51,11 @@ export const Compare = ({
     regionExposure,
     setRegionExposure,
     areaSeries,
-    setAreaSeries
+    setAreaSeries,
+    currentExposure,
+    setExposure,
+    currentHazard,
+    setHazard
 }: Filters) => {
     return (
         <div className="bg-[#1E1E1E] w-full h-full flex justify-center pt-[152px]">
@@ -71,6 +79,10 @@ export const Compare = ({
                         setRegionExposure={setRegionExposure}
                         areaSeries={areaSeries}
                         setAreaSeries={setAreaSeries}
+                        currentExposure={currentExposure}
+                        setExposure={setExposure}
+                        currentHazard={currentHazard}
+                        setHazard={setHazard}
                     />
                 )}
             </div>

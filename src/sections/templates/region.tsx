@@ -52,10 +52,14 @@ export const Region = ({
     setExposureState,
     maxValue,
     setMaxValue,
-    regionExposure,
-    setRegionExposure,
+    // regionExposure,
+    // setRegionExposure,
     areaSeries,
-    setAreaSeries
+    setAreaSeries,
+    currentExposure,
+    setExposure,
+    currentHazard,
+    setHazard
 }: Filters) => {
 
     var exposure: ExposureShape = [];
@@ -69,7 +73,6 @@ export const Region = ({
               color: '#ffffff',
               fontFamily: 'Arial'
             },
-
     }
 });
 
@@ -116,6 +119,7 @@ export const Region = ({
         features: Array<{
             attributes: {
                 NAME_1: string,
+                Reference_area: string,
                 wExposed: number,
                 period: number,
                 scenario: string,
@@ -128,13 +132,28 @@ export const Region = ({
 
         const whereClause = `Admin_Filter IN ('gadm0', 'gadm1') AND country_abr IN ('${countryData.iso3}')`;
         var queryString = `where=${encodeURIComponent(whereClause)}`;
+        
+        const urlObject = [
+            { hazard: "Riverine Flooding", exposure: "Population", url: `https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/Floods_riverine_people_all/FeatureServer/0/query?${queryString}` },
+            { hazard: "Draught", exposure: "Cropland", url: `https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/oecd_draught_cropland_pivoted/FeatureServer/0/query?${queryString}` },
+            { hazard: "Temperature Extremes", exposure: "Population", url: `https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/oecd_temperatures_pivoted/FeatureServer/0/query?${queryString}` },
+            { hazard: "Temperature Extremes", exposure: "Livestock", url: `https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/oecd_temperatures_pivoted/FeatureServer/0/query?${queryString}` }
+        ];
+
+        let url = "";
+
+        urlObject.forEach((item) => {
+            if (item.hazard === currentHazard && item.exposure === currentExposure) {
+                url = item.url;
+            }
+        });
 
         const parameters = new URLSearchParams({
             returnIdsOnly: 'true',
             cacheHint: 'true',
             f: 'json'
         });
-        const url = `https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/Floods_riverine_people_all/FeatureServer/0/query?${queryString}`;
+
         const result = await fetch(url, {
             method: 'POST',
             headers: {
@@ -223,7 +242,7 @@ export const Region = ({
                     for (var c = 0; c < exposure.length; c++) {
 
                         // add to existing NAME_1 entries
-                        if (exposure[c][0] === tableData[a].features[b].attributes.NAME_1 
+                        if ((exposure[c][0] === tableData[a].features[b].attributes.NAME_1 || exposure[c][0] === tableData[a].features[b].attributes.Reference_area)
                             && exposure[c][2] === tableData[a].features[b].attributes.period
                             && exposure[c][3] === tableData[a].features[b].attributes.scenario) {
                             existence = true;
@@ -234,7 +253,7 @@ export const Region = ({
                     // if no existing NAME_1 was found earlier, push new NAME_1 entries
                     if (existence == false) {
                         exposure.push([
-                            tableData[a].features[b].attributes.NAME_1,
+                            (tableData[a].features[b].attributes.NAME_1 || tableData[a].features[b].attributes.Reference_area),
                             tableData[a].features[b].attributes.wExposed,
                             tableData[a].features[b].attributes.period,
                             tableData[a].features[b].attributes.scenario
