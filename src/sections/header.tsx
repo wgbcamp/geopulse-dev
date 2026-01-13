@@ -6,6 +6,7 @@ import { Views } from './templates/views';
 import { Container } from './templates/container';
 import { Options } from './templates/sub/options';
 import { Timeline } from './templates/sub/timeline';
+import { InequalityGroup } from "./templates/sub/inequalityGroup";
 
 import { LineSquiggleIcon } from '../components/icons/lucide-line-squiggle';
 import { DatabaseIcon } from '../components/icons/lucide-database';
@@ -48,11 +49,10 @@ let hazards: Factor = ["Temperature Extremes", "Urban Heatwave", "Riverine Flood
 let exposures: Factor = ["Buildings", "Cropland", "GDP", "Urban GDP", "Population"];
 let scenarios: Factor = ["historical", "rcp4p5", "rcp8p5", "Hot House"];
 let spatialDimensions: Factor = ["2D", "3D"];
-let subExposures: Factor = ["Dry Days", "SPEI Index", "Hot Days", "Tropical Nights", "Icing Days" ];
+let subExposures: Factor = ["Hot Days", "Dry Days", "SPEI Index", "Tropical Nights", "Icing Days" ];
 let inequalitySymbols = [
-    {category: "Hot Days", symbols: ["> 30*", "> 35*", "> 40*"]},
-    {category: "Tropical Nights", symbols: ["> 20*", "> 26", "> 32"]},
-    {category: "Hot Days", symbols: ["> 30", "> 35", "> 40"]}
+    {category: "Hot Days", symbols: ["30*", "35*", "40*"]},
+    {category: "Tropical Nights", symbols: ["20*", "26", "32"]}
 ];
 
 type HeaderTypes = Array<{
@@ -137,6 +137,18 @@ export const Header = ({ currentDimension, currentTime, currentView, currentScen
                         headerState={headerState}
                         setTime={setTime} 
                     />}
+                headerState={headerState}
+            />
+            <Container
+                title={"Day Comparisons"}
+                element={
+                    <InequalityGroup
+                        currentExposureFilter={currentExposureFilter}
+                        setExposureFilter={setExposureFilter}
+                        inequalitySymbols={inequalitySymbols}
+                        headerState={headerState}
+                    />
+                }
                 headerState={headerState}
             />
             <div style={{ height: '96px' }} className='flex items-center justify-center'>

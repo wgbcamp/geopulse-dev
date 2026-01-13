@@ -371,6 +371,7 @@ export const Region = ({
                                 }
                             },
                             width: '90%',
+                            
                         },
                         tooltip: {
                             formatter: function () {
