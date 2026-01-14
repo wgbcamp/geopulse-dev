@@ -241,10 +241,12 @@ type CountryString = {
 };
 
 type ComboBoxProps = {
-  loadGeoJson(value: CountryString): Promise<void>
+  loadGeoJson(value: CountryString): Promise<void>,
+  country: [object, object],
+  position: number
 }
 
-export const ComboBox = ({ loadGeoJson}: ComboBoxProps) => {
+export const ComboBox = ({ loadGeoJson, country, position }: ComboBoxProps) => {
 
     const [open, setOpen] = React.useState(false);
     const [value, setValue] = useState("");
@@ -259,7 +261,7 @@ export const ComboBox = ({ loadGeoJson}: ComboBoxProps) => {
                     aria-expanded={open}
                     className="w-[200px] justify-between dark"
                 >
-                {value ? isoCountries.find((country) => country.name === value)?.name : "Select country..."} 
+                {value ? isoCountries.find((country) => country.name === value)?.name : country[position].name as string === "string" ? "Select country..." : country[position].name } 
                 <ChevronsUpDown className="opacity-50" />
                 </Button>
             </PopoverTrigger>

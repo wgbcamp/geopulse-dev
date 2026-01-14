@@ -136,6 +136,8 @@ export const Header = ({ currentDimension, currentTime, currentView, currentScen
                         currentTime={currentTime}
                         headerState={headerState}
                         setTime={setTime} 
+                        currentHazard={currentHazard}
+                        currentExposure={currentExposure}
                     />}
                 headerState={headerState}
             />

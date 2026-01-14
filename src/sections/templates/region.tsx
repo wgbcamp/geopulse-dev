@@ -123,30 +123,60 @@ export const Region = ({
                 wExposed: number,
                 period: number,
                 scenario: string,
-                Admin_Filter: string
+                Admin_Filter: string,
+                [key: string]: string | number;
             }
         }>
     }>;
 
     async function test(countryData: CountryData) {
 
-        const whereClause = `Admin_Filter IN ('gadm0', 'gadm1') AND country_abr IN ('${countryData.iso3}')`;
+        var isoFix = "ISO3";
+        var adminFix = "ADMIN_FILTER";
+        var gadm0Fix = "adm0";
+        var gadm1Fix = "adm1";
+
+        if (currentHazard === "Riverine Flooding" && currentExposure === "Population") {
+            isoFix = "country_abr";
+            var adminFix = "Admin_Filter";
+            var gadm0Fix = "gadm0";
+            var gadm1Fix = "gadm1";
+        }
+
+        const whereClause = `${adminFix} IN ('${gadm0Fix}', '${gadm1Fix}') AND ${isoFix} IN ('${countryData.iso3}')`;
         var queryString = `where=${encodeURIComponent(whereClause)}`;
         
         const urlObject = [
-            { hazard: "Riverine Flooding", exposure: "Population", url: `https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/Floods_riverine_people_all/FeatureServer/0/query?${queryString}` },
-            { hazard: "Draught", exposure: "Cropland", url: `https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/oecd_draught_cropland_pivoted/FeatureServer/0/query?${queryString}` },
-            { hazard: "Temperature Extremes", exposure: "Population", url: `https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/oecd_temperatures_pivoted/FeatureServer/0/query?${queryString}` },
-            { hazard: "Temperature Extremes", exposure: "Livestock", url: `https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/oecd_temperatures_pivoted/FeatureServer/0/query?${queryString}` }
+            { hazard: "Riverine Flooding", exposure: "Population", 
+                url: `https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/Floods_riverine_people_all/FeatureServer/0/query?${queryString}`,
+                outFields: 'Admin_Filter,wExposed,NAME_1,country_abr,period,scenario'
+            },
+            { hazard: "Draught", exposure: "Cropland", 
+                url: `https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/draught_cropland_table/FeatureServer/0/query?${queryString}`,
+                outFields: 'ADMIN_FILTER,MEASURE,REF_AREA_NAME,ISO3,TIME_PERIOD,CLIMATE_SCENARIO'
+            },
+            { hazard: "Temperature Extremes", exposure: "Population",
+                url: `https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/temperature_population_table/FeatureServer/0/query?${queryString}`,
+                outFields: 'ADMIN_FILTER,MEASURE,REF_AREA_NAME,ISO3,TIME_PERIOD,CLIMATE_SCENARIO'
+                },
+            { hazard: "Temperature Extremes", exposure: "Livestock", 
+                url: `https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/temperature_livestock_table/FeatureServer/0/query?${queryString}`, 
+                outFields: 'ADMIN_FILTER,MEASURE,REF_AREA_NAME,ISO3,TIME_PERIOD,CLIMATE_SCENARIO'
+            }
         ];
 
         let url = "";
+        let outFields = "";
 
         urlObject.forEach((item) => {
             if (item.hazard === currentHazard && item.exposure === currentExposure) {
                 url = item.url;
+                outFields = item.outFields;
             }
         });
+
+        console.log(queryString);
+        console.log(url);
 
         const parameters = new URLSearchParams({
             returnIdsOnly: 'true',
@@ -162,6 +192,7 @@ export const Region = ({
             body: parameters
         });
         var x = await result.json();
+        console.log(x);
         var y = x.objectIds.filter((value: ObjectID) => value);
         console.log(y);
         console.log(y.join(","));
@@ -179,12 +210,12 @@ export const Region = ({
 
             const params = new URLSearchParams({
                 objectIds: y.slice(start, end).join(","),
-                outFields: 'Admin_Filter,period,scenario,country_abr,wExposed,NAME_1',
+                outFields: outFields,
                 f: 'json',
                 maxRecordCountFactor: '5'
             });
 
-            fetch('https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/Floods_riverine_people_all/FeatureServer/0/query', {
+            fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
@@ -219,52 +250,57 @@ export const Region = ({
     ];
     var scenarioModel = [
         {scenario: 'rcp4p5', name: 'Orderly trajectory'},
-        {scenario: 'rcp8p5', name: 'Disorderly trajectory'}
+        {scenario: 'rcp8p5', name: 'Disorderly trajectory'},
+        {scenario: 'SSP126', name: 'Orderly trajectory'},
+        {scenario: 'SSP245', name: 'Disorderly trajectory'},
+        {scenario: 'SSP370', name: 'Hot House'},  
     ];
 
     const sumWeightedExposure = async (tableData: TableArray) => {
         tempMaxValue = 0;
         console.log(tableData);
-        for (var a = 0; a < tableData.length; a++) {
-            for (var b = 0; b < tableData[a].features.length; b++) {
 
-                // filter out regional (gadm0) results, only including gadm1
-                if (tableData[a].features[b].attributes.Admin_Filter === "gadm1") {
-
-                    // set max value for color axis in highcharts
-                    if (tempMaxValue < tableData[a].features[b].attributes.wExposed) {
-                        tempMaxValue = tableData[a].features[b].attributes.wExposed;
-                    }
-                    // set check for the length of the exposure array
-                    var existence = false;
-
-                    // loop through exposure array 
-                    for (var c = 0; c < exposure.length; c++) {
-
-                        // add to existing NAME_1 entries
-                        if ((exposure[c][0] === tableData[a].features[b].attributes.NAME_1 || exposure[c][0] === tableData[a].features[b].attributes.Reference_area)
-                            && exposure[c][2] === tableData[a].features[b].attributes.period
-                            && exposure[c][3] === tableData[a].features[b].attributes.scenario) {
-                            existence = true;
-                            exposure[c][1] += tableData[a].features[b].attributes.wExposed;
-                            break;
+        // loop through tableData
+        tableData.forEach((parent) => {
+            // loop through each feature property
+            parent.features.forEach((entry) => {
+                // find attributes keys
+                var a = Object.keys(entry.attributes);
+                    // execute code if gadm1 is found
+                    if (entry.attributes[a[0]] === "gadm1" || entry.attributes[a[0]] === "adm1") {
+                        // update tempMaxValue for colorAxis range
+                        if (entry.attributes[a[1]] as number > tempMaxValue) {
+                            tempMaxValue = entry.attributes[a[1]] as number;
                         }
-                    }
-                    // if no existing NAME_1 was found earlier, push new NAME_1 entries
-                    if (existence == false) {
-                        exposure.push([
-                            (tableData[a].features[b].attributes.NAME_1 || tableData[a].features[b].attributes.Reference_area),
-                            tableData[a].features[b].attributes.wExposed,
-                            tableData[a].features[b].attributes.period,
-                            tableData[a].features[b].attributes.scenario
-                        ]);
-                    }
-                    // organize only regional (gadm0) results
-                } else if (tableData[a].features[b].attributes.Admin_Filter === "gadm0") {
+                        var b = false;
+                        if (exposure.length > 0) {
+                            // loop through exposure array
+                            exposure.forEach((exposureElement) => {
+                                // if exposure measure value equals entry measure value, add value
+                                if (exposureElement[0] === entry.attributes[a[2]]
+                                    && exposureElement[2] === entry.attributes[a[4]]
+                                    && exposureElement[3] === entry.attributes[a[5]]
+                                ) {
+                                    exposureElement[1] += entry.attributes[a[1]] as number;
+                                    b = true;
+                                }
+                            })
+                        }
+                        // push entry array values into exposure array, if entry doesn't already exist
+                        if (b === false) {
+                            exposure.push([
+                                entry.attributes[a[2]] as string,
+                                entry.attributes[a[1]] as number,
+                                entry.attributes[a[4]] as number,
+                                entry.attributes[a[5]] as string
+                            ])
+                        }
+                    // filter down to gadm1 values
+                    } else if (entry.attributes[a[0]] === "gadm0" || entry.attributes[a[0]] === "adm0") {
                         // loop through scenario model
                         scenarioModel.forEach((item) => {
                             // reference matching scenario from scenarioModel object
-                            if (item.scenario === tableData[a].features[b].attributes.scenario) {
+                            if (item.scenario === entry.attributes[a[5]]) {
                                 // loop through temporary gadm0 array
                                 tempGadm0.forEach((element) => {
                                     // reference matching name from temporary gadm0 array
@@ -272,9 +308,9 @@ export const Region = ({
                                         // loop through lineChartOrder object
                                         lineChartOrder.forEach((index) => {
                                             // reference matching period from lineChartOrder object
-                                            if (index.period === tableData[a].features[b].attributes.period) {
+                                            if (index.period === entry.attributes[a[4]]) {
                                                 // add values to temporary gadm0 array
-                                                element.data[index.position] += tableData[a].features[b].attributes.wExposed;
+                                                element.data[index.position] += entry.attributes[a[1]] as number;
                                             }
                                         })
                                     }
@@ -282,10 +318,34 @@ export const Region = ({
                             }
                         });
                 }
+            })
+
+            
+        })
+
+ 
+     
+
+        console.log(exposure);
+
+        //replace exposure scenario values with the names that would be visualized
+        exposure.forEach((element) => {
+            switch (element[3]) {
+                case "SSP126":
+                    element.splice(3, 1, 'rcp4p5');
+                    break;
+                case "SSP245":
+                    element.splice(3, 1, 'rcp8p5');
+                    break;
+                case "SSP370":
+                    element.splice(3, 1, 'Hot House');
+                    break;
             }
-        }
+        });
+         
         console.log(tempGadm0);
         console.log(exposure);
+        console.log(tempMaxValue);
 
         const updateAreaValues = (position: number) => {
             setAreaSeries(prev => {
@@ -309,7 +369,10 @@ export const Region = ({
         const updateExposureValues = (position: number) => {
             setExposureState(prev => {
                 const next = [...prev];
+                        console.log(next);
                 next[position] = exposure;
+                console.log(next);
+                console.log(exposure);
                 return next;
             })
         }
@@ -321,10 +384,10 @@ export const Region = ({
         console.log(series);
 
         const updateSeriesValues = (position: number) => {
-            console.log(series);
             setSeries(prev => {
                 const next = [...prev];
                 next[position] = exposureState[position].filter((value) => (value[2] === currentTime.time)).filter((value) => (value[3] === currentScenario));
+                console.log(next);
                 return next;
             })
        }
@@ -333,7 +396,7 @@ export const Region = ({
 
     return (
         <Card className="bg-[#1E1E1E] w-full h-9/10 overflow-y-auto overflow-x-hidden dark flex items-center shadow-md">
-            <ComboBox loadGeoJson={loadGeoJson} />
+            <ComboBox loadGeoJson={loadGeoJson} country={country} position={position}/>
             <div className='flex flex-col '>
                 <MapsChart
                     options={{
