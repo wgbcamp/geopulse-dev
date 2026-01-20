@@ -46,7 +46,7 @@ export type View = Array<{
 type Factor = Array<string>;
 
 let hazards: Factor = ["Temperature Extremes", "Urban Heatwave", "Riverine Flooding", "Coastal Flooding", "Drought", "Draught", "Sea Level"];
-let exposures: Factor = ["Buildings", "Cropland", "GDP", "Urban GDP", "Population"];
+let exposures: Factor = ["Buildings", "Cropland", "GDP", "Urban GDP", "Population", "Livestock"];
 let scenarios: Factor = ["historical", "rcp4p5", "rcp8p5", "Hot House"];
 let spatialDimensions: Factor = ["2D", "3D"];
 let subExposures: Factor = ["Hot Days", "Dry Days", "SPEI Index", "Tropical Nights", "Icing Days" ];
@@ -124,6 +124,7 @@ export const Header = ({ currentDimension, currentTime, currentView, currentScen
                             setHovering={setHovering}
                             setDimension={setDimension}
                             setExposureFilter={setExposureFilter}
+                            currentView={currentView}
                         />}
                     headerState={headerState}
                     key={x.title}

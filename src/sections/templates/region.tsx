@@ -120,7 +120,7 @@ export const Region = ({
             attributes: {
                 NAME_1: string,
                 Reference_area: string,
-                wExposed: number,
+                MEDIAN: number,
                 period: number,
                 scenario: string,
                 Admin_Filter: string,
@@ -131,37 +131,29 @@ export const Region = ({
 
     async function test(countryData: CountryData) {
 
-        var isoFix = "ISO3";
-        var adminFix = "ADMIN_FILTER";
-        var gadm0Fix = "adm0";
-        var gadm1Fix = "adm1";
-
-        if (currentHazard === "Riverine Flooding" && currentExposure === "Population") {
-            isoFix = "country_abr";
-            var adminFix = "Admin_Filter";
-            var gadm0Fix = "gadm0";
-            var gadm1Fix = "gadm1";
-        }
-
-        const whereClause = `${adminFix} IN ('${gadm0Fix}', '${gadm1Fix}') AND ${isoFix} IN ('${countryData.iso3}')`;
+        const whereClause = `ADMIN_FILTER IN ('adm0', 'adm1') AND ISO3 IN ('${countryData.iso3}')`;
         var queryString = `where=${encodeURIComponent(whereClause)}`;
         
         const urlObject = [
-            { hazard: "Riverine Flooding", exposure: "Population", 
-                url: `https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/Floods_riverine_people_all/FeatureServer/0/query?${queryString}`,
-                outFields: 'Admin_Filter,wExposed,NAME_1,country_abr,period,scenario'
+            {
+                hazard: "Riverine Flooding",
+                exposure: "Population",
+                url: `https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/riverine_population_table/FeatureServer/0/query?${queryString}`,
             },
-            { hazard: "Draught", exposure: "Cropland", 
+            { 
+                hazard: "Draught", 
+                exposure: "Cropland", 
                 url: `https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/draught_cropland_table/FeatureServer/0/query?${queryString}`,
-                outFields: 'ADMIN_FILTER,MEASURE,REF_AREA_NAME,ISO3,TIME_PERIOD,CLIMATE_SCENARIO'
             },
-            { hazard: "Temperature Extremes", exposure: "Population",
+            { 
+                hazard: "Temperature Extremes", 
+                exposure: "Population",
                 url: `https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/temperature_population_table/FeatureServer/0/query?${queryString}`,
-                outFields: 'ADMIN_FILTER,MEASURE,REF_AREA_NAME,ISO3,TIME_PERIOD,CLIMATE_SCENARIO'
-                },
-            { hazard: "Temperature Extremes", exposure: "Livestock", 
+            },
+            { 
+                hazard: "Temperature Extremes", 
+                exposure: "Livestock", 
                 url: `https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/temperature_livestock_table/FeatureServer/0/query?${queryString}`, 
-                outFields: 'ADMIN_FILTER,MEASURE,REF_AREA_NAME,ISO3,TIME_PERIOD,CLIMATE_SCENARIO'
             }
         ];
 
@@ -171,7 +163,7 @@ export const Region = ({
         urlObject.forEach((item) => {
             if (item.hazard === currentHazard && item.exposure === currentExposure) {
                 url = item.url;
-                outFields = item.outFields;
+                outFields = 'ADMIN_FILTER,MEDIAN,REF_AREA_NAME,ISO3,TIME_PERIOD,CLIMATE_SCENARIO,MEASURE';
             }
         });
 
@@ -267,7 +259,7 @@ export const Region = ({
                 // find attributes keys
                 var a = Object.keys(entry.attributes);
                     // execute code if gadm1 is found
-                    if (entry.attributes[a[0]] === "gadm1" || entry.attributes[a[0]] === "adm1") {
+                    if (entry.attributes[a[0]] === "adm1") {
                         // update tempMaxValue for colorAxis range
                         if (entry.attributes[a[1]] as number > tempMaxValue) {
                             tempMaxValue = entry.attributes[a[1]] as number;
@@ -296,7 +288,7 @@ export const Region = ({
                             ])
                         }
                     // filter down to gadm1 values
-                    } else if (entry.attributes[a[0]] === "gadm0" || entry.attributes[a[0]] === "adm0") {
+                    } else if (entry.attributes[a[0]] === "adm0") {
                         // loop through scenario model
                         scenarioModel.forEach((item) => {
                             // reference matching scenario from scenarioModel object
