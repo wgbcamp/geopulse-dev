@@ -233,6 +233,7 @@ export const Region = ({
     }
 
     var tempMaxValue: number;
+    var tempPeriods: number[];
     var tempGadm0 = [{data: [0,0,0,0], name: "Orderly trajectory"}, {data: [0,0,0,0], name: "Disorderly trajectory"}];
     var lineChartOrder = [
         {period: 1980, position: 0},
@@ -250,6 +251,7 @@ export const Region = ({
 
     const sumWeightedExposure = async (tableData: TableArray) => {
         tempMaxValue = 0;
+        tempPeriods = [];
         console.log(tableData);
 
         // loop through tableData
@@ -309,6 +311,11 @@ export const Region = ({
                                 })
                             }
                         });
+                }
+                // gather the period values to be added to the timeline
+                if (tempPeriods.includes(entry.attributes[a[5]] as number)) {
+                    tempPeriods.push(entry.attributes[a[5]] as number);
+                    console.log(tempPeriods);
                 }
             })
 
