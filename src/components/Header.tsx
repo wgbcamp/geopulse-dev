@@ -40,6 +40,7 @@ import { isoCountries, countryByIso3 } from "@/config/isoCountries";
 
 
 import Hamburger from '../assets/Group 51.png'
+import Lockup from '../assets/lockup.svg'
 
 export const Header = () => {
 
@@ -58,6 +59,8 @@ export const Header = () => {
     const [eventFilterOpened, setEventFilterOpened] = useState<boolean>(false);
     const [countryFilterOpened, setCountryFilterOpened] = useState<boolean>(false);
     const [calendarOpened, setCalendarOpened] = useState<boolean>(false);
+    const [currentDatePreset, setCurrentDatePreset] = useState<string>("Last 3 months");
+    const [temporaryDate, setTemporaryDate] = useState<any>({ from: new Date(new Date().getFullYear(), new Date().getMonth() - 3, new Date().getDate()), to: (new Date) });
     const [hoverDate, setHoverDate] = useState<Date | undefined>(undefined);
     const handleOpenChange = (newOpenState: boolean) => {
         if (newOpenState) {
@@ -91,6 +94,45 @@ export const Header = () => {
         });
     }
 
+    const date = new Date();
+    const allData = new Date("2019-01-07");
+    const threeMonthsAgo = new Date(date.setMonth(date.getMonth() - 3));
+    const sixMonthsAgo = new Date(date.setMonth(date.getMonth() - 6));
+    const twelveMonthsAgo = new Date(date.setMonth(date.getMonth() - 12));
+
+    const datePresets = (value: string) => {
+        switch (value) {
+            case "All Data": 
+            setTemporaryDate({
+                from: allData,
+                to: (new Date)
+            });
+            setCurrentDatePreset("All Data");
+                break;
+            case "Last 3 months":
+                setTemporaryDate({
+                from: threeMonthsAgo,
+                to: (new Date)
+            })
+            setCurrentDatePreset("Last 3 months");
+                break;
+            case "Last 6 months":
+                setTemporaryDate({
+                from: sixMonthsAgo,
+                to: (new Date)
+            })
+            setCurrentDatePreset("Last 6 months");
+                break;
+            case "Last Year":
+                setTemporaryDate({
+                from: twelveMonthsAgo,
+                to: (new Date)
+            })
+            setCurrentDatePreset("Last Year");
+                break;
+        }
+    }
+
     const calendarComponent =
         <Card className={`rounded-none w-full h-22 xl:h-14.75 p-0 px-2 items-center justify-center shadow-none border-x-0 gap-0`}>
             <div className='w-full flex flex-col items-center'>
@@ -113,24 +155,30 @@ export const Header = () => {
                                     </g>
                                 </svg>
                             </div>
-                            
                         </div>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0 my-2.5 rounded-none flex flex-row">
+                    <PopoverContent className="w-auto p-0 my-2.5 rounded-none flex flex-col items-center">
+                        <div className="w-9/10 flex py-5 justify-evenly gap-2">
+                            <Button className={`font-bold ${currentDatePreset == "All Data" ? 'bg-(--primarygray-40) text-black hover:text-white' : 'bg-(--accentblue-100)'} cursor-pointer`} onClick={() => datePresets("All Data")}>All Data</Button>
+                            <Button className={`font-bold ${currentDatePreset == "Last 3 months" ? 'bg-(--primarygray-40) text-black hover:text-white' : 'bg-(--accentblue-100)'} cursor-pointer`} onClick={() => datePresets("Last 3 months")}>Last 3 months</Button>
+                            <Button className={`font-bold ${currentDatePreset == "Last 6 months" ? 'bg-(--primarygray-40) text-black hover:text-white' : 'bg-(--accentblue-100)'} cursor-pointer`} onClick={() => datePresets("Last 6 months")}>Last 6 months</Button>
+                            <Button className={`font-bold ${currentDatePreset == "Last Year" ? 'bg-(--primarygray-40) text-black hover:text-white' : 'bg-(--accentblue-100)'} cursor-pointer`} onClick={() => datePresets("Last Year")}>Last Year</Button>
+                        </div>
                         <Calendar
                             mode="range"
                             defaultMonth={state?.dateRange.from}
                             selected={
-                                state?.dateRange.from && !state?.dateRange.to && hoverDate && hoverDate > state?.dateRange.from
-                                    ? { from: state?.dateRange.from, to: hoverDate }
-                                    : state?.dateRange
+                                temporaryDate.from && !temporaryDate.to && hoverDate && hoverDate > temporaryDate.from
+                                    ? { from: temporaryDate.from, to: hoverDate }
+                                    : temporaryDate
                             }
                             onSelect={(date) => {
-                                if (date) actions?.setDateRange(date);
+                                if (date) setTemporaryDate(date);
                                 if (date?.to) setHoverDate(undefined);
+                                setCurrentDatePreset("none");
                             }}
                             onDayMouseEnter={(day) => {
-                                if (state?.dateRange.from && !state?.dateRange.to) setHoverDate(day);
+                                if (temporaryDate.from && !temporaryDate.to) setHoverDate(day);
                             }}
                             onDayMouseLeave={() => setHoverDate(undefined)}
                             numberOfMonths={2}
@@ -138,6 +186,10 @@ export const Header = () => {
                             startMonth={new Date("2019-01-07")}
                             captionLayout='dropdown'
                         />
+                        <div className="w-4/10 flex py-5 justify-around gap-2">
+                            <Button className={`w-5/10 font-bold bg-(--accentblue-100) cursor-pointer`} onClick={() => actions?.setDateRange(temporaryDate)}>Apply</Button>
+                            <Button className={`w-5/10 font-bold bg-white text-(--accentblue-100) hover:text-white hover:border-0 border-2 border-(--accentblue-100) cursor-pointer`} onClick={() => {setCalendarOpened(false); }}>Cancel</Button>
+                        </div>
                     </PopoverContent>
                 </Popover>
             </div>
@@ -209,7 +261,7 @@ export const Header = () => {
                 </div>
                 <div className='w-23 xl:w-0'></div>
                 <div className="rounded-none w-full xl:w-120 flex flex-row items-center justify-center font-semibold bg-(--fundblue) text-white border-none">
-                    <div className=''>IMF GEOPULSE</div>
+                    <img src={Lockup}></img>
                 </div>
                 <div className={`flex items-center w-60 xl:w-0 xl:h-0 overflow-hidden justify-center cursor-pointer bg-(--fundblue) rounded-none border-0 border-none`}>
                     <div className='h-7/10 flex w-9/10 items-center justify-evenly rounded-lg bg-(--accentblue-30)' onClick={() => setDataOptions(true)}>
@@ -267,48 +319,48 @@ export const Header = () => {
                         {calendarComponent}
                         <Card className="rounded-none p-0 flex flex-col items-center justify-center gap-0 h-22 xl:h-14.75 w-full px-2">
                             <Popover open={open} onOpenChange={setOpen}>
-                                            <PopoverTrigger asChild>
-                                                <Button
-                                                    variant="outline"
-                                                    role="combobox"
-                                                    aria-expanded={open}
-                                                    className="w-95/100 justify-between light"
-                                                >
-                                                    {countryByIso3[iso3]}
-                                                    <ChevronsUpDown className="opacity-50" />
-                                                </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-[200px] p-0 light">
-                                                <Command>
-                                                    <CommandInput placeholder="Search country..." className="h-9" />
-                                                    <CommandList>
-                                                        <CommandEmpty>Country not found.</CommandEmpty>
-                                                        <CommandGroup>
-                                                            {isoCountries.map((country) => (
-                                                                <CommandItem
-                                                                    className="data-[selected=true]:bg-neutral-200"
-                                                                    key={country.iso3}
-                                                                    value={country.name}
-                                                                    onSelect={() => {
-                                                                        setOpen(false)
-                                                                        setIso3(country.iso3)
-                                                                        actions?.setCountryFilter(country.iso3); doSomething(country.iso3)
-                                                                    }}
-                                                                >
-                                                                    {country.name}
-                                                                    <Check
-                                                                        className={cn(
-                                                                            "ml-auto",
-                                                                            iso3 === country.iso3 ? "opacity-100" : "opacity-0"
-                                                                        )}
-                                                                    />
-                                                                </CommandItem>
-                                                            ))}
-                                                        </CommandGroup>
-                                                    </CommandList>
-                                                </Command>
-                                            </PopoverContent>
-                                        </Popover>     
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        role="combobox"
+                                        aria-expanded={open}
+                                        className="w-95/100 justify-between light"
+                                    >
+                                        {countryByIso3[iso3]}
+                                        <ChevronsUpDown className="opacity-50" />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[200px] p-0 light">
+                                    <Command>
+                                        <CommandInput placeholder="Search country..." className="h-9" />
+                                        <CommandList>
+                                            <CommandEmpty>Country not found.</CommandEmpty>
+                                            <CommandGroup>
+                                                {isoCountries.map((country) => (
+                                                    <CommandItem
+                                                        className="data-[selected=true]:bg-neutral-200 text-left"
+                                                        key={country.iso3}
+                                                        value={country.name}
+                                                        onSelect={() => {
+                                                            setOpen(false)
+                                                            setIso3(country.iso3)
+                                                            actions?.setCountryFilter(country.iso3); doSomething(country.iso3)
+                                                        }}
+                                                    >
+                                                        {country.name}
+                                                        <Check
+                                                            className={cn(
+                                                                "ml-auto",
+                                                                iso3 === country.iso3 ? "opacity-100" : "opacity-0"
+                                                            )}
+                                                        />
+                                                    </CommandItem>
+                                                ))}
+                                            </CommandGroup>
+                                        </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                            </Popover>
                         </Card>
                     </div>
                     :
