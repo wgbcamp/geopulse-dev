@@ -31,7 +31,7 @@ import { realtimeObject } from '@/config/datasets';
 import Exposures from '../assets/Layers.svg';
 
 export const Route = createFileRoute('/eventtracking')({
-  component: EventTracking,
+    component: EventTracking,
 })
 
 
@@ -40,7 +40,7 @@ function EventTracking() {
 
     const state = useContext(AppStateContext);
 
-    const [realtimeExposure, setRealtimeExposure] = useState<{exposure: string, filter: string}>({ exposure: "Population", filter: "Population"});
+    const [realtimeExposure, setRealtimeExposure] = useState<{ exposure: string, filter: string }>({ exposure: "Population", filter: "Population" });
     const [events, setEvents] = useState<any>(null);
     // const [hiddenEvents, setHiddenEvents] = useState<number>(0);
     const [focusedEvent, setFocusedEvent] = useState<any>("");
@@ -48,7 +48,7 @@ function EventTracking() {
     // const eventPopupRef = useRef<string>("all events");
     const [focusedFeatures, setFocusedFeatures] = useState<any>(null);
     const [focusedSliderValue, setFocusedSliderValue] = useState<number[]>([0]);
-    const [focusedSliderPlaying, setFocusedSliderPlaying] = useState<boolean>(false);   
+    const [focusedSliderPlaying, setFocusedSliderPlaying] = useState<boolean>(false);
     const ref = useRef(null);
     const eventRef = useRef<HTMLDivElement | null>(null);
     const eventsRef = useRef<any>(null);
@@ -70,12 +70,14 @@ function EventTracking() {
     const eventFeatureLayer = useRef<FeatureLayer | null>(null);
     const pulseEls = useRef<{ el: HTMLDivElement; geometry: any }[]>([]);
 
-    const [layerSettingsPopup, setLayerSettingsPopup] = useState<boolean>(false); 
+    const [layerSettingsPopup, setLayerSettingsPopup] = useState<boolean>(false);
 
     const exposureLayerForGroup = useRef<any>(null);
     const graphicsLayer = useRef<GraphicsLayer>(null);
     const outlineLayer = useRef<GraphicsLayer>(null);
     const groupLayer = useRef<GroupLayer>(null);
+
+    const [dataExplainerView, setDataExplainerView] = useState("Compare");
 
     useEffect(() => {
         view.current.on("click", async (event) => {
@@ -87,7 +89,7 @@ function EventTracking() {
                         focusOnEvent({ longitude: i.geometry.longitude, latitude: i.geometry.latitude }, i.attributes);
                     }
                 })
-            })  
+            })
         })
     }, [events]);
 
@@ -120,7 +122,7 @@ function EventTracking() {
         url: "https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/gdacs_episodes_clean/FeatureServer"
     });
 
-     useEffect(() => {
+    useEffect(() => {
         if (ref.current) {
 
             // base layer displaying the regions of the world
@@ -184,7 +186,7 @@ function EventTracking() {
                 popupEnabled: false
             });
 
-             const scaleBar = new ScaleBar({
+            const scaleBar = new ScaleBar({
                 view: view.current,
                 unit: "metric" // Options: "metric", "non-metric", or "dual"
             });
@@ -225,22 +227,22 @@ function EventTracking() {
             resizeObserver.observe(ref.current);
 
             // remove all arcgis default ui components
-            view.current.ui.components = [];      
+            view.current.ui.components = [];
         }
 
         // clean up
-         return () => {
-             view.current.destroy();
-             baseLayer.current?.destroy();
-             boundariesLayer.current?.destroy();
-             graphicsLayer.current?.destroy();
-             outlineLayer.current?.destroy();
-             groupLayer.current?.destroy();
-         }
-   
+        return () => {
+            view.current.destroy();
+            baseLayer.current?.destroy();
+            boundariesLayer.current?.destroy();
+            graphicsLayer.current?.destroy();
+            outlineLayer.current?.destroy();
+            groupLayer.current?.destroy();
+        }
+
     }, []);
 
-       useEffect(() => {
+    useEffect(() => {
 
         if (!map.current || !groupLayer.current) return;
 
@@ -256,8 +258,8 @@ function EventTracking() {
         }
 
         const url = realtimeObject[realtimeExposure.exposure].url[realtimeExposure.filter];
-        const classBreaksRenderer = new ClassBreaksRenderer({ 
-            field: "Value", 
+        const classBreaksRenderer = new ClassBreaksRenderer({
+            field: "Value",
             classBreakInfos: realtimeObject[realtimeExposure.exposure].colorScheme
         });
         const renderer = new SimpleRenderer({
@@ -303,21 +305,21 @@ function EventTracking() {
                     title: "exposure"
                 });
                 break;
+        }
+
+        // add and reorder exposure layers
+        if (groupLayer.current && exposureLayer.current && exposureLayerForGroup.current && graphicsLayer.current && baseLayer.current) {
+            map.current.layers.add(exposureLayer.current);
+            map.current.reorder(exposureLayer.current, 2);
+            groupLayer.current.add(exposureLayerForGroup.current);
+            groupLayer.current.layers.reorder(graphicsLayer.current, 2);
+
+            // if an event is focused and focusedFeatures exists, apply blur, darken, and greyscale to layers outside of the group layer
+            if (focusedFeatures?.length > 0) {
+                baseLayer.current.effect = "blur(6px) brightness(0.7) grayscale(0.8)";
+                exposureLayer.current.effect = "blur(6px) brightness(0.7) grayscale(0.8)";
             }
-
-           // add and reorder exposure layers
-           if (groupLayer.current && exposureLayer.current && exposureLayerForGroup.current && graphicsLayer.current && baseLayer.current) {
-               map.current.layers.add(exposureLayer.current);
-               map.current.reorder(exposureLayer.current, 2);
-               groupLayer.current.add(exposureLayerForGroup.current);
-               groupLayer.current.layers.reorder(graphicsLayer.current, 2);
-
-               // if an event is focused and focusedFeatures exists, apply blur, darken, and greyscale to layers outside of the group layer
-               if (focusedFeatures?.length > 0) {
-                   baseLayer.current.effect = "blur(6px) brightness(0.7) grayscale(0.8)";
-                   exposureLayer.current.effect = "blur(6px) brightness(0.7) grayscale(0.8)";
-               }
-           }
+        }
     }, [realtimeExposure, dimension3D])
 
     const removeBlur = () => {
@@ -598,7 +600,7 @@ function EventTracking() {
 
         // const feature = result.features.filter((x) => x.attributes.episodeid == 1); //features.attributes.eventid
         // const feature = result.features[index || 0]; //features.attributes.eventid
-        
+
         const ascendingFeatures = Object.values(
             result.features.reduce((groups, feature) => {
                 const id = feature.attributes.episodeid;
@@ -608,28 +610,28 @@ function EventTracking() {
         ).sort((a, b) => a[0].attributes.episodeid - b[0].attributes.episodeid);
 
         console.log("ASCENDING FEATURES: ", ascendingFeatures);
-        
+
         console.log("feature ", result.features);
 
-        
+
 
         setFocusedFeatures(ascendingFeatures); // Store the features in state
         console.log("FocusedFeatures: ", ascendingFeatures);
 
         let combinedExtent: __esri.Extent | null = null;
-            for (const feature of result.features) {
-                const ext = feature.geometry?.extent;
-                console.log("feature element extent: ", feature.geometry?.extent?.toJSON());
-                if (!ext) continue;
-                combinedExtent = combinedExtent ? combinedExtent.union(ext) : ext;
-            }
+        for (const feature of result.features) {
+            const ext = feature.geometry?.extent;
+            console.log("feature element extent: ", feature.geometry?.extent?.toJSON());
+            if (!ext) continue;
+            combinedExtent = combinedExtent ? combinedExtent.union(ext) : ext;
+        }
 
-            if (combinedExtent) {
-                console.log("combinedExtent: ", combinedExtent.toJSON());
-                view.current.goTo(combinedExtent);
-            }
+        if (combinedExtent) {
+            console.log("combinedExtent: ", combinedExtent.toJSON());
+            view.current.goTo(combinedExtent);
+        }
 
-        
+
 
         applyPolygon(ascendingFeatures[0]); // Apply the polygon styling from the first feature (or the specified index)
     }
@@ -649,7 +651,7 @@ function EventTracking() {
                 },
             };
 
-              let outlineSymbol = {
+            let outlineSymbol = {
                 type: "simple-fill",
                 color: "rgba(0, 0, 0, 0.3)",
                 outline: {
@@ -683,7 +685,7 @@ function EventTracking() {
 
     // focuses view on the event selected
     const focusOnEvent = (coors: { longitude: number, latitude: number }, attributes: any) => {
-        pauseSlider();        
+        pauseSlider();
         removeBlur(); // remove blur from previous event if it exists
         setFocusedSliderValue([0]); // reset slider value to 0 when focusing on a new event
         console.log(coors);
@@ -692,7 +694,7 @@ function EventTracking() {
 
         // reveal group layer for focused event and blur other layers
         highlightCountry(attributes.eventid);
-        
+
 
         console.log(map.current);
         setFocusedEvent(attributes);
@@ -701,7 +703,7 @@ function EventTracking() {
         // hide event dots 
         document.querySelectorAll<HTMLElement>(".pw").forEach(element => {
             element.style.visibility = "hidden";
-        }) 
+        })
 
         if (!eventFeatureLayer.current) return;
         eventFeatureLayer.current.renderer.uniqueValueInfos = [];
@@ -716,13 +718,13 @@ function EventTracking() {
             case "play":
                 setFocusedSliderPlaying(true);
                 intervalRef.current = setInterval(() => {
-                    if ( blocker !== focusedEvent || i >= focusedFeatures.length - 1 ) {
+                    if (blocker !== focusedEvent || i >= focusedFeatures.length - 1) {
                         pauseSlider();
                         return;
                     } else {
-                    i += 1;
-                    applyPolygon(focusedFeatures[i]);
-                    setFocusedSliderValue([i]);
+                        i += 1;
+                        applyPolygon(focusedFeatures[i]);
+                        setFocusedSliderValue([i]);
                     }
                 }, 500);
                 break;
@@ -740,11 +742,11 @@ function EventTracking() {
             setFocusedSliderPlaying(false); // reset playing state of slider when focusing on a new event
         }
     }
- 
+
     const unfocusEvent = () => {
-        setEventPopup("all events"); 
-        setFocusedEvent(""); 
-        removeBlur(); 
+        setEventPopup("all events");
+        setFocusedEvent("");
+        removeBlur();
         pauseSlider();
         if (!eventFeatureLayer.current) return;
         console.log("DUD")
@@ -870,25 +872,25 @@ function EventTracking() {
 
         if (value.key == "h") {
             exposureLayer.current = new FeatureLayer({
-                    url: realtimeObject[realtimeExposure.exposure].url[realtimeExposure.filter],
-                    renderer: new SimpleRenderer({
-                        symbol: new PointSymbol3D({
-                            symbolLayers: [new ObjectSymbol3DLayer({
-                                resource: {
-                                    primitive: "cube"
-                                },
-                                material: {
-                                    color: "#00E9FF"
-                                },
-                                anchor: "bottom",
-                                width: 60000,
-                                depth: 60000,
-                                height: 60000
-                            })]
-                        })
-                    }),
-                    title: "exposure"
-                });
+                url: realtimeObject[realtimeExposure.exposure].url[realtimeExposure.filter],
+                renderer: new SimpleRenderer({
+                    symbol: new PointSymbol3D({
+                        symbolLayers: [new ObjectSymbol3DLayer({
+                            resource: {
+                                primitive: "cube"
+                            },
+                            material: {
+                                color: "#00E9FF"
+                            },
+                            anchor: "bottom",
+                            width: 60000,
+                            depth: 60000,
+                            height: 60000
+                        })]
+                    })
+                }),
+                title: "exposure"
+            });
         }
     }
 
@@ -899,25 +901,25 @@ function EventTracking() {
                 <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden" ref={pulseContainerRef}>
                 </div>
             </div>
-            <div className={`absolute z-0 md:-z-1 top-33.5 left-8.25 flex items-center border-solid transition-all duration-300 text-white`} onClick={() =>  toggleLayerSettingsPopup(true)}>
+            <div className={`absolute z-0 md:-z-1 top-33.5 left-8.25 flex items-center border-solid transition-all duration-300 text-white`} onClick={() => toggleLayerSettingsPopup(true)}>
                 <div className="rounded-full flex items-center justify-center cursor-pointer h-17.5 w-17.5 md:invisible text-white bg-black border-[1.37px] border-solid border-[#0084FF] mr-[10px]" onClick={() => setMobileExposures(!mobileExposures)}>
                     <img src={Exposures}></img>
                 </div>
             </div>
             {exposuresArray.map((e: any, index: number) =>
-                <div id={`${index}`} className={`absolute -z-1 md:z-1 left-8.25 pointer-events-none`} style={{top: index*55 + 200}} onMouseLeave={() => setPopInState("")}>
+                <div id={`${index}`} className={`absolute -z-1 md:z-1 left-8.25 pointer-events-none`} style={{ top: index * 55 + 200 }} onMouseLeave={() => setPopInState("")}>
                     <div className=' flex gap-2 items-start pointer-events-none has-[.pop-in]:pointer-events-auto'>
                         <div className={`flex items-center border-solid transition-all duration-300 text-white`}>
-                                <div className={`flex items-center pointer-events-auto cursor-pointer transition-all duration-300  text-white`} onClick={() => setRealtimeExposure({exposure: e.name, filter: e.name}) } onMouseEnter={() => togglePopIn(e.name)}>
-                                    <div className={`rounded-full flex items-center justify-start ${realtimeExposure.exposure == e.name ? 'bg-(--accentblue-100)' : 'bg-black hover:bg-(--accentdarkblue-100)'} transition-all duration-300 border-[1.37px] border-solid border-[#0084FF] h-[37px] pr-[10px]`}>
-                                        <div className='rounded-full flex items-center justify-center bg-black border border-solid border-[#0084FF] h-[37px] w-[37px]'>{e.icon}</div>
-                                        <div className='text-white text-[12px] ml-3 font-bold'>{e.name}</div>
-                                    </div>
+                            <div className={`flex items-center pointer-events-auto cursor-pointer transition-all duration-300  text-white`} onClick={() => setRealtimeExposure({ exposure: e.name, filter: e.name })} onMouseEnter={() => togglePopIn(e.name)}>
+                                <div className={`rounded-full flex items-center justify-start ${realtimeExposure.exposure == e.name ? 'bg-(--accentblue-100)' : 'bg-black hover:bg-(--accentdarkblue-100)'} transition-all duration-300 border-[1.37px] border-solid border-[#0084FF] h-[37px] pr-[10px]`}>
+                                    <div className='rounded-full flex items-center justify-center bg-black border border-solid border-[#0084FF] h-[37px] w-[37px]'>{e.icon}</div>
+                                    <div className='text-white text-[12px] ml-3 font-bold'>{e.name}</div>
                                 </div>
+                            </div>
                         </div>
                         <div id='exposureContainer' className={`pointer-events-none has-[.pop-in]:pointer-events-auto flex gap-2 ml-10 flex-wrap max-w-5/10 items-center border-solid transition-all duration-300 text-white`}>
                             {e.categories.map((f: any, index: number) =>
-                                <div id={`exposure_category_${f}`} className={`exposure_ h-9 bg-black border-2 rounded-2xl px-5 opacity-0 cursor-pointer ${popInState == e.name ? 'pop-in' : popInState == "initial" ? 'pop-default' : 'pop-out'} ${realtimeExposure.filter == f ? 'border-(--accentcyan-100)' : 'border-(--accentdarkblue-50)'}`} style={popInState == "initial" ? {animationDelay: index * 0 + 'ms'} : {animationDelay: index * 50 + 'ms'}} onClick={() => setRealtimeExposure({exposure: e.name, filter: f})}>
+                                <div id={`exposure_category_${f}`} className={`exposure_ h-9 bg-black border-2 rounded-2xl px-5 opacity-0 cursor-pointer ${popInState == e.name ? 'pop-in' : popInState == "initial" ? 'pop-default' : 'pop-out'} ${realtimeExposure.filter == f ? 'border-(--accentcyan-100)' : 'border-(--accentdarkblue-50)'}`} style={popInState == "initial" ? { animationDelay: index * 0 + 'ms' } : { animationDelay: index * 50 + 'ms' }} onClick={() => setRealtimeExposure({ exposure: e.name, filter: f })}>
                                     <div className='h-9/10 flex justify-center items-center overflow-hidden'>
                                         <div className='text-white text-[12px] font-bold'>{f}</div>
                                     </div>
@@ -941,7 +943,7 @@ function EventTracking() {
                             <section className='text-left w-95/100 font-bold text-(--accentdarkblue-50)'>EXPOSURES</section>
                             <div className='flex flex-row flex-wrap gap-3'>
                                 {exposuresArray.map((e: any) =>
-                                    <div className={`w-25 h-25 bg-black border-2 rounded-2xl cursor-pointer ${realtimeExposure.exposure == e.name ? 'border-(--accentcyan-100)' : 'border-(--accentdarkblue-50)'}`} onClick={() => {setRealtimeExposure({exposure: e.name, filter: e.name}); setLayerSettingsPopup(false);}}>
+                                    <div className={`w-25 h-25 bg-black border-2 rounded-2xl cursor-pointer ${realtimeExposure.exposure == e.name ? 'border-(--accentcyan-100)' : 'border-(--accentdarkblue-50)'}`} onClick={() => { setRealtimeExposure({ exposure: e.name, filter: e.name }); setLayerSettingsPopup(false); }}>
                                         <div className='h-full flex justify-center items-end'>
                                             <div className='text-white text-[12px] font-bold'>{e.name}</div>
                                         </div>
@@ -953,7 +955,7 @@ function EventTracking() {
                 </div>
             </div>
             <div className={`absolute z-2 bottom-0 md:top-50 md:right-0 ${eventPopup == "all events" ? "visible" : "invisible"} max-h-full md:h-70/100 w-full md:w-[300px] flex flex-col bg-white shadow-lg/40 cursor-default draggable`} style={{
-                        "--drag-y": `${y}px`,
+                "--drag-y": `${y}px`,
                 touchAction: "none"
             }}>
                 <div onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp}>
@@ -989,7 +991,7 @@ function EventTracking() {
                                     :
                                     null
                                 }
-                                
+
                             </div>
                         </div>
                     ))}
@@ -1070,28 +1072,28 @@ function EventTracking() {
                 <div className={`text-[14px] px-2 ml-4 rounded-md text-white font-extrabold`} style={{ backgroundColor: `var(--${focusedEvent.alertlevel?.toLowerCase()})` }}
                 >Level {focusedEvent.alertscore}
                 </div>
-                
-                
-                  
+
+
+
                 <div className="pt-5 font-bold text-[14px] pl-4">Main economies affected:</div>
                 <div className='text-left text-[14px] pb-4 pl-4'>{focusedEvent.country} | <u className='cursor-pointer'>Download</u></div>
                 <div className="pt-5 flex flex-row w-full text-[12px] font-bold justify-around border-t-1 px-4">
                     <div className='flex flex-col w-full items-between text-left'>
                         <div className='pb-2 border-solid border-b-1'>LAYER</div>
-                        {exposuresArray.filter((a) => a.name !== "Nightlights").map((e: any) => 
+                        {exposuresArray.filter((a) => a.name !== "Nightlights").map((e: any) =>
                             <div className='h-[45px] text-[16px] font-medium border-solid border-b-1 flex items-center '>{e.name}</div>
                         )}
                     </div>
                     <div className='w-full text-left'>
                         <div className='pb-2 border-solid border-b-1 pl-3'>EXPOSURE</div>
-                        {exposuresArray.filter((a) => a.name !== "Nightlights").map((e: any) => 
+                        {exposuresArray.filter((a) => a.name !== "Nightlights").map((e: any) =>
                             <div className='h-[45px] text-[16px] font-medium border-solid border-b-1 flex items-center border-l-1 pl-3'>{focusedEvent.exposures ? JSON.parse(focusedEvent.exposures)[e.name] : "N/A"}</div>
                         )}
-                    </div>                
+                    </div>
                 </div>
                 <div className="pt-[24px] pb-5 text-(--accentblue-100) font-bold text-[12px] text-center w-full"><u className='cursor-pointer'>Explore Methodology</u></div>
             </div>
-            <div className="absolute bottom-0 invisible md:visible h-[175px] w-[350px] bg-[rgba(0,0,0,0.85)] flex flex-col items-center justify-around"> 
+            <div className="absolute bottom-0 invisible md:visible h-[175px] w-[350px] bg-[rgba(0,0,0,0.85)] flex flex-col items-center justify-around">
                 <div className="w-8/10 h-5/10 flex flex-col items-center">
                     <div className="flex text-white w-full font-extrabold tracking-wide text-[12px] pb-[10px]">
                         <div>EVENT TYPES</div>
@@ -1109,7 +1111,7 @@ function EventTracking() {
                                 </div>
                             )}
                         </div>
-                      
+
                     </div>
                 </div>
                 <div className='h-3/10 w-8/10 flex flex-col items-center justify-end'>
@@ -1130,7 +1132,333 @@ function EventTracking() {
                     </div>
                 </div>
             </div>
-                         
+            {/* <div className="absolute z-3 bottom-0 w-full h-full bg-[#00000095] flex items-center justify-center">
+                <div className="h-8/10 w-8/10 max-h-300 max-w-300 bg-white rounded-sm flex flex-col overflow-hidden">
+                    <div className="bg-(--fundblue) h-35 w-full flex flex-col ">
+                        <div className="w-full">
+                            <div className="w-96/100 flex justify-end">
+                                <div className='text-white font-bold pt-2 cursor-pointer'>CLOSE</div>
+                            </div>
+                        </div>
+                        <div className='w-full flex justify-end'>
+                            <div className='w-9/10'>
+                                <div className="w-full flex justify-start">
+                                    <div className="w-96/100 flex">
+                                        <div className='text-white font-bold text-2xl'>Data Explainer</div>
+                                    </div>
+                                </div>
+                                <div className="flex flex-row gap-x-2 overflow-x-scroll">
+                                    <div className='flex flex-col w-50'>
+                                        <div className="text-xs text-white pt-3 pb-2 tracking-widest font-semibold">REALTIME</div>
+                                        <div className={`h-10 w-50 font-bold ${dataExplainerView == "Event Tracking" ? "text-(--primaryblue-100) bg-white" : "text-black bg-(--primarygray-40)"} rounded-t-md flex items-center justify-center cursor-pointer`} onClick={() => setDataExplainerView("Event Tracking")}>EVENT TRACKING</div>
+                                    </div>
+                                    <div className='flex flex-col w-100'>
+                                        <div className="text-xs text-white pt-3 pb-2 tracking-widest font-semibold">FORWARD LOOKING</div>
+                                        <div className='flex flex-row gap-x-1'>
+                                            <div className={`h-10 w-50 font-bold ${dataExplainerView == "Grid" ? "text-(--primaryblue-100) bg-white" : "text-black bg-(--primarygray-40)"} rounded-t-md flex items-center justify-center cursor-pointer`} onClick={() => setDataExplainerView("Grid")}>GRID</div>
+                                            <div className={`h-10 w-50 font-bold ${dataExplainerView == "Compare" ? "text-(--primaryblue-100) bg-white" : "text-black bg-(--primarygray-40)"} rounded-t-md flex items-center justify-center cursor-pointer`} onClick={() => setDataExplainerView("Compare")}>COMPARE</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className='flex w-full justify-center overflow-scroll my-5'>
+                        <div className='flex flex-col lg:flex-row bg-white mt-12 w-9/10 max-h-291 gap-x-9 justify-start'>
+                            {dataExplainerView == "Event Tracking" ?
+                                <div>
+                                    <div className='flex flex-col gap-y-5 text-left'>
+                                        <section className='font-bold'>Navigating the Real-Time Event Tracking Page</section>
+                                        <p>
+                                            The <b>Real-Time</b> view in GeoPulse provides continuous monitoring of natural hazard events as they unfold around the world.
+                                            The interactive maps identify affected locations, understand the scale of potential impacts, and explore exposure across key
+                                            economic and infrastructure indicators.
+                                        </p>
+
+                                        <section className='font-bold'>Refine Your Search</section>
+                                        <p>
+                                            The controls in the top navigation bar allow users to focus the analysis on events of interest.
+                                        </p>
+                                        <p>You can narrow or expand the events displayed by:</p>
+                                        <ul className='list-disc pl-5'>
+                                            <li>
+                                                <b>Selecting a time frame</b> (for example, the last three months, last six months, last year, or a custom date range)
+                                            </li>
+                                            <li><b>Choosing a specific country</b></li>
+                                            <li><b>Filtering by event type to focus on particular hazards</b></li>
+                                        </ul>
+
+                                        <section className='font-bold'>Understand Exposure Layers</section>
+                                        <p>
+                                            On the left side of the map, users can select from a series of <b>exposure layers</b>. These layers represent key economic,
+                                            demographic, and infrastructure assets that may be affected by natural hazards.
+                                        </p>
+                                        <p>Exposure layers help answer questions such as:</p>
+                                        <ul className='list-disc pl-5'>
+                                            <li>How many people may be affected by an event?</li>
+                                            <li>Which sectoral areas are most vulnerable to economic losses?</li>
+                                        </ul>
+
+                                        <p>
+                                            By turning layers on and off, users can visualize where hazards intersect with important assets and better understand
+                                            the geographic distribution of potential impacts.
+                                        </p>
+
+                                        <p>
+                                            <b>Read More</b> for additional information on the methodology and data sources behind this analysis.
+                                        </p>
+                                    </div>
+                                    <div className='flex flex-col gap-y-5 text-left'>
+                                        <section className='font-bold'>Explore Current and Historical Events</section>
+
+                                        <p>
+                                            The Real-Time page displays a global map of recent and ongoing events together with relevant exposure layers.
+                                            Users can explore events by selecting event markers directly on the map or by viewing event details in the panel
+                                            on the right side of the screen.
+                                        </p>
+
+                                        <p>
+                                            The right-side panel provides additional information about the selected event, including:
+                                        </p>
+
+                                        <ul className='list-disc pl-5'>
+                                            <li>Event name and status</li>
+                                            <li>Timeline and duration</li>
+                                            <li>Event severity metrics</li>
+                                            <li>Affected countries or regions</li>
+                                            <li>Estimated exposure and risk indicators</li>
+                                            <li>Links to download supporting data and explore methodology</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                :
+                                null
+                            }
+                            {dataExplainerView == "Compare" ?
+                                <div>
+                                    <div className='flex flex-col gap-y-5 text-left'>
+                                        <section className='font-bold'>Navigating the Compare View</section>
+
+                                        <p>
+                                            The Compare view illustrates how climate-related hazards and exposures may evolve under different future climate scenarios.
+                                            Designed for benchmarking and strategic planning, this view enables side-by-side comparisons of countries or subnational
+                                            regions, helping users identify areas that may face higher levels of exposure under future climate conditions.
+                                        </p>
+
+                                        <section className='font-bold'>Compare Countries or Subnational Regions</section>
+
+                                        <p>
+                                            The Compare view displays two maps side by side, making it easy to evaluate differences in exposure across locations.
+                                            You can:
+                                        </p>
+
+                                        <ul className='list-disc pl-5 space-y-1'>
+                                            <li>
+                                                Compare two different countries to understand how future climate risks vary across economies.
+                                            </li>
+                                            <li>
+                                                Compare subnational regions within the same country to identify areas that may face higher exposure levels.
+                                            </li>
+                                        </ul>
+
+                                        <section className='font-bold'>Select a Hazard and Exposure Indicator</section>
+
+                                        <p>At the top of the page, users can choose:</p>
+
+                                        <ul className='list-disc pl-5 space-y-1'>
+                                            <li>
+                                                A hazard category (such as coastal flooding, riverine flooding, heat stress, drought, or other available hazards).
+                                            </li>
+                                            <li>
+                                                An exposure layer (such as population, GDP, urban GDP, buildings).
+                                            </li>
+                                            <li>
+                                                A climate scenario (Orderly or Disorderly).
+                                            </li>
+                                            <li>
+                                                A time horizon for analysis.
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div className='flex flex-col gap-y-5 text-left'>
+                                        <section className='font-bold'>Choose a Climate Scenario</section>
+
+                                        <p>
+                                            GeoPulse allows users to compare future outcomes under different climate pathways.
+                                        </p>
+
+                                        <p>
+                                            <b>Orderly Transition</b> An orderly transition assumes that climate mitigation measures are introduced early and steadily
+                                            over time. In climate science, this represents a lower-emissions pathway where governments, businesses, and societies
+                                            gradually reduce greenhouse gas emissions, limiting the extent of future warming and associated climate impacts.
+                                        </p>
+
+                                        <p>
+                                            <b>Disorderly Transition</b> A disorderly transition assumes delayed or uneven climate action. Under this pathway,
+                                            emissions remain higher for longer before stronger mitigation efforts occur later in the century. This results in
+                                            greater warming and generally higher levels of climate-related exposure and risk.
+                                        </p>
+
+                                        <section className='font-bold'>Explore Future Time Horizons</section>
+
+                                        <p>
+                                            The time selector allows users to view projections across multiple planning horizons:
+                                        </p>
+
+                                        <ul className='list-disc pl-5 space-y-1'>
+                                            <li><b>Historical:</b> 1980–2014</li>
+                                            <li><b>Early-Century:</b> 2030</li>
+                                            <li><b>Mid-Century:</b> 2050</li>
+                                            <li><b>End-Century:</b> 2100</li>
+                                        </ul>
+
+                                        <section className='font-bold'>[Add section about hazard sliders]</section>
+
+                                        <section className='font-bold'>Interpret the Maps</section>
+
+                                        <p>
+                                            The maps display exposure levels using a graduated color scale. Darker shades indicate higher levels of exposure relative
+                                            to the selected indicator and scenario.
+                                        </p>
+
+                                        <p>Users can:</p>
+
+                                        <ul className='list-disc pl-5 space-y-1'>
+                                            <li>Hover over regions to view detailed values.</li>
+                                            <li>Identify geographic hotspots.</li>
+                                            <li>Compare exposure patterns between locations.</li>
+                                            <li>Understand where future climate impacts may become more concentrated.</li>
+                                            <li>Download results for further analysis.</li>
+                                        </ul>
+
+                                        <p>
+                                            Read More for additional information on the methodology and data sources behind this analysis.
+                                        </p>
+                                    </div>
+                                </div>
+                                :
+                                null
+                            }
+                            {dataExplainerView == "Grid" ?
+                                <div>
+                                    <div className='flex flex-col gap-y-5 text-left'>
+                                        <section className='font-bold'>Navigating the Grid View</section>
+
+                                        <p>
+                                            The Grid view enables users to explore forward-looking climate risks at a highly granular spatial level.
+                                            Unlike the Compare view, which focuses on benchmarking locations side by side, the Grid view allows users
+                                            to examine how hazards and exposures intersect across the globe using detailed geospatial data.
+                                        </p>
+
+                                        <section className='font-bold'>Select a Hazard, Exposure, and Climate Scenario</section>
+
+                                        <p>
+                                            Using the controls at the top of the page, you can customize the map by selecting:
+                                        </p>
+
+                                        <ul className='list-disc pl-5 space-y-1'>
+                                            <li>
+                                                A hazard category (such as coastal flooding, riverine flooding, heat stress, drought, or other available hazards).
+                                            </li>
+                                            <li>
+                                                An exposure layer (such as population, GDP, urban GDP, buildings).
+                                            </li>
+                                            <li>
+                                                A climate scenario (Orderly or Disorderly).
+                                            </li>
+                                            <li>
+                                                A time horizon for analysis.
+                                            </li>
+                                        </ul>
+
+                                        <section className='font-bold'>Choose a Climate Scenario</section>
+
+                                        <p>
+                                            GeoPulse allows users to compare future risks under different climate pathways.
+                                        </p>
+
+                                        <p>
+                                            <b>Orderly Transition</b> An orderly transition assumes that emissions reductions and climate policies are implemented
+                                            gradually and early. This pathway generally results in lower levels of warming and more moderate future climate impacts.
+                                        </p>
+
+                                        <p>
+                                            <b>Disorderly Transition</b> A disorderly transition assumes delayed or uneven climate action, leading to higher
+                                            greenhouse gas concentrations and greater warming before mitigation efforts take effect. This pathway generally
+                                            produces larger increases in climate-related hazards and exposures.
+                                        </p>
+                                    </div>
+
+                                    <div className='flex flex-col gap-y-5 text-left'>
+                                        <section className='font-bold'>Explore Future Time Horizons</section>
+
+                                        <p>
+                                            The time selector enables users to evaluate exposure across multiple planning horizons.
+                                        </p>
+
+                                        <ul className='list-disc pl-5 space-y-1'>
+                                            <li><b>Historical:</b> 1980–2014</li>
+                                            <li><b>Early-Century:</b> 2030</li>
+                                            <li><b>Mid-Century:</b> 2050</li>
+                                            <li><b>End-Century:</b> 2100</li>
+                                        </ul>
+
+                                        <section className='font-bold'>Understanding the Bivariate Legend</section>
+
+                                        <p>
+                                            The legend combines two variables into a single visualization. Rather than displaying only hazard intensity or only exposure,
+                                            the map simultaneously shows both dimensions so users can quickly identify where high hazards overlap with high concentrations
+                                            of exposed assets.
+                                        </p>
+
+                                        <p>In the example shown:</p>
+
+                                        <ul className='list-disc pl-5 space-y-1'>
+                                            <li>The vertical axis represents Population Exposure (low to high).</li>
+                                            <li>The horizontal axis represents Flood Height (low to high).</li>
+                                            <li>
+                                                Each grid cell on the map is colored based on the combination of these two variables.
+                                            </li>
+                                        </ul>
+
+                                        <p>The legend can be interpreted as follows:</p>
+
+                                        <ul className='list-disc pl-5 space-y-1'>
+                                            <li>
+                                                <b>Low Hazard + Low Exposure:</b> Areas where flood levels and exposed populations are both relatively low.
+                                            </li>
+                                            <li>
+                                                <b>High Hazard + Low Exposure:</b> Areas with severe flooding but relatively few people exposed.
+                                            </li>
+                                            <li>
+                                                <b>Low Hazard + High Exposure:</b> Areas with large populations but relatively lower flood intensity.
+                                            </li>
+                                            <li>
+                                                <b>High Hazard + High Exposure:</b> Areas where severe flooding coincides with large exposed populations,
+                                                representing potential risk hotspots.
+                                            </li>
+                                        </ul>
+
+                                        <p>
+                                            The color gradient helps users distinguish between these combinations at a glance. Areas that appear in the most
+                                            intense colors represent locations where both hazard levels and exposure levels are relatively high, making them
+                                            important areas for further analysis and resilience planning.
+                                        </p>
+
+                                        <p>
+                                            Read More for additional information on the methodology and data sources behind this analysis.
+                                        </p>
+                                    </div>
+                                </div>
+                                :
+                                null
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div> */}
+
 
         </div>
     )

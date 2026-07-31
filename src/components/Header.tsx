@@ -336,7 +336,7 @@ export const Header = () => {
                                         <CommandList>
                                             <CommandEmpty>Country not found.</CommandEmpty>
                                             <CommandGroup>
-                                                {isoCountries.map((country) => (
+                                                {isoCountries.sort((a, b) => a.name.localeCompare(b.name)).map((country) => (
                                                     <CommandItem
                                                         className="data-[selected=true]:bg-neutral-200 text-left"
                                                         key={country.iso3}
