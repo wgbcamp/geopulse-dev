@@ -23,6 +23,7 @@ import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
 import { faPause } from "@fortawesome/free-solid-svg-icons";
+import DataIcon from '../assets/data_icon.svg';
 
 import { Slider } from "@/components/ui/slider"
 
@@ -77,6 +78,7 @@ function EventTracking() {
     const outlineLayer = useRef<GraphicsLayer>(null);
     const groupLayer = useRef<GroupLayer>(null);
 
+    const [dataExplainerOpen, setDataExplainerState] = useState(false);
     const [dataExplainerView, setDataExplainerView] = useState("Compare");
 
     useEffect(() => {
@@ -1132,12 +1134,14 @@ function EventTracking() {
                     </div>
                 </div>
             </div>
-            {/* <div className="absolute z-3 bottom-0 w-full h-full bg-[#00000095] flex items-center justify-center">
+            {dataExplainerOpen 
+            ? 
+            <div className="absolute z-3 bottom-0 w-full h-full bg-[#00000095] flex items-center justify-center">
                 <div className="h-8/10 w-8/10 max-h-300 max-w-300 bg-white rounded-sm flex flex-col overflow-hidden">
                     <div className="bg-(--fundblue) h-35 w-full flex flex-col ">
                         <div className="w-full">
                             <div className="w-96/100 flex justify-end">
-                                <div className='text-white font-bold pt-2 cursor-pointer'>CLOSE</div>
+                                <div className='text-white font-bold pt-2 cursor-pointer' onClick={() => setDataExplainerState(false)}>CLOSE</div>
                             </div>
                         </div>
                         <div className='w-full flex justify-end'>
@@ -1175,6 +1179,29 @@ function EventTracking() {
                                             economic and infrastructure indicators.
                                         </p>
 
+                                        <div className='flex flex-col gap-y-5 text-left'>
+                                            <section className='font-bold'>Explore Current and Historical Events</section>
+
+                                            <p>
+                                                The Real-Time page displays a global map of recent and ongoing events together with relevant exposure layers.
+                                                Users can explore events by selecting event markers directly on the map or by viewing event details in the panel
+                                                on the right side of the screen.
+                                            </p>
+
+                                            <p>
+                                                The right-side panel provides additional information about the selected event, including:
+                                            </p>
+
+                                            <ul className='list-disc pl-5'>
+                                                <li>Event name and status</li>
+                                                <li>Timeline and duration</li>
+                                                <li>Event severity metrics</li>
+                                                <li>Affected countries or regions</li>
+                                                <li>Estimated exposure and risk indicators</li>
+                                                <li>Links to download supporting data and explore methodology</li>
+                                            </ul>
+                                        </div>
+
                                         <section className='font-bold'>Refine Your Search</section>
                                         <p>
                                             The controls in the top navigation bar allow users to focus the analysis on events of interest.
@@ -1185,7 +1212,7 @@ function EventTracking() {
                                                 <b>Selecting a time frame</b> (for example, the last three months, last six months, last year, or a custom date range)
                                             </li>
                                             <li><b>Choosing a specific country</b></li>
-                                            <li><b>Filtering by event type to focus on particular hazards</b></li>
+                                            <li><b>Filtering by event type</b> to focus on particular hazards</li>
                                         </ul>
 
                                         <section className='font-bold'>Understand Exposure Layers</section>
@@ -1208,39 +1235,17 @@ function EventTracking() {
                                             <b>Read More</b> for additional information on the methodology and data sources behind this analysis.
                                         </p>
                                     </div>
-                                    <div className='flex flex-col gap-y-5 text-left'>
-                                        <section className='font-bold'>Explore Current and Historical Events</section>
-
-                                        <p>
-                                            The Real-Time page displays a global map of recent and ongoing events together with relevant exposure layers.
-                                            Users can explore events by selecting event markers directly on the map or by viewing event details in the panel
-                                            on the right side of the screen.
-                                        </p>
-
-                                        <p>
-                                            The right-side panel provides additional information about the selected event, including:
-                                        </p>
-
-                                        <ul className='list-disc pl-5'>
-                                            <li>Event name and status</li>
-                                            <li>Timeline and duration</li>
-                                            <li>Event severity metrics</li>
-                                            <li>Affected countries or regions</li>
-                                            <li>Estimated exposure and risk indicators</li>
-                                            <li>Links to download supporting data and explore methodology</li>
-                                        </ul>
-                                    </div>
                                 </div>
                                 :
                                 null
                             }
                             {dataExplainerView == "Compare" ?
                                 <div>
-                                    <div className='flex flex-col gap-y-5 text-left'>
+                                    <div className='flex flex-col gap-y-5 pb-5 text-left'>
                                         <section className='font-bold'>Navigating the Compare View</section>
 
                                         <p>
-                                            The Compare view illustrates how climate-related hazards and exposures may evolve under different future climate scenarios.
+                                            The <b>Compare</b> view illustrates how climate-related hazards and exposures may evolve under different future climate scenarios.
                                             Designed for benchmarking and strategic planning, this view enables side-by-side comparisons of countries or subnational
                                             regions, helping users identify areas that may face higher levels of exposure under future climate conditions.
                                         </p>
@@ -1254,10 +1259,10 @@ function EventTracking() {
 
                                         <ul className='list-disc pl-5 space-y-1'>
                                             <li>
-                                                Compare two different countries to understand how future climate risks vary across economies.
+                                                Compare <b>two different countries</b> to understand how future climate risks vary across economies.
                                             </li>
                                             <li>
-                                                Compare subnational regions within the same country to identify areas that may face higher exposure levels.
+                                                Compare <b>subnational regions within the same country</b> to identify areas that may face higher exposure levels.
                                             </li>
                                         </ul>
 
@@ -1267,16 +1272,16 @@ function EventTracking() {
 
                                         <ul className='list-disc pl-5 space-y-1'>
                                             <li>
-                                                A hazard category (such as coastal flooding, riverine flooding, heat stress, drought, or other available hazards).
+                                                A <b>hazard category</b> (such as coastal flooding, riverine flooding, heat stress, drought, or other available hazards).
                                             </li>
                                             <li>
-                                                An exposure layer (such as population, GDP, urban GDP, buildings).
+                                                An <b>exposure layer</b> (such as population, GDP, urban GDP, buildings).
                                             </li>
                                             <li>
-                                                A climate scenario (Orderly or Disorderly).
+                                                A <b>climate scenario</b> (Orderly or Disorderly).
                                             </li>
                                             <li>
-                                                A time horizon for analysis.
+                                                A <b>time horizon</b> for analysis.
                                             </li>
                                         </ul>
                                     </div>
@@ -1299,42 +1304,58 @@ function EventTracking() {
                                             emissions remain higher for longer before stronger mitigation efforts occur later in the century. This results in
                                             greater warming and generally higher levels of climate-related exposure and risk.
                                         </p>
+                                        <div className='flex flex-col gap-y-5 text-left'>
+                                            <section className='font-bold'>Explore Future Time Horizons</section>
 
-                                        <section className='font-bold'>Explore Future Time Horizons</section>
+                                            <p>
+                                                The time selector allows users to view projections across multiple planning horizons:
+                                            </p>
+                                            <table className='border'>
+                                                <tr className='border'>
+                                                    <th className='border text-center bg-(--primarygray-10)'><b>Future Horizon</b></th>
+                                                    <th className='border text-center bg-(--primarygray-10)'><b>Reference Year</b></th>
+                                                </tr>
+                                                <tr>
+                                                    <td className='border'>Historical</td>
+                                                    <td className='border'>1980-2014</td>
+                                                </tr>
+                                                <tr>
+                                                    <td className='border'>Early-Century</td>
+                                                    <td className='border'>2030</td>
+                                                </tr>
+                                                <tr>
+                                                    <td className='border'>Mid-Century</td>
+                                                    <td className='border'>2050</td>
+                                                </tr>
+                                                <tr>
+                                                    <td className='border'>End-Century</td>
+                                                    <td className='border'>2100</td>
+                                                </tr>
+                                            </table>
 
-                                        <p>
-                                            The time selector allows users to view projections across multiple planning horizons:
-                                        </p>
+                                            <section className='font-bold'>[Add section about hazard sliders]</section>
 
-                                        <ul className='list-disc pl-5 space-y-1'>
-                                            <li><b>Historical:</b> 1980–2014</li>
-                                            <li><b>Early-Century:</b> 2030</li>
-                                            <li><b>Mid-Century:</b> 2050</li>
-                                            <li><b>End-Century:</b> 2100</li>
-                                        </ul>
+                                            <section className='font-bold'>Interpret the Maps</section>
 
-                                        <section className='font-bold'>[Add section about hazard sliders]</section>
+                                            <p>
+                                                The maps display exposure levels using a graduated color scale. Darker shades indicate higher levels of exposure relative
+                                                to the selected indicator and scenario.
+                                            </p>
 
-                                        <section className='font-bold'>Interpret the Maps</section>
+                                            <p>Users can:</p>
 
-                                        <p>
-                                            The maps display exposure levels using a graduated color scale. Darker shades indicate higher levels of exposure relative
-                                            to the selected indicator and scenario.
-                                        </p>
+                                            <ul className='list-disc pl-5 space-y-1'>
+                                                <li>Hover over regions to view detailed values.</li>
+                                                <li>Identify geographic hotspots.</li>
+                                                <li>Compare exposure patterns between locations.</li>
+                                                <li>Understand where future climate impacts may become more concentrated.</li>
+                                                <li>Download results for further analysis.</li>
+                                            </ul>
 
-                                        <p>Users can:</p>
-
-                                        <ul className='list-disc pl-5 space-y-1'>
-                                            <li>Hover over regions to view detailed values.</li>
-                                            <li>Identify geographic hotspots.</li>
-                                            <li>Compare exposure patterns between locations.</li>
-                                            <li>Understand where future climate impacts may become more concentrated.</li>
-                                            <li>Download results for further analysis.</li>
-                                        </ul>
-
-                                        <p>
-                                            Read More for additional information on the methodology and data sources behind this analysis.
-                                        </p>
+                                            <p>
+                                                <b>Read More</b> for additional information on the methodology and data sources behind this analysis.
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                                 :
@@ -1346,7 +1367,7 @@ function EventTracking() {
                                         <section className='font-bold'>Navigating the Grid View</section>
 
                                         <p>
-                                            The Grid view enables users to explore forward-looking climate risks at a highly granular spatial level.
+                                            The <b>Grid</b> view enables users to explore forward-looking climate risks at a highly granular spatial level.
                                             Unlike the Compare view, which focuses on benchmarking locations side by side, the Grid view allows users
                                             to examine how hazards and exposures intersect across the globe using detailed geospatial data.
                                         </p>
@@ -1359,16 +1380,16 @@ function EventTracking() {
 
                                         <ul className='list-disc pl-5 space-y-1'>
                                             <li>
-                                                A hazard category (such as coastal flooding, riverine flooding, heat stress, drought, or other available hazards).
+                                                A <b>hazard category</b> (such as coastal flooding, riverine flooding, heat stress, drought, or other available hazards).
                                             </li>
                                             <li>
-                                                An exposure layer (such as population, GDP, urban GDP, buildings).
+                                                An <b>exposure layer</b> (such as population, GDP, urban GDP, buildings).
                                             </li>
                                             <li>
-                                                A climate scenario (Orderly or Disorderly).
+                                                A <b>climate scenario</b> (Orderly or Disorderly).
                                             </li>
                                             <li>
-                                                A time horizon for analysis.
+                                                A <b>time horizon</b> for analysis.
                                             </li>
                                         </ul>
 
@@ -1396,13 +1417,28 @@ function EventTracking() {
                                         <p>
                                             The time selector enables users to evaluate exposure across multiple planning horizons.
                                         </p>
-
-                                        <ul className='list-disc pl-5 space-y-1'>
-                                            <li><b>Historical:</b> 1980–2014</li>
-                                            <li><b>Early-Century:</b> 2030</li>
-                                            <li><b>Mid-Century:</b> 2050</li>
-                                            <li><b>End-Century:</b> 2100</li>
-                                        </ul>
+                                        <table className='border'>
+                                                <tr className='border'>
+                                                    <th className='border text-center bg-(--primarygray-10)'><b>Future Horizon</b></th>
+                                                    <th className='border text-center bg-(--primarygray-10)'><b>Reference Year</b></th>
+                                                </tr>
+                                                <tr>
+                                                    <td className='border'>Historical</td>
+                                                    <td className='border'>1980-2014</td>
+                                                </tr>
+                                                <tr>
+                                                    <td className='border'>Early-Century</td>
+                                                    <td className='border'>2030</td>
+                                                </tr>
+                                                <tr>
+                                                    <td className='border'>Mid-Century</td>
+                                                    <td className='border'>2050</td>
+                                                </tr>
+                                                <tr>
+                                                    <td className='border'>End-Century</td>
+                                                    <td className='border'>2100</td>
+                                                </tr>
+                                            </table>
 
                                         <section className='font-bold'>Understanding the Bivariate Legend</section>
 
@@ -1415,8 +1451,8 @@ function EventTracking() {
                                         <p>In the example shown:</p>
 
                                         <ul className='list-disc pl-5 space-y-1'>
-                                            <li>The vertical axis represents Population Exposure (low to high).</li>
-                                            <li>The horizontal axis represents Flood Height (low to high).</li>
+                                            <li>The <b>vertical axis</b> represents <b>Population Exposure</b> (low to high).</li>
+                                            <li>The <b>horizontal axis</b> represents <b>Flood Height</b> (low to high).</li>
                                             <li>
                                                 Each grid cell on the map is colored based on the combination of these two variables.
                                             </li>
@@ -1424,22 +1460,29 @@ function EventTracking() {
 
                                         <p>The legend can be interpreted as follows:</p>
 
-                                        <ul className='list-disc pl-5 space-y-1'>
-                                            <li>
-                                                <b>Low Hazard + Low Exposure:</b> Areas where flood levels and exposed populations are both relatively low.
-                                            </li>
-                                            <li>
-                                                <b>High Hazard + Low Exposure:</b> Areas with severe flooding but relatively few people exposed.
-                                            </li>
-                                            <li>
-                                                <b>Low Hazard + High Exposure:</b> Areas with large populations but relatively lower flood intensity.
-                                            </li>
-                                            <li>
-                                                <b>High Hazard + High Exposure:</b> Areas where severe flooding coincides with large exposed populations,
-                                                representing potential risk hotspots.
-                                            </li>
-                                        </ul>
-
+                                        <table className='border'>
+                                                <tr className='border'>
+                                                    <th className='border text-center bg-(--primarygray-10)'><b>Legend Category</b></th>
+                                                    <th className='border text-center bg-(--primarygray-10)'><b>Meaning</b></th>
+                                                </tr>
+                                                <tr>
+                                                    <td className='border'>Low Hazard + Low Exposure</td>
+                                                    <td className='border'>Areas where flood levels and exposed populations are both relatively low.</td>
+                                                </tr>
+                                                <tr>
+                                                    <td className='border'>High Hazard + Low Exposure</td>
+                                                    <td className='border'>Areas with severe flooding but relatively few people exposed.</td>
+                                                </tr>
+                                                <tr>
+                                                    <td className='border'>Low Hazard + High Exposure</td>
+                                                    <td className='border'>Areas with large populations but relatively lower flood intensity.</td>
+                                                </tr>
+                                                <tr>
+                                                    <td className='border'>High Hazard + High Exposure</td>
+                                                    <td className='border'>Areas where severe flooding coincides with large exposed populations,
+                                                representing potential risk hotspots.</td>
+                                                </tr>
+                                            </table>
                                         <p>
                                             The color gradient helps users distinguish between these combinations at a glance. Areas that appear in the most
                                             intense colors represent locations where both hazard levels and exposure levels are relatively high, making them
@@ -1447,7 +1490,7 @@ function EventTracking() {
                                         </p>
 
                                         <p>
-                                            Read More for additional information on the methodology and data sources behind this analysis.
+                                            <b>Read More</b> for additional information on the methodology and data sources behind this analysis.
                                         </p>
                                     </div>
                                 </div>
@@ -1457,8 +1500,13 @@ function EventTracking() {
                         </div>
                     </div>
                 </div>
-            </div> */}
-
+            </div>
+            :
+            null}
+            <div className='flex flex-col items-center justify-center h-14.75 w-15.25 absolute top-20 right-3 gap-y-1 cursor-pointer bg-(--accentdarkblue-80) rounded-sm' onClick={() => {setDataExplainerState(true)}}>
+                <img src={DataIcon} width={15}></img>
+                <span className='font-bold text-white text-xs text-base/5'>Data Explainer</span>
+            </div>
 
         </div>
     )
