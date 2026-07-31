@@ -79,7 +79,7 @@ function EventTracking() {
     const groupLayer = useRef<GroupLayer>(null);
 
     const [dataExplainerOpen, setDataExplainerState] = useState(false);
-    const [dataExplainerView, setDataExplainerView] = useState("Compare");
+    const [dataExplainerView, setDataExplainerView] = useState("Event Tracking");
 
     useEffect(() => {
         view.current.on("click", async (event) => {
