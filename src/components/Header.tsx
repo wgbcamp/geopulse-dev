@@ -41,6 +41,7 @@ import { isoCountries, countryByIso3 } from "@/config/isoCountries";
 
 import Hamburger from '../assets/Group 51.png'
 import Lockup from '../assets/lockup.svg'
+import DropdownArrow from '../assets/Dropdown-arrow.svg';
 
 export const Header = () => {
 
@@ -134,7 +135,7 @@ export const Header = () => {
     }
 
     const calendarComponent =
-        <Card className={`rounded-none w-full h-22 xl:h-14.75 p-0 px-2 items-center justify-center shadow-none border-x-0 gap-0`}>
+        <Card className={`rounded-none w-full h-22 xl:h-14.75 p-0 px-2 items-center justify-center border-r-0 gap-0 select-none`}>
             <div className='w-full flex flex-col items-center'>
                 <Popover open={calendarOpened} onOpenChange={() => setCalendarOpened(!calendarOpened)}>
                     <PopoverTrigger asChild>
@@ -149,11 +150,7 @@ export const Header = () => {
                                         {state?.dateRange.to ? format(state?.dateRange.to, "MMM d, yyyy") : <span>Select a date</span>}
                                     </section>
                                 </div>
-                                <svg width="12" height="12" viewBox="0 0 8 5" xmlns="http://www.w3.org/2000/svg">
-                                    <g transform={`rotate(${calendarOpened ? "180" : "0"}, 3.9375, 2.1753)`}>
-                                        <path d="M3.64746 4.23193L0.131836 0.716309C-0.0439453 0.558105 -0.0439453 0.294434 0.131836 0.118652C0.290039 -0.0395508 0.553711 -0.0395508 0.729492 0.118652L3.94629 3.33545L7.16309 0.118652C7.32129 -0.0395508 7.58496 -0.0395508 7.74316 0.118652C7.91895 0.276855 7.91895 0.558105 7.74316 0.716309L4.22754 4.23193C4.06934 4.39014 3.80566 4.39014 3.64746 4.23193Z" fill="black" />
-                                    </g>
-                                </svg>
+                                <img src={DropdownArrow} className={`${calendarOpened ? "rotate-180" : "rotate-0"}`}></img>
                             </div>
                         </div>
                     </PopoverTrigger>
@@ -289,16 +286,13 @@ export const Header = () => {
                 </div>
                 {location.pathname == "/eventtracking" ?
                     <div className={`flex flex-col xl:flex-row ${dataOptions ? 'h-full' : 'h-0'} w-full col-start-1 col-end-4 xl:col-start-2 xl:col-end-3 `}>
-                        <Card className="rounded-none p-0 flex flex-col items-center justify-center gap-0 h-22 xl:h-14.75 w-full px-2">
+                        {calendarComponent}
+                        <Card className="rounded-none border-r-0  p-0 flex flex-col items-center justify-center gap-0 h-22 xl:h-14.75 w-full px-2">
                             <Popover open={eventFilterOpened} onOpenChange={() => setEventFilterOpened(!eventFilterOpened)}>
                                 <PopoverTrigger asChild>
                                     <div className="flex flex-row items-center w-95/100 h-full justify-between cursor-pointer">
                                         <div className="text-[14px] font-bold text-end flex items-center pl-2">{eventTypes[state?.eventFilter]}</div>
-                                        <svg width="12" height="12" viewBox="0 0 8 5" xmlns="http://www.w3.org/2000/svg">
-                                            <g transform={`rotate(${eventFilterOpened ? "180" : "0"}, 3.9375, 2.1753)`}>
-                                                <path d="M3.64746 4.23193L0.131836 0.716309C-0.0439453 0.558105 -0.0439453 0.294434 0.131836 0.118652C0.290039 -0.0395508 0.553711 -0.0395508 0.729492 0.118652L3.94629 3.33545L7.16309 0.118652C7.32129 -0.0395508 7.58496 -0.0395508 7.74316 0.118652C7.91895 0.276855 7.91895 0.558105 7.74316 0.716309L4.22754 4.23193C4.06934 4.39014 3.80566 4.39014 3.64746 4.23193Z" fill="black" />
-                                            </g>
-                                        </svg>
+                                        <img src={DropdownArrow} className={`${eventFilterOpened ? "rotate-180" : "rotate-0"}`}></img>
                                     </div>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-56.25 p-0 my-1.25 rounded-none shadow-[0_-10px_10px_-5px_rgba(0,0,0,0.1)]">
@@ -316,7 +310,6 @@ export const Header = () => {
                                 </PopoverContent>
                             </Popover>
                         </Card>
-                        {calendarComponent}
                         <Card className="rounded-none p-0 flex flex-col items-center justify-center gap-0 h-22 xl:h-14.75 w-full px-2">
                             <Popover open={open} onOpenChange={setOpen}>
                                 <PopoverTrigger asChild>
@@ -324,13 +317,15 @@ export const Header = () => {
                                         variant="outline"
                                         role="combobox"
                                         aria-expanded={open}
-                                        className="w-95/100 justify-between light"
+                                        className="w-95/100 font-bold justify-between light border-0 shadow-none hover:bg-white cursor-pointer"
                                     >
-                                        {countryByIso3[iso3]}
-                                        <ChevronsUpDown className="opacity-50" />
+                                        <div className='max-w-25 overflow-hidden'>
+                                            {countryByIso3[iso3]}
+                                        </div>
+                                        <img src={DropdownArrow} className={`${open ? "rotate-180" : "rotate-0"}`}></img>
                                     </Button>
                                 </PopoverTrigger>
-                                <PopoverContent className="w-[200px] p-0 light">
+                                <PopoverContent className="w-60 p-0 mt-4 light rounded-none">
                                     <Command>
                                         <CommandInput placeholder="Search country..." className="h-9" />
                                         <CommandList>

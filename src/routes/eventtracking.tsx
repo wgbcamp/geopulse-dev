@@ -574,7 +574,7 @@ function EventTracking() {
                 field: "eventtype",
                 uniqueValueInfos: uniqueColorValues
             },
-            definitionExpression: `${state?.eventFilter !== 'AL' ? `eventtype='${state?.eventFilter}' AND` : ''} (fromdate >= timestamp '${toTimestamp(new Date(state.dateRange.from))}' AND fromdate <= timestamp '${toTimestamp(new Date(state.dateRange.to))}'
+            definitionExpression: `(fromdate >= timestamp '${toTimestamp(new Date(state.dateRange.from))}' AND fromdate <= timestamp '${toTimestamp(new Date(state.dateRange.to))}'
             OR
             todate >= timestamp '${toTimestamp(new Date(state.dateRange.from))}' AND todate <= timestamp '${toTimestamp(new Date(state.dateRange.to))}'
             OR
@@ -589,7 +589,15 @@ function EventTracking() {
 
         map.current.add(eventFeatureLayer.current); // add events feature layer to map
 
-    }, [state?.dateRange.from, state?.dateRange.to, state?.eventFilter])
+    }, [state?.dateRange.from, state?.dateRange.to])
+
+    view.current.whenLayerView(eventFeatureLayer.current as FeatureLayer).then((layerView) => {
+        if (state?.eventFilter !== "AL") {
+            layerView.filter = {
+                where: `eventtype='${state?.eventFilter}'`
+            };
+        }        
+    })
 
     // query feature layer 
     async function highlightCountry(eventid: any, index?: number) {
@@ -966,11 +974,11 @@ function EventTracking() {
                         <div className='w-15 h-1 bg-(--accentcoolgray-60) rounded-xl'></div>
                     </div>
                     <div className="h-[32px] shadow-[0px_4px_5.8px_0px_#00000024] flex items-center justify-start">
-                        <b className="ml-2">{events?.length || 0} Events in Date Range</b>
+                        <b className="ml-2">{state?.eventFilter == "AL" ? events?.length : events?.filter((element: Record<string, any>) => element.attributes.eventtype == state?.eventFilter).length} Events in Date Range</b>
                     </div>
                 </div>
                 <div className="h-full pb-20 md:pb-0 overflow-y-scroll flex flex-col justify-start" ref={eventRef}>
-                    {events?.map((event: any) => (
+                    {events?.filter((element: Record<string, any>) => (element.attributes.eventtype == state?.eventFilter) || state?.eventFilter == "AL")?.map((event: any) => (
                         <div key={event.attributes.htmldescription} className="p-2 border-b border-gray-300 items-start flex flex-col text-left">
                             <h3 className="font-bold text-[14px] text-[var(--accentblue-100)]">{event.attributes.country.toUpperCase()}</h3>
                             <h3 className="font-bold text-[16px]">{event.attributes.description}</h3>
