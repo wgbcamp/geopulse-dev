@@ -24,6 +24,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
 import { faPause } from "@fortawesome/free-solid-svg-icons";
 import DataIcon from '../assets/data_icon.svg';
+import DropdownArrow from '../assets/Dropdown-arrow.svg';
 
 import { Slider } from "@/components/ui/slider"
 
@@ -1077,8 +1078,20 @@ function EventTracking() {
 
 
 
-                <div className="pt-5 font-bold text-[14px] pl-4">Main economies affected:</div>
-                <div className='text-left text-[14px] pb-4 pl-4'>{focusedEvent.country} | <u className='cursor-pointer'>Download</u></div>
+                <div className="pt-5 font-bold text-[14px] pl-4">View affected economies</div>
+                <div className='text-left flex flex-wrap text-[14px] pb-4 pl-4 pt-2 gap-3'>
+                    <div className='rounded-xl h-5 whitespace-nowrap px-3 py-3 bg-(--accentwarmgray-20) font-bold flex items-center justify-center'>
+                        <div>Total</div>
+                    </div>
+                    {focusedEvent?.country?.split(", ")?.map((a, i) =>
+                        <div className='rounded-xl h-5 whitespace-nowrap px-3 py-3 bg-(--accentwarmgray-20) font-bold flex items-center justify-center'>
+                            <div>{a}</div>
+                        </div>
+                    )}
+                    <div className='rounded-xl h-5 whitespace-nowrap px-2 py-3 bg-(--accentwarmgray-20) font-bold flex items-center justify-center'>
+                        <div className='w-10 flex justify-between'>All <img src={DropdownArrow}></img></div>
+                    </div>
+                </div>
                 <div className="pt-5 flex flex-row w-full text-[12px] font-bold justify-around border-t-1 px-4">
                     <div className='flex flex-col w-full items-between text-left'>
                         <div className='pb-2 border-solid border-b-1'>LAYER</div>
@@ -1151,7 +1164,7 @@ function EventTracking() {
                                         <div className='text-white font-bold text-2xl'>Data Explainer</div>
                                     </div>
                                 </div>
-                                <div className="flex flex-row gap-x-2 overflow-x-scroll">
+                                <div className="flex flex-row gap-x-2 overflow-x-auto">
                                     <div className='flex flex-col w-50'>
                                         <div className="text-xs text-white pt-3 pb-2 tracking-widest font-semibold">REALTIME</div>
                                         <div className={`h-10 w-50 font-bold ${dataExplainerView == "Event Tracking" ? "text-(--primaryblue-100) bg-white" : "text-black bg-(--primarygray-40)"} rounded-t-md flex items-center justify-center cursor-pointer`} onClick={() => setDataExplainerView("Event Tracking")}>EVENT TRACKING</div>
@@ -1167,8 +1180,8 @@ function EventTracking() {
                             </div>
                         </div>
                     </div>
-                    <div className='flex w-full justify-center overflow-scroll my-5'>
-                        <div className='flex flex-col lg:flex-row bg-white mt-12 w-9/10 max-h-291 gap-x-9 justify-start'>
+                    <div className='flex w-full justify-center overflow-y-scroll my-5'>
+                        <div id="dataExplainer" className='flex flex-col lg:flex-row bg-white mt-12 w-9/10 max-h-291 gap-x-9 justify-start'>
                             {dataExplainerView == "Event Tracking" ?
                                 <div>
                                     <div className='flex flex-col gap-y-5 text-left'>
