@@ -73,7 +73,7 @@ export const Header = () => {
     const [menuOptions, setMenuOptions] = useState<boolean>(false);
 
     const [open, setOpen] = React.useState(false);
-    const [iso3, setIso3] = useState("AND");
+    const [iso3, setIso3] = useState("");
     
 
     const swapTable = (hazard: string, exposure: string, threshold: { name: string; threshold: any }, measure: { name: string; id: string }) => {
@@ -156,10 +156,10 @@ export const Header = () => {
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0 my-2.5 rounded-none flex flex-col items-center">
                         <div className="w-9/10 flex py-5 justify-evenly gap-2">
-                            <Button className={`font-bold ${currentDatePreset == "All Data" ? 'bg-(--primarygray-40) text-black hover:text-white' : 'bg-(--accentblue-100)'} cursor-pointer`} onClick={() => datePresets("All Data")}>All Data</Button>
-                            <Button className={`font-bold ${currentDatePreset == "Last 3 months" ? 'bg-(--primarygray-40) text-black hover:text-white' : 'bg-(--accentblue-100)'} cursor-pointer`} onClick={() => datePresets("Last 3 months")}>Last 3 months</Button>
-                            <Button className={`font-bold ${currentDatePreset == "Last 6 months" ? 'bg-(--primarygray-40) text-black hover:text-white' : 'bg-(--accentblue-100)'} cursor-pointer`} onClick={() => datePresets("Last 6 months")}>Last 6 months</Button>
-                            <Button className={`font-bold ${currentDatePreset == "Last Year" ? 'bg-(--primarygray-40) text-black hover:text-white' : 'bg-(--accentblue-100)'} cursor-pointer`} onClick={() => datePresets("Last Year")}>Last Year</Button>
+                            <Button className={`font-bold ${currentDatePreset == "All Data" ? 'bg-(--accentblue-100)' : 'bg-(--primarygray-40) text-black hover:text-white' } cursor-pointer`} onClick={() => datePresets("All Data")}>All Data</Button>
+                            <Button className={`font-bold ${currentDatePreset == "Last 3 months" ? 'bg-(--accentblue-100)' : 'bg-(--primarygray-40) text-black hover:text-white' } cursor-pointer`} onClick={() => datePresets("Last 3 months")}>Last 3 months</Button>
+                            <Button className={`font-bold ${currentDatePreset == "Last 6 months" ? 'bg-(--accentblue-100)' : 'bg-(--primarygray-40) text-black hover:text-white' } cursor-pointer`} onClick={() => datePresets("Last 6 months")}>Last 6 months</Button>
+                            <Button className={`font-bold ${currentDatePreset == "Last Year" ? 'bg-(--accentblue-100)' : 'bg-(--primarygray-40) text-black hover:text-white' } cursor-pointer`} onClick={() => datePresets("Last Year")}>Last Year</Button>
                         </div>
                         <Calendar
                             mode="range"
@@ -192,7 +192,7 @@ export const Header = () => {
             </div>
         </Card>;
 
-    const doSomething =  (iso3: string) => {
+    const queryCountryCoordinates =  (iso3: string) => {
 
         const whereClause = `ISO3 IN ('${iso3}')`;
         const queryString = `where=${encodeURIComponent(whereClause)}`;
@@ -320,7 +320,7 @@ export const Header = () => {
                                         className="w-95/100 font-bold justify-between light border-0 shadow-none hover:bg-white cursor-pointer"
                                     >
                                         <div className='max-w-25 overflow-hidden'>
-                                            {countryByIso3[iso3]}
+                                            {state?.countryFilter == "All countries" ? "All countries" : countryByIso3[iso3]}
                                         </div>
                                         <img src={DropdownArrow} className={`${open ? "rotate-180" : "rotate-0"}`}></img>
                                     </Button>
@@ -331,6 +331,24 @@ export const Header = () => {
                                         <CommandList>
                                             <CommandEmpty>Country not found.</CommandEmpty>
                                             <CommandGroup>
+                                                <CommandItem
+                                                        className="data-[selected=true]:bg-neutral-200 text-left"
+                                                        key="all"
+                                                        value="All countries"
+                                                        onSelect={() => {
+                                                            setOpen(false);
+                                                            setIso3("");
+                                                            actions?.setCountryFilter("All countries");
+                                                        }}
+                                                    >
+                                                        All countries
+                                                        <Check
+                                                            className={cn(
+                                                                "ml-auto",
+                                                                state?.countryFilter === "All countries" ? "opacity-100" : "opacity-0"
+                                                            )}
+                                                        />
+                                                    </CommandItem>
                                                 {isoCountries.sort((a, b) => a.name.localeCompare(b.name)).map((country) => (
                                                     <CommandItem
                                                         className="data-[selected=true]:bg-neutral-200 text-left"
@@ -339,7 +357,7 @@ export const Header = () => {
                                                         onSelect={() => {
                                                             setOpen(false)
                                                             setIso3(country.iso3)
-                                                            actions?.setCountryFilter(country.iso3); doSomething(country.iso3)
+                                                            actions?.setCountryFilter(country.iso3); queryCountryCoordinates(country.iso3)
                                                         }}
                                                     >
                                                         {country.name}

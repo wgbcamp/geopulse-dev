@@ -89,7 +89,7 @@ export function App() {
     to: (new Date)
   });
   const [eventFilter, setEventFilter] = useState<string>("AL");
-  const [countryFilter, setCountryFilter] = useState<string>("AND");
+  const [countryFilter, setCountryFilter] = useState<string>("All countries");
   const [countryCoordinates, setCountryCoordinates] = useState<{ longitude: number, latitude: number }>({ longitude: 42.55108741, latitude: 1.57672606 });
 
   const state = useMemo<AppState>(() => ({
