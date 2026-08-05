@@ -1142,8 +1142,8 @@ function EventTracking() {
                         <div className='w-10 flex justify-between'>All <img src={DropdownArrow}></img></div>
                     </div>
                 </div>
-                <div className="pt-5 flex flex-row w-78 text-[12px] font-bold justify-around border-t-1 px-4">
-                    <div className='flex flex-col w-full items-between text-left'>
+                <div className="pt-5 flex flex-row w-full text-[12px] font-bold justify-around border-t-1 px-4">
+                    <div className='flex flex-col w-40 items-between text-left'>
                         <div className='pb-2 border-solid border-b-1'>LAYER</div>
                         {exposuresArray.filter((a) => a.name !== "Nightlights").map((e: any) =>
                             <div className='h-[45px] text-[16px] font-medium border-solid border-b-1 flex items-center '>{e.name}</div>
