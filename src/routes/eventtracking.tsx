@@ -4,6 +4,23 @@ import { useState, useRef, useEffect, useCallback, useContext } from 'react'
 
 import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
 
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
+import { Button } from "@/components/ui/button"
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command"
+import { cn } from "@/lib/utils"
+import { Check } from "lucide-react"
+
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer.js";
 import GroupLayer from "@arcgis/core/layers/GroupLayer.js";
 import ScaleBar from "@arcgis/core/widgets/ScaleBar.js";
@@ -47,10 +64,8 @@ function EventTracking() {
 
     const [realtimeExposure, setRealtimeExposure] = useState<{ exposure: string, filter: string }>({ exposure: "Population", filter: "Population" });
     const [events, setEvents] = useState<any>(null);
-    // const [hiddenEvents, setHiddenEvents] = useState<number>(0);
     const [focusedEvent, setFocusedEvent] = useState<any>("");
     const [eventPopup, setEventPopup] = useState<string>("all events");
-    // const eventPopupRef = useRef<string>("all events");
     const [focusedFeatures, setFocusedFeatures] = useState<any>(null);
     const [focusedSliderValue, setFocusedSliderValue] = useState<number[]>([0]);
     const [focusedSliderPlaying, setFocusedSliderPlaying] = useState<boolean>(false);
@@ -58,15 +73,15 @@ function EventTracking() {
 
     const [currentCountryExposure, setCurrentCountryExposure] = useState<any>(null);
 
+    const [otherCountryDropdownStatus, setOtherCountryDropdownStatus] = useState<any>(false);
+
     const ref = useRef(null);
     const eventRef = useRef<HTMLDivElement | null>(null);
-    const eventsRef = useRef<any>(null);
     const pulseContainerRef = useRef<HTMLDivElement>(null);
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     const [dimension3D, setDimension3D] = useState<boolean>(false);
 
-    const countryRef = useRef<any>(null);
 
     const [mobileExposures, setMobileExposures] = useState<boolean>(false);
 
@@ -77,7 +92,6 @@ function EventTracking() {
     const boundariesLayer = useRef<VectorTileLayer | null>(null);
     const exposureLayer = useRef<any>(null);
     const eventFeatureLayer = useRef<FeatureLayer | null>(null);
-    const pulseEls = useRef<{ el: HTMLDivElement; geometry: any }[]>([]);
 
     const [layerSettingsPopup, setLayerSettingsPopup] = useState<boolean>(false);
 
@@ -1130,17 +1144,72 @@ function EventTracking() {
 
                 <div className="pt-5 font-bold text-[14px] pl-4">View affected economies</div>
                 <div className='text-left flex flex-wrap text-[14px] pb-4 pl-4 pt-2 gap-3'>
-                    <div className={`rounded-xl h-5 whitespace-nowrap px-3 py-3 ${currentCountryExposure == "ALL" ? "bg-(--accentblue-100) text-white"  : "bg-(--accentwarmgray-20)"} font-bold flex items-center justify-center cursor-pointer`} onClick={() => setCurrentCountryExposure("ALL")}>
-                        <div>Total</div>
-                    </div>
-                    {focusedEvent?.affectedcountries?.split(",")?.map((a, i) =>
-                        <div className={`rounded-xl h-5 whitespace-nowrap px-3 py-3 ${currentCountryExposure == a ? "bg-(--accentblue-100) text-white"  : "bg-(--accentwarmgray-20)"} font-bold flex items-center justify-center cursor-pointer`} onClick={() => {setCurrentCountryExposure(a); console.log(focusedCountryExposures.indexOf(focusedCountryExposures.find((c: any) => c.attributes.areaid == a)))}}>
-                            <div>{countryByIso3[a]}</div>
+                        <div className={`rounded-xl h-5 whitespace-nowrap px-3 py-3 ${currentCountryExposure == "ALL" ? "bg-(--accentblue-100) text-white" : "bg-(--accentwarmgray-20)"} font-bold flex items-center justify-center cursor-pointer`} onClick={() => setCurrentCountryExposure("ALL")}>
+                            <div>Total</div>
                         </div>
+                    {focusedEvent?.affectedcountries?.split(",")?.map((a: string, i: number) => {
+                            if ( i < 3) {
+                                return (
+                                    <div className={`rounded-xl h-5 whitespace-nowrap px-3 py-3 ${currentCountryExposure == a ? "bg-(--accentblue-100) text-white" : "bg-(--accentwarmgray-20)"} font-bold flex items-center justify-center cursor-pointer`} onClick={() => { setCurrentCountryExposure(a); console.log(focusedCountryExposures.indexOf(focusedCountryExposures.find((c: any) => c.attributes.areaid == a))) }}>
+                                        <div>{countryByIso3[a]}</div>
+                                    </div>
+                                )
+                            }
+                        }
                     )}
-                    <div className='rounded-xl h-5 whitespace-nowrap px-2 py-3 bg-(--accentwarmgray-20) font-bold flex items-center justify-center'>
-                        <div className='w-10 flex justify-between'>All <img src={DropdownArrow}></img></div>
-                    </div>
+                    {focusedEvent?.affectedcountries?.split(",")?.length > 2 ? <div className={`rounded-xl h-5 whitespace-nowrap px-2 py-3 ${focusedEvent?.affectedcountries?.split(",")?.find((a, i) => a == currentCountryExposure && i > 2) ? 'bg-(--accentblue-100)' : 'bg-(--accentwarmgray-20)'}  font-bold flex items-center justify-center`} onClick={() => setOtherCountryDropdownStatus(!otherCountryDropdownStatus)}>
+                        <div className='w-10 pr-12 flex justify-between cursor-pointer'>Other</div>
+                            <Popover open={otherCountryDropdownStatus} onOpenChange={setOtherCountryDropdownStatus}>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        role="combobox"
+                                        aria-expanded={otherCountryDropdownStatus}
+                                        className="w-4 h-5.25 font-bold justify-between light border-0 shadow-none p-0 bg-transparent hover:bg-transparent cursor-pointer"
+                                    >
+                                        <img src={DropdownArrow} className={`${otherCountryDropdownStatus ? "rotate-180" : "rotate-0"}`}></img>
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-60 p-0 light rounded-none">
+                                    <Command>
+                                        <CommandInput placeholder="Search country..." className="h-9" />
+                                        <CommandList>
+                                            <CommandEmpty>Country not found.</CommandEmpty>
+                                            <CommandGroup>
+                                                {focusedEvent?.affectedcountries?.split(",")?.map((a, i) => {
+                                                    if (i > 2) {
+                                                        return (
+                                                            <CommandItem
+                                                                className="data-[selected=true]:bg-white text-left"
+                                                                key="all"
+                                                                value="All countries"
+                                                                onSelect={() => {
+                                                                    setOtherCountryDropdownStatus(false);
+                                                                    setCurrentCountryExposure(a);
+                                                                }}
+                                                            >
+                                                                {countryByIso3[a]}
+                                                                <Check
+                                                                    className={cn(
+                                                                        "ml-auto",
+                                                                        currentCountryExposure === a ? "opacity-100" : "opacity-0"
+                                                                    )}
+                                                                />
+                                                            </CommandItem>
+                                                        )
+                                                    }
+                                                }
+                                                )}
+                                            </CommandGroup>
+                                        </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                            </Popover>
+                        </div>
+                        :
+                        null
+                    }
+                    
                 </div>
                 <div className="pt-5 flex flex-row w-full text-[12px] font-bold justify-around border-t-1 px-4">
                     <div className='flex flex-col w-40 items-between text-left'>
