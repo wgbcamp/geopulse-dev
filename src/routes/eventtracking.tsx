@@ -675,7 +675,7 @@ function EventTracking() {
 
 
 
-        applyPolygon(ascendingFeatures[0]); // Apply the polygon styling from the first feature (or the specified index)
+        applyPolygon(ascendingFeatures[ascendingFeatures.length - 1]); // Apply the polygon styling from the first feature (or the specified index)
     }
 
     const applyPolygon = (features: any) => {
@@ -724,6 +724,10 @@ function EventTracking() {
             // })
         }
     }
+
+    useEffect(() => {
+        setFocusedSliderValue([focusedFeatures?.length - 1]);
+    }, [focusedFeatures]);
 
     // focuses view on the event selected
     const focusOnEvent = async (coors: { longitude: number, latitude: number }, attributes: any) => {
@@ -1091,7 +1095,6 @@ function EventTracking() {
                                     min={0}
                                     // if there are no features, set max to 10 for demonstrative purposes
                                     max={focusedFeatures?.length - 1 || 10}
-                                    defaultValue={[0]}
                                     value={focusedSliderValue}
                                     onValueChange={(value) => {
                                         setFocusedSliderValue(value);
@@ -1157,7 +1160,7 @@ function EventTracking() {
                             }
                         }
                     )}
-                    {focusedEvent?.affectedcountries?.split(",")?.length > 2 ? <div className={`rounded-xl h-5 whitespace-nowrap px-2 py-3 ${focusedEvent?.affectedcountries?.split(",")?.find((a, i) => a == currentCountryExposure && i > 2) ? 'bg-(--accentblue-100)' : 'bg-(--accentwarmgray-20)'}  font-bold flex items-center justify-center`} onClick={() => setOtherCountryDropdownStatus(!otherCountryDropdownStatus)}>
+                    {focusedEvent?.affectedcountries?.split(",")?.length > 2 ? <div className={`rounded-xl h-5 whitespace-nowrap px-2 py-3 ${focusedEvent?.affectedcountries?.split(",")?.find((a, i) => a == currentCountryExposure && i > 2) ? 'bg-(--accentblue-100) text-white' : 'bg-(--accentwarmgray-20)'}  font-bold flex items-center justify-center`} onClick={() => setOtherCountryDropdownStatus(!otherCountryDropdownStatus)}>
                         <div className='w-10 pr-12 flex justify-between cursor-pointer'>Other</div>
                             <Popover open={otherCountryDropdownStatus} onOpenChange={setOtherCountryDropdownStatus}>
                                 <PopoverTrigger asChild>
