@@ -1,6 +1,6 @@
 {
   "files": [],
-  "include": ["src", "*.ts"], // added for arcgis
+  "include": ["src", "*.ts", "public/GADM_ADMIN1.ts"], // added for arcgis
   "references": [
     {
       "path": "./tsconfig.app.json"

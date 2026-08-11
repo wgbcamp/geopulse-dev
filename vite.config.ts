@@ -31,6 +31,6 @@ export default defineConfig(({ mode }) => {
         inline: ['@esri/calcite-components']
       },
       environment: 'jsdom',
-    }
+    },
   }
 })

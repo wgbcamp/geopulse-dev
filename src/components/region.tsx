@@ -200,7 +200,7 @@ export const Region = ({ defaultIso3, geoJson, regionId, sharedYMax, onDataMax }
             // } 
         };
         loadCountryData(iso3);
-    }, [iso3, state?.currentHazard, state?.currentExposure]);
+    }, [iso3, state?.currentHazard, state?.currentExposure, geoJson]);
 
     // re-process already-fetched data
     useEffect(() => {

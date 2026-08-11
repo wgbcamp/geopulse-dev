@@ -1,4 +1,4 @@
-import { useContext, useState, useCallback } from 'react'
+import { useContext, useState, useCallback, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 
 import { AppStateContext } from '../app';
@@ -6,7 +6,6 @@ import { AppStateContext } from '../app';
 import { Region } from "../components/region"
 import { Thresholds } from "../components/thresholds"
 
-import { GADM_ADMIN1 } from "../config/GADM_ADMIN1"
 import { comparisonNote } from "../config/datasets"
 
 export const Route = createFileRoute('/compare')({
@@ -14,6 +13,14 @@ export const Route = createFileRoute('/compare')({
 })
 
 function CompareView() {
+
+    const [polygons, setPolygons] = useState<any>(null);
+
+    useEffect(() => {
+        fetch('/GADM_ADMIN1.json')
+            .then((res) => res.json())
+            .then((jsonRes) => setPolygons(jsonRes));
+    }, []);
 
     // Each panel reports its current data max; both panels then share the joint max as their y-scale.
     const [maxes, setMaxes] = useState<Record<string, number>>({});
@@ -29,14 +36,14 @@ function CompareView() {
                     <Region
                         regionId="A"
                         defaultIso3={"CHN"}
-                        geoJson={GADM_ADMIN1}
+                        geoJson={polygons}
                         sharedYMax={sharedYMax}
                         onDataMax={handleDataMax}
                     />
                     <Region
                         regionId="B"
                         defaultIso3={"BGD"}
-                        geoJson={GADM_ADMIN1}
+                        geoJson={polygons}
                         sharedYMax={sharedYMax}
                         onDataMax={handleDataMax}
                     />
