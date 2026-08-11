@@ -17,7 +17,7 @@ function CompareView() {
     const [polygons, setPolygons] = useState<any>(null);
 
     useEffect(() => {
-        fetch('/GADM_ADMIN1.json')
+        fetch(`${import.meta.env.VITE_BASE}/GADM_ADMIN1.json`)
             .then((res) => res.json())
             .then((jsonRes) => setPolygons(jsonRes));
     }, []);
