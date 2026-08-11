@@ -135,7 +135,7 @@ function EventTracking() {
                         attributes: feature.attributes,
                         geometry: feature.geometry
                     }
-                }).sort((a, b) => b.attributes.fromdate - a.attributes.fromdate);
+                }).sort((a, b) => Math.floor(Date.parse(b.attributes.fromdate) / 1000) - Math.floor(Date.parse(a.attributes.fromdate) / 1000));
                 setEvents(x);
             })
         });
@@ -464,7 +464,7 @@ function EventTracking() {
                                         type: "CIMAnimatedSymbolProperties",
                                         primitiveName: "animationOverride",
                                         playAnimation: true,
-                                        randomizeStartTime: false,
+                                        randomizeStartTime: true,
                                         repeatType: "Loop",
                                         repeatDelay: 1,
                                         duration: 1.8,
@@ -478,7 +478,7 @@ function EventTracking() {
                                         type: "CIMAnimatedSymbolProperties",
                                         primitiveName: "animationOverride",
                                         playAnimation: true,
-                                        randomizeStartTime: false,
+                                        randomizeStartTime: true,
                                         repeatType: "Loop",
                                         repeatDelay: 1,
                                         duration: 1.8,
@@ -768,16 +768,23 @@ function EventTracking() {
     const playEvent = (status: string) => {
         const blocker = focusedEvent;
         let i = focusedSliderValue[0];
+        let interval = 0;
 
         switch (status) {
             case "play":
                 setFocusedSliderPlaying(true);
                 intervalRef.current = setInterval(() => {
-                    if (blocker !== focusedEvent || i >= focusedFeatures.length - 1) {
+                    if (blocker !== focusedEvent || ((i >= focusedFeatures.length - 1) && (interval !== 0))) {
                         pauseSlider();
                         return;
+                    } else if (((i == focusedFeatures.length - 1) && (interval == 0))) {
+                        i = 0;
+                        interval += 1;
+                        applyPolygon(focusedFeatures[i]);
+                        setFocusedSliderValue([i]);
                     } else {
                         i += 1;
+                        interval += 1;
                         applyPolygon(focusedFeatures[i]);
                         setFocusedSliderValue([i]);
                     }
@@ -1160,8 +1167,8 @@ function EventTracking() {
                             }
                         }
                     )}
-                    {focusedEvent?.affectedcountries?.split(",")?.length > 2 ? <div className={`rounded-xl h-5 whitespace-nowrap px-2 py-3 ${focusedEvent?.affectedcountries?.split(",")?.find((a, i) => a == currentCountryExposure && i > 2) ? 'bg-(--accentblue-100) text-white' : 'bg-(--accentwarmgray-20)'}  font-bold flex items-center justify-center`} onClick={() => setOtherCountryDropdownStatus(!otherCountryDropdownStatus)}>
-                        <div className='w-10 pr-12 flex justify-between cursor-pointer'>Other</div>
+                    {focusedEvent?.affectedcountries?.split(",")?.length > 3 ? <div className={`rounded-xl overflow-hidden h-5 px-2 py-3 ${focusedEvent?.affectedcountries?.split(",")?.find((a, i) => a == currentCountryExposure && i > 2) ? 'bg-(--accentblue-100) text-white' : 'bg-(--accentwarmgray-20)'}  font-bold flex items-center justify-center`} onClick={() => setOtherCountryDropdownStatus(!otherCountryDropdownStatus)}>
+                        <div className='text-wrap max-w-40 flex justify-between cursor-pointer'>{currentCountryExposure !== "ALL" ? countryByIso3[currentCountryExposure] : "Other"}</div>
                             <Popover open={otherCountryDropdownStatus} onOpenChange={setOtherCountryDropdownStatus}>
                                 <PopoverTrigger asChild>
                                     <Button
@@ -1170,7 +1177,10 @@ function EventTracking() {
                                         aria-expanded={otherCountryDropdownStatus}
                                         className="w-4 h-5.25 font-bold justify-between light border-0 shadow-none p-0 bg-transparent hover:bg-transparent cursor-pointer"
                                     >
-                                        <img src={DropdownArrow} className={`${otherCountryDropdownStatus ? "rotate-180" : "rotate-0"}`}></img>
+                                        
+                                        <svg className={`${otherCountryDropdownStatus ? "rotate-180" : "rotate-0"}`} width="14" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M10 18.75C14.8438 18.75 18.75 14.8438 18.75 10C18.75 5.15625 14.8438 1.25 10 1.25C5.15625 1.25 1.25 5.15625 1.25 10C1.25 14.8438 5.15625 18.75 10 18.75ZM10 0C15.5078 0 20 4.49219 20 10C20 15.5078 15.5078 20 10 20C4.49219 20 0 15.5078 0 10C0 4.49219 4.49219 0 10 0ZM5.19531 9.17969C4.96094 8.94531 4.96094 8.55469 5.19531 8.32031C5.42969 8.08594 5.82031 8.08594 6.05469 8.32031L10 12.2266L13.9453 8.32031C14.1797 8.08594 14.5703 8.08594 14.8047 8.32031C15.0781 8.55469 15.0781 8.94531 14.8047 9.17969L10.4297 13.5547C10.1953 13.8281 9.80469 13.8281 9.57031 13.5547L5.19531 9.17969Z" fill={`${focusedEvent?.affectedcountries?.split(",")?.find((a, i) => a == currentCountryExposure && i > 2) ? "white" : "black"}`} />
+                                        </svg>
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-60 p-0 light rounded-none">
@@ -1191,7 +1201,9 @@ function EventTracking() {
                                                                     setCurrentCountryExposure(a);
                                                                 }}
                                                             >
-                                                                {countryByIso3[a]}
+                                                                <div className='w-90 text-wrap'>
+                                                                    <div>{countryByIso3[a]}</div>
+                                                                </div>
                                                                 <Check
                                                                     className={cn(
                                                                         "ml-auto",
@@ -1224,7 +1236,7 @@ function EventTracking() {
                     <div className='w-full text-left'>
                         <div className='pb-2 border-solid border-b-1 pl-3'>EXPOSURE</div>
                         {exposuresArray.filter((a) => a.name !== "Nightlights").map((e: any) =>
-                            <div className='h-[45px] text-[16px] font-medium border-solid border-b-1 flex items-center border-l-1 pl-3'>{focusedCountryExposures ? focusedCountryExposures[focusedCountryExposures.indexOf(focusedCountryExposures.find((c: any) => c.attributes.areaid == currentCountryExposure))].attributes[e.id] + " " + e.suffix: "N/A"}</div>     
+                            <div className='h-[45px] text-[16px] font-medium border-solid border-b-1 flex items-center border-l-1 pl-3'>{focusedCountryExposures ? focusedCountryExposures[focusedCountryExposures.indexOf(focusedCountryExposures.find((c: any) => c.attributes.areaid == currentCountryExposure))]?.attributes[e.id] + " " + e.suffix : "N/A"}</div>     
                         )}
                     </div>
                 </div>
