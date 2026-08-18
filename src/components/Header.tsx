@@ -269,22 +269,22 @@ export const Header = () => {
                     </div>
                 </div>
             </div>
-            <div className={`w-full xl:h-14.75 grid grid-cols-[1fr_1fr_50px] ${location.pathname === "/compare" || location.pathname === "/grid" ? 'xl:grid-cols-[180px_300px_1fr]' : location.pathname == "/eventtracking" ? 'xl:grid-cols-[180px_600px_300px]' : 'xl:grid-cols-[180px_360px_1fr]' }  xl:col-start-2 xl:col-end-3`}>
+            <div className={`w-full xl:h-14.75 grid grid-cols-[1fr_1fr_50px] ${location.pathname === "/compare" || location.pathname === "/grid" ? 'xl:grid-cols-[180px_300px_1fr]' : location.pathname == "/events" ? 'xl:grid-cols-[180px_600px_300px]' : 'xl:grid-cols-[180px_360px_1fr]' }  xl:col-start-2 xl:col-end-3`}>
                 <div className='flex w-full xl:col-start-1 xl:col-end-2'>
-                    <Card className={`rounded-none p-0 flex flex-col items-center justify-center w-full gap-0 hover:bg-white transition-colors duration-200 ${location.pathname == "/eventtracking" ? 'bg-white' : 'bg-(--accentblue-30)'} border-0`}>
+                    <Card className={`rounded-none p-0 flex flex-col items-center justify-center w-full gap-0 hover:bg-white transition-colors duration-200 ${location.pathname == "/events" ? 'bg-white' : 'bg-(--accentblue-30)'} border-0`}>
                         <div className='h-full w-full flex flex-col justify-end'>
                             <div className="text-[11px] font-bold text-(--primaryblack-90)">REAL-TIME</div>
-                            <Link to="/eventtracking" activeOptions={{ exact: true }} className="flex flex-row h-[35px] items-center justify-center cursor-pointer">
+                            <Link to="/events" activeOptions={{ exact: true }} className="flex flex-row h-[35px] items-center justify-center cursor-pointer">
                                 <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M18.537 9.99983C18.537 14.7074 14.7075 18.5372 10.0003 18.5372C5.29321 18.5372 1.463 14.7074 1.463 9.99983C1.463 5.2923 5.29287 1.46244 10.0003 1.46244C11.7447 1.46244 13.4073 1.98621 14.815 2.95286L13.1275 3.19924L13.3392 4.64652L17.3756 4.05635L16.7835 0.0202228L15.3363 0.232225L15.5483 1.67748C13.9192 0.586124 12.0042 0 9.99966 0C4.48571 0 0 4.48643 0 10.0002C0 15.5142 4.48638 20 10.0003 20C15.5143 20 20 15.5139 20 9.99983H18.537ZM7.43361 3.65628L6.0852 4.22286L9.25182 11.7565L16.7859 8.58929L16.2197 7.24077L10.0334 9.84142L7.43361 3.65628Z" fill={`${location.pathname == "/eventtracking" ? 'var(--orange)' : 'black'}`} />
+                                    <path d="M18.537 9.99983C18.537 14.7074 14.7075 18.5372 10.0003 18.5372C5.29321 18.5372 1.463 14.7074 1.463 9.99983C1.463 5.2923 5.29287 1.46244 10.0003 1.46244C11.7447 1.46244 13.4073 1.98621 14.815 2.95286L13.1275 3.19924L13.3392 4.64652L17.3756 4.05635L16.7835 0.0202228L15.3363 0.232225L15.5483 1.67748C13.9192 0.586124 12.0042 0 9.99966 0C4.48571 0 0 4.48643 0 10.0002C0 15.5142 4.48638 20 10.0003 20C15.5143 20 20 15.5139 20 9.99983H18.537ZM7.43361 3.65628L6.0852 4.22286L9.25182 11.7565L16.7859 8.58929L16.2197 7.24077L10.0334 9.84142L7.43361 3.65628Z" fill={`${location.pathname == "/events" ? 'var(--orange)' : 'black'}`} />
                                 </svg>
-                                <div className={`text-sm font-bold text-end flex items-center pl-1 ${location.pathname == "/eventtracking" ? 'text-(--orange)' : 'text-black'}`}>Event Tracking</div>
+                                <div className={`text-sm font-bold text-end flex items-center pl-1 ${location.pathname == "/events" ? 'text-(--orange)' : 'text-black'}`}>Event Tracking</div>
                             </Link>
                         </div>
-                        <div className={`h-1 w-full bg-(--orange) ${location.pathname == "/eventtracking" ? "opacity-100" : "opacity-0"}`}></div>
+                        <div className={`h-1 w-full bg-(--orange) ${location.pathname == "/events" ? "opacity-100" : "opacity-0"}`}></div>
                     </Card>
                 </div>
-                {location.pathname == "/eventtracking" ?
+                {location.pathname == "/events" ?
                     <div className={`flex flex-col xl:flex-row ${dataOptions ? 'h-full' : 'h-0'} w-full col-start-1 col-end-4 xl:col-start-2 xl:col-end-3 `}>
                         {calendarComponent}
                         <Card className="rounded-none border-r-0  p-0 flex flex-col items-center justify-center gap-0 h-22 xl:h-14.75 w-full px-2">
@@ -379,7 +379,7 @@ export const Header = () => {
                     :
                     null
                 }
-                <div className={`shadow-[0_1px_3px_0_rgb(0_0_0/0.1),0_1px_2px_-1px_rgb(0_0_0/0.1)]  h-14.75 flex col-start-2 row-start-1 border-r ${location.pathname == '/compare' || location.pathname == '/grid' ? 'xl:col-start-2 xl:col-end-3' : location.pathname == '/eventtracking' ? 'xl:col-start-3 xl:col-end-4' : 'xl:col-start-2 xl:col-end-3'}`}>   
+                <div className={`shadow-[0_1px_3px_0_rgb(0_0_0/0.1),0_1px_2px_-1px_rgb(0_0_0/0.1)]  h-14.75 flex col-start-2 row-start-1 border-r ${location.pathname == '/compare' || location.pathname == '/grid' ? 'xl:col-start-2 xl:col-end-3' : location.pathname == '/events' ? 'xl:col-start-3 xl:col-end-4' : 'xl:col-start-2 xl:col-end-3'}`}>   
                     <Card className={`shadow-none rounded-none xl:grow p-0 w-full h-full flex flex-col items-center justify-end gap-0 hover:bg-white transition-colors duration-200 ${location.pathname == "/compare" || location.pathname == "/grid" ? 'bg-white' : 'bg-(--accentblue-30)'} border-0`}>
                         <div className="text-[11px] font-bold text-(--primaryblack-90)">FORWARD LOOKING</div>
                         <div className="flex flex-end flex-col w-full">

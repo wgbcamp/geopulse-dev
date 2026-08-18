@@ -11,7 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as GridRouteImport } from './routes/grid'
-import { Route as EventtrackingRouteImport } from './routes/eventtracking'
+import { Route as EventsRouteImport } from './routes/events'
 import { Route as DatamethodologyRouteImport } from './routes/datamethodology'
 import { Route as CompareRouteImport } from './routes/compare'
 import { Route as AboutRouteImport } from './routes/about'
@@ -27,9 +27,9 @@ const GridRoute = GridRouteImport.update({
   path: '/grid',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EventtrackingRoute = EventtrackingRouteImport.update({
-  id: '/eventtracking',
-  path: '/eventtracking',
+const EventsRoute = EventsRouteImport.update({
+  id: '/events',
+  path: '/events',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DatamethodologyRoute = DatamethodologyRouteImport.update({
@@ -58,7 +58,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/compare': typeof CompareRoute
   '/datamethodology': typeof DatamethodologyRoute
-  '/eventtracking': typeof EventtrackingRoute
+  '/events': typeof EventsRoute
   '/grid': typeof GridRoute
   '/home': typeof HomeRoute
 }
@@ -67,7 +67,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/compare': typeof CompareRoute
   '/datamethodology': typeof DatamethodologyRoute
-  '/eventtracking': typeof EventtrackingRoute
+  '/events': typeof EventsRoute
   '/grid': typeof GridRoute
   '/home': typeof HomeRoute
 }
@@ -77,7 +77,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/compare': typeof CompareRoute
   '/datamethodology': typeof DatamethodologyRoute
-  '/eventtracking': typeof EventtrackingRoute
+  '/events': typeof EventsRoute
   '/grid': typeof GridRoute
   '/home': typeof HomeRoute
 }
@@ -88,7 +88,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/compare'
     | '/datamethodology'
-    | '/eventtracking'
+    | '/events'
     | '/grid'
     | '/home'
   fileRoutesByTo: FileRoutesByTo
@@ -97,7 +97,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/compare'
     | '/datamethodology'
-    | '/eventtracking'
+    | '/events'
     | '/grid'
     | '/home'
   id:
@@ -106,7 +106,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/compare'
     | '/datamethodology'
-    | '/eventtracking'
+    | '/events'
     | '/grid'
     | '/home'
   fileRoutesById: FileRoutesById
@@ -116,7 +116,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   CompareRoute: typeof CompareRoute
   DatamethodologyRoute: typeof DatamethodologyRoute
-  EventtrackingRoute: typeof EventtrackingRoute
+  EventsRoute: typeof EventsRoute
   GridRoute: typeof GridRoute
   HomeRoute: typeof HomeRoute
 }
@@ -137,11 +137,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GridRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/eventtracking': {
-      id: '/eventtracking'
-      path: '/eventtracking'
-      fullPath: '/eventtracking'
-      preLoaderRoute: typeof EventtrackingRouteImport
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/datamethodology': {
@@ -180,7 +180,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   CompareRoute: CompareRoute,
   DatamethodologyRoute: DatamethodologyRoute,
-  EventtrackingRoute: EventtrackingRoute,
+  EventsRoute: EventsRoute,
   GridRoute: GridRoute,
   HomeRoute: HomeRoute,
 }

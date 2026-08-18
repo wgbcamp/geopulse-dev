@@ -4,7 +4,7 @@ export const Route = createFileRoute('/')({
   component: Index,
   beforeLoad: () => {
     throw redirect({
-      to: '/eventtracking'
+      to: '/events'
     })
   }
 })

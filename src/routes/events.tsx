@@ -50,12 +50,12 @@ import Exposures from '../assets/Layers.svg';
 
 import { countryByIso3 } from "@/config/isoCountries";
 
-export const Route = createFileRoute('/eventtracking')({
-    component: EventTracking,
+export const Route = createFileRoute('/events')({
+    component: Events,
 })
 
 
-function EventTracking() {
+function Events() {
 
     const [popInState, setPopInState] = useState<string>("initial");
 
@@ -106,7 +106,7 @@ function EventTracking() {
                 return Math.max(minZoomX, minZoomY);
             }
 
-    const [currentZoom, setCurrentZoom] = useState(Math.max(2, getMinZoom(window.innerWidth, window.innerHeight)))
+    // const [currentZoom, setCurrentZoom] = useState(Math.max(2, getMinZoom(window.innerWidth, window.innerHeight)))
     useEffect(() => {
         view.current.on("click", async (event) => {
             const response = await view.current.hitTest(event);
@@ -219,14 +219,14 @@ function EventTracking() {
             });
 
             // use this for updating symbol sizes
-            reactiveUtils.watch(
-                () => view.current.zoom,
-                (newZoom) => {
-                    console.log("Zoom level changed to:", newZoom);
-                    eventFeatureLayer.current.renderer.uniqueValueInfos = uniqueColorValues;
-                    setCurrentZoom(newZoom);
-                }
-            );
+            // reactiveUtils.watch(
+            //     () => view.current.zoom,
+            //     (newZoom) => {
+            //         console.log("Zoom level changed to:", newZoom);
+            //         eventFeatureLayer.current.renderer.uniqueValueInfos = uniqueColorValues;
+            //         setCurrentZoom(newZoom);
+            //     }
+            // );
             if (scaleBarRef.current) {
                 scaleBarRef.current.view = view.current;
             }
