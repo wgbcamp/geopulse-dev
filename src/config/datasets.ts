@@ -441,7 +441,9 @@ export const realtimeObject: Record<string, { url: Record<string,string>, colorS
     },
     "Buildings":
     {
-        url: { "Buildings": `${URL_RTBASE}/gba_buildings_count/ImageServer` },
+        url: {
+            "Buildings": `${URL_RTBASE}/gba_buildings_count/ImageServer`,
+        },
         colorScheme: [
             {
                 "minValue": 0.0,
@@ -492,6 +494,64 @@ export const realtimeObject: Record<string, { url: Record<string,string>, colorS
         title: "building count",
         unit: ""
 
+    },
+    "Capital stock":
+    {
+        url: {
+            "Capital stock": `${URL_RTBASE}/residential_shell_replacement_value_usd/ImageServer`,
+            "Residential capital stock": `${URL_RTBASE}/residential_shell_replacement_value_usd/ImageServer`,
+            "Non-residential capital stock": `${URL_RTBASE}/nonresidential_shell_replacement_value_usd/ImageServer`
+        },
+        colorScheme: [
+            {
+                "minValue": 0.1,
+                "maxValue": 1000,
+                "symbol": {
+                    "type": "simple-fill",
+                    "color": [50, 48, 50, 1.0]
+                },
+                "label": "< $1K"
+            },
+            {
+                "minValue": 1000,
+                "maxValue": 30000,
+                "symbol": {
+                    "type": "simple-fill",
+                    "color": [90, 55, 65, 1.0]
+                },
+                "label": "$30K"
+            },
+            {
+                "minValue": 30000,
+                "maxValue": 800000,
+                "symbol": {
+                    "type": "simple-fill",
+                    "color": [160, 70, 100, 1.0]
+                },
+                "label": "$800K"
+            },
+            {
+                "minValue": 800000,
+                "maxValue": 170000000,
+                "symbol": {
+                    "type": "simple-fill",
+                    "color": [210, 130, 60, 1.0]
+                },
+                "label": "$170M"
+            },
+            {
+                "minValue": 170000000,
+                "maxValue": 36000000000,
+                "symbol": {
+                    "type": "simple-fill",
+                    "color": [240, 249, 33, 1.0]
+                },
+                "label": "> $170M"
+            }
+        ],
+        title: "Capital stock",
+        unit: "(USD)"
+ 
     },
     "Nightlights":
     {

@@ -1,8 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
-import globe from '../assets/globe.svg'
-import arrowRight from '../assets/arrow-right.svg'
-import arrowRightBlack from '../assets/arrow-right-black.svg'
+import { GlobeIcon } from '../assets/GlobeIcon'
+import { ArrowRight } from '../assets/arrow-right'
 import MenuBackground from '../assets/hero-bg.jpg'
 import LightBackground from '../assets/light-bg.jpg'
 import globeExtrusions from '../assets/globeExtrusions.png'
@@ -11,15 +10,15 @@ import trackPreview from '../assets/trackPreview.png'
 import seePreview from '../assets/tile-02.jpg'
 import estimatePreview from '../assets/estimatePreview.jpg'
 import griddedEconomics from '../assets/griddedEconomicsBackground.jpg'
-import griddedCapitalStock from '../assets/Gridded_Capital_Stock_Preview.jpg'
-import griddedGDP from '../assets/Gridded_GDP_Preview.jpg'
+import griddedCapitalStock from '../assets/Gridded_Capital_Stock.png'
+import griddedGDP from '../assets/Gridded_GDP.png'
 import exportable from '../assets/exportable.svg'
 import downloadable from '../assets/downloadable.svg'
 import transparentMethodology from '../assets/transparentMethodology.svg'
 import harmonizedIndicators from '../assets/harmonizedIndicators.svg'
-import footerBackground from '../assets/footerBackground.jpg'
 import whiteGeo from '../assets/white-geo.jpg'
 import carsBackground from '../assets/cars-bg.jpg'
+import IMFLogo from '../assets/IMF-logo 1.png'
 import type { ReactElement } from 'react'
 
 export const Route = createFileRoute('/home')({
@@ -72,34 +71,37 @@ const cardDetails: { title: string, description: string, misc: ReactElement, num
     }
 ];
 
-const mapButton = (background: string, foreground: string) =>  
-<div className={`${background} ${foreground} rounded-[100px] h-15 flex items-center justify-center py-5 px-10 gap-2 cursor-pointer`}>
-                <img src={globe}></img>
-                <span className="font-bold text-[18px]">Explore the Map</span>
-                <img src={arrowRight}></img>
-            </div>;
+export const mapButton = (background: string, foreground: string, icon1: ReactElement, icon2: ReactElement, link: string) =>
+    <Link to={link} activeOptions={{ exact: true }} className={`${background} ${foreground} rounded-[100px] h-15 flex items-center justify-center py-5 px-10 gap-2 cursor-pointer`}>
+        {icon1}
+        <span className="font-bold text-[18px]">Explore the Map</span>
+        {icon2}
+    </Link>;
 
-const overviewCategories: { title: string, description: ReactElement, picture: string, order: string }[] = [
+const overviewCategories: { title: string, description: ReactElement, picture: string, order: string, link: string }[] = [
     {
         title: "Track",
         description: <div className='max-w-90 flex flex-col gap-5'><span><b>Mauris eget ante ex.</b> Sed non elit tincidunt, vehicula sem vel, ullamcorper elit. Nullam aliquet nisl nulla, in sollicitudin augue placerat at.</span>
             <span>Sed non elit tincidunt, vehicula sem vel, ullamcorper elit. Nullam aliquet nisl nulla, in sollicitudin augue placerat at.</span></div>,
         picture: trackPreview,
-        order: "normal"
+        order: "normal",
+        link: '/events'
     },
     {
         title: "See",
         description: <div className='max-w-90 flex flex-col gap-5'><span><b>Mauris eget ante ex.</b> Sed non elit tincidunt, vehicula sem vel, ullamcorper elit. Nullam aliquet nisl nulla, in sollicitudin augue placerat at.</span>
             <span>Sed non elit tincidunt, vehicula sem vel, ullamcorper elit. Nullam aliquet nisl nulla, in sollicitudin augue placerat at.</span></div>,
         picture: seePreview,
-        order: "reverse"
+        order: "reverse",
+        link: '/grid'
     },
     {
         title: "Estimate",
         description: <div className='max-w-90 flex flex-col gap-5'><span><b>Mauris eget ante ex.</b> Sed non elit tincidunt, vehicula sem vel, ullamcorper elit. Nullam aliquet nisl nulla, in sollicitudin augue placerat at.</span>
             <span>Sed non elit tincidunt, vehicula sem vel, ullamcorper elit. Nullam aliquet nisl nulla, in sollicitudin augue placerat at.</span></div>,
         picture: estimatePreview,
-        order: "normal"
+        order: "normal",
+        link: '/compare'
     }
 ];
 
@@ -107,13 +109,13 @@ const griddedCategories: { title: string, subtitle: string, description: string,
     {
         title: "gridded capital stock",
         subtitle: "Physical Capital, Mapped To The Ground",
-        description: "Capital stock resolved to the same 1 km grid — the buildings, plant and infrastructure a hazard puts directly at risk, quantified the moment it’s threatened.",
+        description: "Capital stock resolved to the same 1 km grid — the buildings, plant and infrastructure a hazard puts directly at risk, quantified the moment it's threatened.",
         picture: griddedCapitalStock
     },
     {
         title: "gridded gdp",
         subtitle: "Economic Output, By The Kilometer",
-        description: "National GDP disaggregated to a 1 km grid, so you can see exactly how much output sits inside a flood plain, a wildfire perimeter, or a hurricane track.",
+        description: "National GDP disaggregated to a 1 km grid, so you can see exactly how much output sits inside a flood plain, a wildfire perimeter, or a hurricane track.",
         picture: griddedGDP
     }
 ];
@@ -192,7 +194,7 @@ function RouteComponent() {
             <span className='text-[60px] font-bold leading-[100%] tracking-[-0.34px]'>Overview</span>
             <span className='w-9/10 max-w-200 text-center text-[20px] font-bold leading-[140%]'>Mauris eget ante ex. Sed non elit tincidunt, vehicula sem vel, ullamcorper elit. Nullam aliquet nisl nulla, in sollicitudin augue placerat at. Nunc euismod sagittis iaculis. Etiam pretium ex vitae neque sagittis varius.</span>
             <img src={overviewPreview}></img>
-            {mapButton('bg-(--accentdarkblue-90)', 'text-white')}
+            {mapButton('bg-(--accentdarkblue-90)', 'text-white', <GlobeIcon color={'var(--primarywhite)'}/>, <ArrowRight color={'var(--primarywhite)'}/>, '/events')}
         </div>
         <div className='w-full flex flex-col items-center bg-white'>
             {overviewCategories.map((e, i) =>
@@ -201,7 +203,7 @@ function RouteComponent() {
                         <div className='lg:w-5/10 flex flex-col gap-y-5 justify-start items-start'>
                             <div className='max-w-90 font-bold text-[80px] tracking-[-1.2px] leading-[100%]'>{e.title}</div>
                             {e.description}
-                            {mapButton('bg-(--accentdarkblue-90)', 'text-white')}
+                            {mapButton('bg-(--accentdarkblue-90)', 'text-white', <GlobeIcon color={'var(--primarywhite)'}/>, <ArrowRight color={'var(--primarywhite)'}/>, e.link)}
                         </div>
                     </div>
                     <img className='pt-10 md:pt-0 md:w-5/10' src={e.picture}></img>
@@ -224,14 +226,15 @@ function RouteComponent() {
                                 <span className='text-[16px] leading-[130%] text-left max-w-105'>{e.description}</span>
                                 <div className="flex gap-2">
                                     <span className='uppercase font-bold leading-[126%] text-[14px]'>Explore</span>
-                                    <img src={arrowRightBlack} className='w-3'></img>
+                                    <div className='w-3'><ArrowRight color={'var(--primaryblack-100)'}/></div>
+                                    
                                 </div>
                             </div>
                         </div>
                         <div className='w-full md:w-5/10 flex items-center justify-start'>
                             <div className='relative flex items-center'>
-                                <img src={e.picture} className='rounded-[6px] border border-[#A7A7A7]'></img>
-                                <div className='absolute inset-0 rounded-[6px] bg-[linear-gradient(180deg,rgba(45,52,116,0)_0%,rgba(45,52,116,0.8)_100%)]'></div>
+                                <img src={e.picture} className=''></img>
+                                {/* <div className='absolute inset-0 rounded-full bg-[linear-gradient(180deg,rgba(45,52,116,0)_0%,rgba(45,52,116,0.8)_100%)]'></div> */}
                             </div>
                         </div>
                     </div>
@@ -276,9 +279,21 @@ function RouteComponent() {
                 Advancing Global Data Standards
             </div>
             <span className='leading-[140%] text-[20px] text-center text-white w-9/10 max-w-220 pb-12'>Designed and sponsored within the IMF on secure cloud infrastructure, GeoPulse fills priority data gaps identified by the G20 Data Gaps Initiative — bringing IMF‑generated risk indicators into a consistent, accessible format for surveillance and policy analysis.</span>
-            <img src={overviewPreview}></img>
-            {mapButton('bg-white', 'text-(--accentdarkblue-90)')}
+            <div className='relative'>
+                <img src={overviewPreview}></img>
+                <div className='absolute inset-0 top-28 w-full flex justify-center'>
+                    <div className='w-69'>
+                        {mapButton('bg-white', 'text-(--accentdarkblue-90)', <GlobeIcon color={'var(--accentdarkblue-90)'} />, <ArrowRight color={'var(--accentdarkblue-90)'} />, '/events')}
+                    </div>
+                </div>
+                {/* <div className='absolute inset-0 bg-[linear-gradient(180deg,rgba(45,52,116,0)_0%,rgba(45,52,116,0.8)_100%)]'></div> */}
+            </div>
         </div>
-        
+        <div className='w-full flex justify-center items-center py-25 bg-(--accentdarkblue-100)'>
+            <div className='flex flex-col items-center gap-9.25'>
+                <img src={IMFLogo}></img>
+                <span className='text-white font-bold leading-[140%]'>© 2026 INTERNATIONAL MONETARY FUND. ALL RIGHTS RESERVED | <u>Privacy Policy</u> | <u>Copyright & Usage</u></span>
+            </div>
+        </div>
     </div>
 }

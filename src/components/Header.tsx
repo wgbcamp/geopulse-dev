@@ -38,10 +38,13 @@ import { format } from 'date-fns';
 import { urlObject, scenarioMapper, measureMapper, eventTypes } from '@/config/datasets';
 import { isoCountries, countryByIso3 } from "@/config/isoCountries";
 
-
 import Hamburger from '../assets/Group 51.png'
 import Lockup from '../assets/lockup.svg'
 import DropdownArrow from '../assets/Dropdown-arrow.svg';
+
+import { mapButton } from '../routes/home'
+import { GlobeIcon } from '../assets/GlobeIcon'
+import { ArrowRight } from '../assets/arrow-right'
 
 export const Header = () => {
 
@@ -231,8 +234,8 @@ export const Header = () => {
     }
 
     return (
-        <div className={`grid grid-cols-[1fr] xl:grid-cols-[232px_1fr] xl:h-14.75 fixed w-full top-0 z-3 ${dataOptions || menuOptions ? '' : 'overflow-hidden h-14.75'} xl:h-[unset]`}>
-            <div className={`flex flex-col ${menuOptions ? 'z-2 h-73.75' : '-z-10 h-0 overflow-hidden'} w-full xl:w-58 bg-(--accentdarkblue-90) xl:bg-[unset] absolute shadow-xl/40`}>
+        <div className={`grid ${location.pathname == "/home" ? 'mt-10.5 grid-cols-[316px_1fr]' : 'grid-cols-[1fr] xl:grid-cols-[232px_1fr]'} xl:h-14.75 fixed w-full top-0 z-3 ${dataOptions || menuOptions ? '' : 'overflow-hidden h-14.75'} ${location.pathname == '/home' ? 'overflow-visible' : ''} xl:h-[unset]`}>
+            <div className={`flex flex-col ${menuOptions ? 'z-2 h-73.75' : '-z-10 h-0 overflow-hidden'} ${location.pathname == '/home' ? 'w-58' : 'w-full xl:w-58'} bg-(--accentdarkblue-90) xl:bg-[unset] absolute shadow-xl/40`}>
                 <div className='flex w-16.75 h-14.75 justify-center items-center bg-(--accentdarkblue-90) cursor-pointer' onClick={() => setMenuOptions(!menuOptions)}>
                     <div className="flex items-center flex-center">
                         <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
@@ -247,6 +250,23 @@ export const Header = () => {
                     <div className='flex items-center w-full h-14.75 text-white cursor-not-allowed'>Team & Contact us</div>
                 </div>
             </div>
+            {location.pathname == '/home' ? 
+                <div className='ml-8 flex'>
+                    <div className={`flex bg-(--fundblue) h-16 w-full shadow-[0_4px_10.4px_0_rgba(0,0,0,0.50)]`}>
+                        <div className='flex cursor-pointer' onClick={() => setMenuOptions(!menuOptions)}>
+                            <div className='flex h-16 w-full'>
+                                <div className='relative flex items-center rounded-none h-full w-17.5 border-r bg-(--accentdarkblue-90) xl:bg-(--accentdarkblue-90) text-white'>
+                                    <img className='absolute right-4' src={Hamburger}></img>
+                                    <div className='absolute text-[11px] top-8.5 right-6.5 font-bold'>MENU</div>
+                                </div>
+                            </div>
+                        </div>
+                        <Link to="/home" activeOptions={{ exact: true }} className="w-60 rounded-none flex items-center justify-center bg-(--fundblue)  border-none">
+                            <img className="px-9 py-6.25" src={Lockup}></img>
+                        </Link>
+                    </div>
+                </div>
+            : 
             <div className={`flex w-full xl:w-58 justify-between xl:justify-start bg-(--fundblue) ${dataOptions ? 'h-0' : 'h-14.75'} overflow-hidden xl:h-14.75`}>
                 <div className='flex cursor-pointer' onClick={() => setMenuOptions(!menuOptions)}>
                     <div className='flex h-14.75 w-full'>
@@ -269,6 +289,15 @@ export const Header = () => {
                     </div>
                 </div>
             </div>
+            }
+            { location.pathname == '/home' 
+                ?
+                <div className='invisible md:visible w-full flex items-center justify-end'>
+                    <div className='rounded-[100px] mr-8 h-15 shadow-[0_4px_6.5px_0_rgba(0,0,0,0.50)]'>
+                        {mapButton('bg-(--accentdarkblue-90)', 'text-white', <GlobeIcon color={'var(--primarywhite)'} />, <ArrowRight color={'var(--primarywhite)'} />, '/events')}
+                    </div>
+                </div>
+            :
             <div className={`w-full xl:h-14.75 grid grid-cols-[1fr_1fr_50px] ${location.pathname === "/compare" || location.pathname === "/grid" ? 'xl:grid-cols-[180px_300px_1fr]' : location.pathname == "/events" ? 'xl:grid-cols-[180px_600px_300px]' : 'xl:grid-cols-[180px_360px_1fr]' }  xl:col-start-2 xl:col-end-3`}>
                 <div className='flex w-full xl:col-start-1 xl:col-end-2'>
                     <Card className={`rounded-none p-0 flex flex-col items-center justify-center w-full gap-0 hover:bg-white transition-colors duration-200 ${location.pathname == "/events" ? 'bg-white' : 'bg-(--accentblue-30)'} border-0`}>
@@ -523,6 +552,8 @@ export const Header = () => {
                     null
                 }
             </div>
+            }
+            
             
             
            
