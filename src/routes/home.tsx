@@ -3,10 +3,12 @@ import { useState } from 'react'
 import globe from '../assets/globe.svg'
 import arrowRight from '../assets/arrow-right.svg'
 import arrowRightBlack from '../assets/arrow-right-black.svg'
-import MenuBackground from '../assets/image 18.png'
+import MenuBackground from '../assets/hero-bg.jpg'
+import LightBackground from '../assets/light-bg.jpg'
 import globeExtrusions from '../assets/globeExtrusions.png'
 import overviewPreview from '../assets/overviewPreview.png'
 import trackPreview from '../assets/trackPreview.png'
+import seePreview from '../assets/tile-02.jpg'
 import estimatePreview from '../assets/estimatePreview.jpg'
 import griddedEconomics from '../assets/griddedEconomicsBackground.jpg'
 import griddedCapitalStock from '../assets/Gridded_Capital_Stock_Preview.jpg'
@@ -14,7 +16,10 @@ import griddedGDP from '../assets/Gridded_GDP_Preview.jpg'
 import exportable from '../assets/exportable.svg'
 import downloadable from '../assets/downloadable.svg'
 import transparentMethodology from '../assets/transparentMethodology.svg'
-import harmonizedIndicators from '../assets/harmonizedIndicators.svg' 
+import harmonizedIndicators from '../assets/harmonizedIndicators.svg'
+import footerBackground from '../assets/footerBackground.jpg'
+import whiteGeo from '../assets/white-geo.jpg'
+import carsBackground from '../assets/cars-bg.jpg'
 import type { ReactElement } from 'react'
 
 export const Route = createFileRoute('/home')({
@@ -23,19 +28,19 @@ export const Route = createFileRoute('/home')({
 
 const categoryDetails: Record<string, { title: ReactElement, subtitle: ReactElement }> = {
     "Overview": {
-        "title": <span className='font-bold text-[60px] xl:text-[100px] leading-none tracking-[-1.816px]'><u className='decoration-(--accentyellow-100)'>Track</u>, <u className='decoration-(--accentyellow-100)'>See</u> & <u className='decoration-(--accentyellow-100)'>Estimate</u> Economic Risk</span>,
+        "title": <span className='font-bold text-[60px] xl:text-[100px] leading-none tracking-[-1.816px]'>Track, See & Estimate Economic Risk</span>,
         "subtitle": <span className='tracking-[-1.089px] text-[16px] md:text-[29px]'><b>Real-time monitoring</b> of floods, hurricanes, wildfires and geopolitical events — and exactly what they put in harm's way.</span>
     },
     "Track": {
-        "title": <span className='font-bold text-[60px] xl:text-[100px] leading-none tracking-[-1.816px]'><u className='decoration-(--accentyellow-100)'>Track</u> Economic Risk</span>,
+        "title": <span className='font-bold text-[60px] xl:text-[100px] leading-none tracking-[-1.816px]'>Track Economic Risk</span>,
         "subtitle": <span className='tracking-[-1.089px] text-[16px] md:text-[29px]'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</span>
     },
     "See": {
-        "title": <span className='font-bold text-[60px] xl:text-[100px] leading-none tracking-[-1.816px]'><u className='decoration-(--accentyellow-100)'>See</u> Forward-Looking Risk</span>,
+        "title": <span className='font-bold text-[60px] xl:text-[100px] leading-none tracking-[-1.816px]'>See Forward-Looking Risk</span>,
         "subtitle": <span className='tracking-[-1.089px] text-[16px] md:text-[29px]'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</span>
     },
     "Estimate": {
-        "title": <span className='font-bold text-[60px] xl:text-[100px] leading-none tracking-[-1.816px]'><u className='decoration-(--accentyellow-100)'>Estimate</u> Gridded Economies</span>,
+        "title": <span className='font-bold text-[60px] xl:text-[100px] leading-none tracking-[-1.816px]'>Estimate Gridded Economies</span>,
         "subtitle": <span className='tracking-[-1.089px] text-[16px] md:text-[29px]'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</span>
     },
 }
@@ -67,8 +72,8 @@ const cardDetails: { title: string, description: string, misc: ReactElement, num
     }
 ];
 
-const mapButton: ReactElement = 
-<div className='bg-(--accentdarkblue-90) rounded-[100px] h-15 text-white flex items-center justify-center py-5 px-10 gap-2 cursor-pointer'>
+const mapButton = (background: string, foreground: string) =>  
+<div className={`${background} ${foreground} rounded-[100px] h-15 flex items-center justify-center py-5 px-10 gap-2 cursor-pointer`}>
                 <img src={globe}></img>
                 <span className="font-bold text-[18px]">Explore the Map</span>
                 <img src={arrowRight}></img>
@@ -86,7 +91,7 @@ const overviewCategories: { title: string, description: ReactElement, picture: s
         title: "See",
         description: <div className='max-w-90 flex flex-col gap-5'><span><b>Mauris eget ante ex.</b> Sed non elit tincidunt, vehicula sem vel, ullamcorper elit. Nullam aliquet nisl nulla, in sollicitudin augue placerat at.</span>
             <span>Sed non elit tincidunt, vehicula sem vel, ullamcorper elit. Nullam aliquet nisl nulla, in sollicitudin augue placerat at.</span></div>,
-        picture: "",
+        picture: seePreview,
         order: "reverse"
     },
     {
@@ -144,7 +149,7 @@ function RouteComponent() {
     const [activeCategory, setActiveCategory] = useState<string>("Overview")
 
     return <div className=''>
-        <div className='h-full relative overflow-hidden pt-30 pb-16 flex flex-col justify-start items-center xl:justify-normal xl:items-start w-full bg-[#1a2868] bg-fixed' style={{ backgroundImage: `linear-gradient(90deg, rgba(26,40,104,0.95) 0%, rgba(26,40,104,0.95) 52%, rgba(26,40,104,0.74) 100%), url(${MenuBackground})`, backgroundSize: 'cover' }}>
+        <div className='h-full relative overflow-hidden pt-30 pb-16 flex flex-col justify-start items-center xl:justify-normal xl:items-start w-full bg-fixed bg-cover' style={{ backgroundImage: `url(${MenuBackground})`}}>
             <div className='flex justify-center xl:justify-normal xl:pt-20 xl:pl-15 max-w-200'>
                 <div className='w-9/10 xl:w-5/10 grid text-white xl:text-left z-1'>
                     {Object.entries(categoryDetails).map(([key, details]) =>
@@ -182,21 +187,21 @@ function RouteComponent() {
         </div>
         <div
             className='w-full flex flex-col items-center gap-y-5 pt-25 pb-25 bg-cover bg-[linear-gradient(180deg,rgba(44,52,115,0)_0%,rgba(44,52,115,0.3)_100%),var(--menu-bg-image)]'
-            style={{ '--menu-bg-image': `url(${MenuBackground})` } as React.CSSProperties}
+            style={{ '--menu-bg-image': `url(${LightBackground})` } as React.CSSProperties}
         >
-            <span><u className='decoration-(--accentyellow-100) text-[60px] font-bold leading-[100%] tracking-[-0.34px]'>Overview</u></span>
-            <span className='w-full max-w-200 text-center text-[20px] font-bold leading-[140%]'>Mauris eget ante ex. Sed non elit tincidunt, vehicula sem vel, ullamcorper elit. Nullam aliquet nisl nulla, in sollicitudin augue placerat at. Nunc euismod sagittis iaculis. Etiam pretium ex vitae neque sagittis varius.</span>
+            <span className='text-[60px] font-bold leading-[100%] tracking-[-0.34px]'>Overview</span>
+            <span className='w-9/10 max-w-200 text-center text-[20px] font-bold leading-[140%]'>Mauris eget ante ex. Sed non elit tincidunt, vehicula sem vel, ullamcorper elit. Nullam aliquet nisl nulla, in sollicitudin augue placerat at. Nunc euismod sagittis iaculis. Etiam pretium ex vitae neque sagittis varius.</span>
             <img src={overviewPreview}></img>
-            {mapButton}
+            {mapButton('bg-(--accentdarkblue-90)', 'text-white')}
         </div>
         <div className='w-full flex flex-col items-center bg-white'>
             {overviewCategories.map((e, i) =>
                 <div className={`w-full md:max-w-500 flex items-center ${e.order == "normal" ? 'flex-col md:flex-row' : 'flex-col md:flex-row-reverse'} pt-10 md:pt-0 bg-white`}>
                     <div className='w-9/10 md:w-5/10 flex flex-col text-left items-center justify-center'>
                         <div className='lg:w-5/10 flex flex-col gap-y-5 justify-start items-start'>
-                            <div className='max-w-90 font-bold text-[80px] tracking-[-1.2px] leading-[100%]'><u className='decoration-(--accentyellow-100)'>{e.title}</u></div>
+                            <div className='max-w-90 font-bold text-[80px] tracking-[-1.2px] leading-[100%]'>{e.title}</div>
                             {e.description}
-                            {mapButton}
+                            {mapButton('bg-(--accentdarkblue-90)', 'text-white')}
                         </div>
                     </div>
                     <img className='pt-10 md:pt-0 md:w-5/10' src={e.picture}></img>
@@ -206,7 +211,7 @@ function RouteComponent() {
         <div className='w-full bg-cover bg-center py-25 flex flex-col items-center' style={{ backgroundImage: `url(${griddedEconomics})` }}>
             <div className="w-9/10 flex flex-col gap-20">
             <div className='w-9/10 flex flex-col gap-y-3'>
-                <div className='font-bold leading-[100%] text-white text-left text-[70px] md:text-[80px] tracking-[-1.2px]'><u className='decoration-(--accentyellow-100)'>Gridded</u> Economics</div>
+                <div className='font-bold leading-[100%] text-white text-left text-[70px] md:text-[80px] tracking-[-1.2px]'>Gridded Economics</div>
                 <div className='text-white text-left text-[20px] leading-[142%] max-w-300'>GeoPulse pairs hazard and exposure layers with new <b>IMF-generated gridded economics</b> — harmonized globally at an unprecedented 1km resolution, far beyond macroeconomic statistics, down to the local level where impacts are felt.</div>
             </div>
             <div className='flex flex-col lg:flex-row gap-7.5'>
@@ -234,9 +239,9 @@ function RouteComponent() {
             </div>
             </div>
         </div>
-        <div className='w-full bg-cover py-25 flex flex-col xl:flex-row bg-position-[50%] bg-no-repeat items-center' style={{ backgroundImage: `url(${MenuBackground})` }}>
+        <div className='w-full bg-cover py-25 flex flex-col xl:flex-row bg-position-[50%] bg-no-repeat items-center' style={{ backgroundImage: `url(${whiteGeo})` }}>
             <div className='flex w-full justify-center'>
-                <span className='w-9/10 tracking-[-1.2px] leading-[100%] font-bold text-[50px] md:text-[80px] max-w-250'>Built to be <u className='decoration-(--accentyellow-100)'>Used</u>, <u className='decoration-(--accentyellow-100)'>Cited</u> & <u className='decoration-(--accentyellow-100)'>Trusted</u></span>
+                <span className='w-9/10 tracking-[-1.2px] leading-[100%] font-bold text-[50px] md:text-[80px] max-w-250'>Built to be Used, Cited & Trusted</span>
             </div>
             <div className='flex w-full justify-center items-center'>
                     <div className='grid grid-cols-1 grid-rows-1 md:grid-cols-2 gap-10 md:gap-10 py-10 w-9/10'>
@@ -261,5 +266,19 @@ function RouteComponent() {
                     </div>
             </div>
         </div>
+        <div
+            className='w-full bg-cover py-25 flex flex-col items-center'
+            style={{
+                backgroundImage: `url(${carsBackground})`,
+            }}
+        >
+            <div className='leading-[100%] tracking-[-0.34px] font-bold text-[60px] w-9/10 text-white pb-7.5'>
+                Advancing Global Data Standards
+            </div>
+            <span className='leading-[140%] text-[20px] text-center text-white w-9/10 max-w-220 pb-12'>Designed and sponsored within the IMF on secure cloud infrastructure, GeoPulse fills priority data gaps identified by the G20 Data Gaps Initiative — bringing IMF‑generated risk indicators into a consistent, accessible format for surveillance and policy analysis.</span>
+            <img src={overviewPreview}></img>
+            {mapButton('bg-white', 'text-(--accentdarkblue-90)')}
+        </div>
+        
     </div>
 }
