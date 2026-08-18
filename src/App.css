@@ -40,6 +40,10 @@ body {
   outline: none !important;
 }
 
+.esri-view-attribution {
+  z-index: -50;
+}
+
 .esri-scale-bar__label {
   padding: 0;
   color: #ffffff !important;

@@ -2,8 +2,6 @@ import { createFileRoute } from '@tanstack/react-router'
 import { AppStateContext } from '../app';
 import { useState, useRef, useEffect, useCallback, useContext } from 'react'
 
-import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
-
 import {
     Popover,
     PopoverContent,
@@ -23,14 +21,16 @@ import { Check } from "lucide-react"
 
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer.js";
 import GroupLayer from "@arcgis/core/layers/GroupLayer.js";
-import ScaleBar from "@arcgis/core/widgets/ScaleBar.js";
+import "@arcgis/map-components/components/arcgis-scale-bar";
+import type {} from "@arcgis/map-components/types/react";
+
+import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
 
 import Map from "@arcgis/core/Map.js";
 import ImageryTileLayer from "@arcgis/core/layers/ImageryTileLayer.js";
 import ClassBreaksRenderer from "@arcgis/core/renderers/ClassBreaksRenderer.js";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer.js";
 import MapView from "@arcgis/core/views/MapView.js";
-import SceneView from "@arcgis/core/views/SceneView.js";
 import PointSymbol3D from "@arcgis/core/symbols/PointSymbol3D.js";
 import ObjectSymbol3DLayer from "@arcgis/core/symbols/ObjectSymbol3DLayer.js";
 import VectorTileLayer from "@arcgis/core/layers/VectorTileLayer.js";
@@ -41,7 +41,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
 import { faPause } from "@fortawesome/free-solid-svg-icons";
 import DataIcon from '../assets/data_icon.svg';
-import DropdownArrow from '../assets/Dropdown-arrow.svg';
 
 import { Slider } from "@/components/ui/slider"
 
@@ -76,12 +75,10 @@ function EventTracking() {
     const [otherCountryDropdownStatus, setOtherCountryDropdownStatus] = useState<any>(false);
 
     const ref = useRef(null);
+    const scaleBarRef = useRef<any>(null);
     const eventRef = useRef<HTMLDivElement | null>(null);
     const pulseContainerRef = useRef<HTMLDivElement>(null);
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-    const [dimension3D, setDimension3D] = useState<boolean>(false);
-
 
     const [mobileExposures, setMobileExposures] = useState<boolean>(false);
 
@@ -103,6 +100,13 @@ function EventTracking() {
     const [dataExplainerOpen, setDataExplainerState] = useState(false);
     const [dataExplainerView, setDataExplainerView] = useState("Event Tracking");
 
+    function getMinZoom(containerWidth: number, containerHeight: number): number {
+                const minZoomX = Math.log2(containerWidth / 256);
+                const minZoomY = Math.log2(containerHeight / 256);
+                return Math.max(minZoomX, minZoomY);
+            }
+
+    const [currentZoom, setCurrentZoom] = useState(Math.max(2, getMinZoom(window.innerWidth, window.innerHeight)))
     useEffect(() => {
         view.current.on("click", async (event) => {
             const response = await view.current.hitTest(event);
@@ -214,14 +218,18 @@ function EventTracking() {
                 popupEnabled: false
             });
 
-            const scaleBar = new ScaleBar({
-                view: view.current,
-                unit: "metric" // Options: "metric", "non-metric", or "dual"
-            });
-
-            view.current.ui.add(scaleBar, {
-                position: "bottom-right"
-            });
+            // use this for updating symbol sizes
+            reactiveUtils.watch(
+                () => view.current.zoom,
+                (newZoom) => {
+                    console.log("Zoom level changed to:", newZoom);
+                    eventFeatureLayer.current.renderer.uniqueValueInfos = uniqueColorValues;
+                    setCurrentZoom(newZoom);
+                }
+            );
+            if (scaleBarRef.current) {
+                scaleBarRef.current.view = view.current;
+            }
 
             // force the view view.current.center to the yLimit whenever the user reaches the limit
             const WORLD_HALF_HEIGHT = 20037508.34; // Web Mercator y at ±85.05°
@@ -348,7 +356,7 @@ function EventTracking() {
                 exposureLayer.current.effect = "blur(6px) brightness(0.7) grayscale(0.8)";
             }
         }
-    }, [realtimeExposure, dimension3D])
+    }, [realtimeExposure])
 
     const removeBlur = () => {
         if (baseLayer.current && exposureLayer.current && graphicsLayer.current && outlineLayer.current) {
@@ -985,7 +993,7 @@ function EventTracking() {
                 </div>
             </div>
             {exposuresArray.map((e: any, index: number) =>
-                <div id={`${index}`} className={`absolute -z-1 md:z-1 left-8.25 pointer-events-none`} style={{ top: index * 55 + 200 }} onMouseLeave={() => setPopInState("")}>
+                <div key={index} id={`${index}`} className={`absolute -z-1 md:z-1 left-8.25 pointer-events-none`} style={{ top: index * 55 + 200 }} onMouseLeave={() => setPopInState("")}>
                     <div className=' flex gap-2 items-start pointer-events-none has-[.pop-in]:pointer-events-auto'>
                         <div className={`flex items-center border-solid transition-all duration-300 text-white`}>
                             <div className={`flex items-center pointer-events-auto cursor-pointer transition-all duration-300  text-white`} onClick={() => setRealtimeExposure({ exposure: e.name, filter: e.name })} onMouseEnter={() => togglePopIn(e.name)}>
@@ -997,7 +1005,7 @@ function EventTracking() {
                         </div>
                         <div id='exposureContainer' className={`pointer-events-none has-[.pop-in]:pointer-events-auto flex gap-2 ml-10 flex-wrap max-w-5/10 items-center border-solid transition-all duration-300 text-white`}>
                             {e.categories.map((f: any, index: number) =>
-                                <div id={`exposure_category_${f}`} className={`exposure_ h-9 bg-black border-2 rounded-2xl px-5 opacity-0 cursor-pointer ${popInState == e.name ? 'pop-in' : popInState == "initial" ? 'pop-default' : 'pop-out'} ${realtimeExposure.filter == f ? 'border-(--accentcyan-100)' : 'border-(--accentdarkblue-50)'}`} style={popInState == "initial" ? { animationDelay: index * 0 + 'ms' } : { animationDelay: index * 50 + 'ms' }} onClick={() => setRealtimeExposure({ exposure: e.name, filter: f })}>
+                                <div key={`exposure_category_${f}`} id={`exposure_category_${f}`} className={`exposure_ h-9 bg-black border-2 rounded-2xl px-5 opacity-0 cursor-pointer ${popInState == e.name ? 'pop-in' : popInState == "initial" ? 'pop-default' : 'pop-out'} ${realtimeExposure.filter == f ? 'border-(--accentcyan-100)' : 'border-(--accentdarkblue-50)'}`} style={popInState == "initial" ? { animationDelay: index * 0 + 'ms' } : { animationDelay: index * 50 + 'ms' }} onClick={() => setRealtimeExposure({ exposure: e.name, filter: f })}>
                                     <div className='h-9/10 flex justify-center items-center overflow-hidden'>
                                         <div className='text-white text-[12px] font-bold'>{f}</div>
                                     </div>
@@ -1021,7 +1029,7 @@ function EventTracking() {
                             <section className='text-left w-95/100 font-bold text-(--accentdarkblue-50)'>EXPOSURES</section>
                             <div className='flex flex-row flex-wrap gap-3'>
                                 {exposuresArray.map((e: any) =>
-                                    <div className={`w-25 h-25 bg-black border-2 rounded-2xl cursor-pointer ${realtimeExposure.exposure == e.name ? 'border-(--accentcyan-100)' : 'border-(--accentdarkblue-50)'}`} onClick={() => { setRealtimeExposure({ exposure: e.name, filter: e.name }); setLayerSettingsPopup(false); }}>
+                                    <div key={e.name} className={`w-25 h-25 bg-black border-2 rounded-2xl cursor-pointer ${realtimeExposure.exposure == e.name ? 'border-(--accentcyan-100)' : 'border-(--accentdarkblue-50)'}`} onClick={() => { setRealtimeExposure({ exposure: e.name, filter: e.name }); setLayerSettingsPopup(false); }}>
                                         <div className='h-full flex justify-center items-end'>
                                             <div className='text-white text-[12px] font-bold'>{e.name}</div>
                                         </div>
@@ -1230,13 +1238,13 @@ function EventTracking() {
                     <div className='flex flex-col w-40 items-between text-left'>
                         <div className='pb-2 border-solid border-b-1'>LAYER</div>
                         {exposuresArray.filter((a) => a.name !== "Nightlights").map((e: any) =>
-                            <div className='h-[45px] text-[16px] font-medium border-solid border-b-1 flex items-center '>{e.name}</div>
+                            <div key={e.name} className='h-[45px] text-[16px] font-medium border-solid border-b-1 flex items-center '>{e.name}</div>
                         )}
                     </div>
                     <div className='w-full text-left'>
                         <div className='pb-2 border-solid border-b-1 pl-3'>EXPOSURE</div>
                         {exposuresArray.filter((a) => a.name !== "Nightlights").map((e: any) =>
-                            <div className='h-[45px] text-[16px] font-medium border-solid border-b-1 flex items-center border-l-1 pl-3'>{focusedCountryExposures ? focusedCountryExposures[focusedCountryExposures.indexOf(focusedCountryExposures.find((c: any) => c.attributes.areaid == currentCountryExposure))]?.attributes[e.id] + " " + e.suffix : "N/A"}</div>     
+                            <div key={e.name} className='h-[45px] text-[16px] font-medium border-solid border-b-1 flex items-center border-l-1 pl-3'>{focusedCountryExposures ? focusedCountryExposures[focusedCountryExposures.indexOf(focusedCountryExposures.find((c: any) => c.attributes.areaid == currentCountryExposure))]?.attributes[e.id] + " " + e.suffix : "N/A"}</div>     
                         )}
                     </div>
                 </div>
@@ -1250,7 +1258,7 @@ function EventTracking() {
                     <div className='h-full w-full text-white flex flex-col'>
                         <div className="grid grid-cols-2 grid-rows-3 gap-2">
                             {hazardsArray.map((h, i) =>
-                                <div className='flex'>
+                                <div key={i} className='flex'>
                                     <div className='flex justify-center border-1 rounded-4xl w-4 h-4' style={{ borderColor: h.color }}>
                                         <div className='flex items-center justify-center'>
                                             <div className="rounded-4xl w-[7px] h-[7px]" style={{ background: h.color }}></div>
@@ -1270,7 +1278,7 @@ function EventTracking() {
                     <div className="h-1/10 w-full" style={{ background: `linear-gradient(to right, ${realtimeObject[realtimeExposure.exposure].colorScheme.map((e, i) => 'rgba(' + e.symbol.color.join(",") + ') ' + (i / realtimeObject[realtimeExposure.exposure].colorScheme.length) * 100 + "%," + ' rgba(' + e.symbol.color.join(",") + ') ' + ((i + 1) / realtimeObject[realtimeExposure.exposure].colorScheme.length) * 100 + "% ").join(",")})` }}></div>
                     <div className="h-[20px] w-full flex justify-between">
                         {realtimeObject[realtimeExposure.exposure].colorScheme.map((e, i) =>
-                            <div className="flex flex-col w-full h-[full]">
+                            <div key={i} className="flex flex-col w-full h-[full]">
                                 <div style={{ justifyContent: 'center' }} className='flex items-start w-full h-[20px]'>
                                     <div className="flex justify-end items-start w-full gap-0">
                                         <div className='text-white text-[12px]'>{e.label}</div>
@@ -1281,6 +1289,12 @@ function EventTracking() {
                     </div>
                 </div>
             </div>
+            <arcgis-scale-bar
+                className='calcite-mode-dark z-150 absolute bottom-3 right-4'
+                ref={scaleBarRef}
+                bar-style="line"
+                unit="metric"
+            ></arcgis-scale-bar>
             {dataExplainerOpen 
             ? 
             <div className="absolute z-3 bottom-0 w-full h-full bg-[#00000095] flex items-center justify-center">

@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as HomeRouteImport } from './routes/home'
 import { Route as GridRouteImport } from './routes/grid'
 import { Route as EventtrackingRouteImport } from './routes/eventtracking'
 import { Route as DatamethodologyRouteImport } from './routes/datamethodology'
@@ -16,6 +17,11 @@ import { Route as CompareRouteImport } from './routes/compare'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 
+const HomeRoute = HomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GridRoute = GridRouteImport.update({
   id: '/grid',
   path: '/grid',
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/datamethodology': typeof DatamethodologyRoute
   '/eventtracking': typeof EventtrackingRoute
   '/grid': typeof GridRoute
+  '/home': typeof HomeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/datamethodology': typeof DatamethodologyRoute
   '/eventtracking': typeof EventtrackingRoute
   '/grid': typeof GridRoute
+  '/home': typeof HomeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,6 +79,7 @@ export interface FileRoutesById {
   '/datamethodology': typeof DatamethodologyRoute
   '/eventtracking': typeof EventtrackingRoute
   '/grid': typeof GridRoute
+  '/home': typeof HomeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,6 +90,7 @@ export interface FileRouteTypes {
     | '/datamethodology'
     | '/eventtracking'
     | '/grid'
+    | '/home'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -89,6 +99,7 @@ export interface FileRouteTypes {
     | '/datamethodology'
     | '/eventtracking'
     | '/grid'
+    | '/home'
   id:
     | '__root__'
     | '/'
@@ -97,6 +108,7 @@ export interface FileRouteTypes {
     | '/datamethodology'
     | '/eventtracking'
     | '/grid'
+    | '/home'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -106,10 +118,18 @@ export interface RootRouteChildren {
   DatamethodologyRoute: typeof DatamethodologyRoute
   EventtrackingRoute: typeof EventtrackingRoute
   GridRoute: typeof GridRoute
+  HomeRoute: typeof HomeRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/home': {
+      id: '/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof HomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/grid': {
       id: '/grid'
       path: '/grid'
@@ -162,6 +182,7 @@ const rootRouteChildren: RootRouteChildren = {
   DatamethodologyRoute: DatamethodologyRoute,
   EventtrackingRoute: EventtrackingRoute,
   GridRoute: GridRoute,
+  HomeRoute: HomeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

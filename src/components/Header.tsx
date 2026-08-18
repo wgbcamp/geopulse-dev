@@ -257,9 +257,9 @@ export const Header = () => {
                     </div>
                 </div>
                 <div className='w-23 xl:w-0'></div>
-                <div className="rounded-none w-full xl:w-120 flex flex-row items-center justify-center font-semibold bg-(--fundblue) text-white border-none">
+                <Link to="/home" activeOptions={{ exact: true }} className="rounded-none w-full xl:w-120 flex flex-row items-center justify-center font-semibold bg-(--fundblue) text-white border-none">
                     <img src={Lockup}></img>
-                </div>
+                </Link>
                 <div className={`flex items-center w-60 xl:w-0 xl:h-0 overflow-hidden justify-center cursor-pointer bg-(--fundblue) rounded-none border-0 border-none`}>
                     <div className='h-7/10 flex w-9/10 items-center justify-evenly rounded-lg bg-(--accentblue-30)' onClick={() => setDataOptions(true)}>
                         <svg width="26" height="23" viewBox="0 0 26 23" xmlns="http://www.w3.org/2000/svg">
@@ -379,7 +379,7 @@ export const Header = () => {
                     :
                     null
                 }
-                <div className={`h-14.75 flex col-start-2 row-start-1 border-r ${location.pathname == '/compare' || location.pathname == '/grid' ? 'xl:col-start-2 xl:col-end-3' : location.pathname == '/eventtracking' ? 'xl:col-start-3 xl:col-end-4' : 'xl:col-start-2 xl:col-end-3'}`}>   
+                <div className={`shadow-[0_1px_3px_0_rgb(0_0_0/0.1),0_1px_2px_-1px_rgb(0_0_0/0.1)]  h-14.75 flex col-start-2 row-start-1 border-r ${location.pathname == '/compare' || location.pathname == '/grid' ? 'xl:col-start-2 xl:col-end-3' : location.pathname == '/eventtracking' ? 'xl:col-start-3 xl:col-end-4' : 'xl:col-start-2 xl:col-end-3'}`}>   
                     <Card className={`shadow-none rounded-none xl:grow p-0 w-full h-full flex flex-col items-center justify-end gap-0 hover:bg-white transition-colors duration-200 ${location.pathname == "/compare" || location.pathname == "/grid" ? 'bg-white' : 'bg-(--accentblue-30)'} border-0`}>
                         <div className="text-[11px] font-bold text-(--primaryblack-90)">FORWARD LOOKING</div>
                         <div className="flex flex-end flex-col w-full">
@@ -409,7 +409,7 @@ export const Header = () => {
                         </div>
                     </Card>
                 </div>
-                <div className='bg-(--accentblue-30) w-full h-full col-start-3 row-start-1 flex justify-center items-center cursor-pointer xl:h-0 xl:w-0 xl:hidden' onClick={() => setDataOptions(false)}>
+                <div className='bg-(--accentblue-30) hover:bg-white w-full h-full col-start-3 row-start-1 flex justify-center items-center cursor-pointer xl:h-0 xl:w-0 xl:hidden' onClick={() => setDataOptions(false)}>
                     <div className=" flex items-center flex-center">
                         <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
                             <path d="M0.390625 1.67969C0 1.32812 0 0.703125 0.390625 0.351562C0.742188 0 1.32812 0 1.67969 0.351562L7.57812 6.25L13.4766 0.351562C13.8672 0 14.4531 0 14.8047 0.351562C15.1953 0.742188 15.1953 1.32812 14.8047 1.67969L8.90625 7.57812L14.8047 13.4766C15.1953 13.8281 15.1953 14.4531 14.8047 14.8047C14.4531 15.1562 13.8672 15.1562 13.4766 14.8047L7.57812 8.90625L1.67969 14.8047C1.32812 15.1562 0.742188 15.1562 0.390625 14.8047C0 14.4531 0 13.8281 0.390625 13.4766L6.28906 7.57812L0.390625 1.67969Z" fill="black" />
@@ -418,7 +418,7 @@ export const Header = () => {
                 </div>
                 {(location.pathname === "/compare" || location.pathname === "/grid") ?
                     <div className={`flex flex-col xl:flex-row xl:w-auto ${dataOptions ? 'h-full' : 'h-0'} xl:h-14.75 overflow-hidden w-full col-start-1 col-end-4 xl:col-start-3 xl:col-end-4 `}>
-                        <Card id="hazardExposure" className="shadow-none rounded-none border-0 p-0 flex flex-col h-22 xl:h-auto xl:w-60 px-2 items-center justify-center gap-0 ">
+                        <Card id="hazardExposure" className="shadow-none rounded-none border-0 p-0 z-100 flex flex-col h-22 xl:h-auto xl:w-60 px-2 items-center justify-center gap-0 ">
                             <div className='w-95/100 border-b-2'>
                                 <Popover open={riskOpened} onOpenChange={handleOpenChange}>
                                     <PopoverTrigger asChild>
