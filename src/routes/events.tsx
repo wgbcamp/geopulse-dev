@@ -1044,7 +1044,7 @@ function Events() {
                     </div>
                 </div>
             </div>
-            <div className={`absolute z-2 bottom-0 md:top-50 md:right-0 ${eventPopup == "all events" ? "visible" : "invisible"} max-h-full md:h-70/100 w-full md:w-[300px] flex flex-col bg-white shadow-lg/40 cursor-default draggable`} style={{
+            <div className={`absolute z-2 bottom-0 md:top-50 md:transition-all md:duration-300 md:ease-in-out ${eventPopup == "all events" ? "md:right-0" : "md:-right-100 invisible"} md:visible max-h-full md:h-70/100 w-full md:w-[300px] flex flex-col bg-white shadow-lg/40 cursor-default draggable`} style={{
                 "--drag-y": `${y}px`,
                 touchAction: "none"
             }}>
@@ -1088,7 +1088,7 @@ function Events() {
                 </div>
                 <div className="h-[10px] bg-[var(--darkblue)] flex items-center justify-center text-white font-bold"></div>
             </div>
-            <div className={`absolute bottom-0 right-0 md:top-40 md:bottom-[unset] ${eventPopup == "focused event" ? "visible" : "invisible"} h-40/100 md:h-70/100 w-full md:w-[325px] pt-3 shadow-lg/40 md:rounded-tl-md flex flex-col items-start bg-white cursor-default transition-all ease-in-out duration-300 overflow-y-auto`}>
+            <div className={`absolute bottom-0 right-0 md:top-40 md:bottom-[unset] md:transition-all md:duration-300 md:ease-in-out ${eventPopup == "focused event" ? "md:right-0 visible" : "md:-right-100 invisible"} h-40/100 md:h-70/100 w-full md:w-[325px] pt-3 shadow-lg/40 md:rounded-tl-md flex flex-col items-start bg-white cursor-default transition-all ease-in-out duration-300 overflow-y-auto`}>
                 <div className="pt-3 w-full flex items-center justify-between pl-4">
                     {focusedEvent.iscurrent == "true" ?
                         <div className="flex h-6.25 justify-center  items-center bg-(--accentred-100) rounded-sm shadow-lg/10 font-bold text-white px-[5px] mb-[6px] mt-[9px] text-[11px]">
@@ -1180,7 +1180,7 @@ function Events() {
                         }
                     )}
                     {focusedEvent?.affectedcountries?.split(",")?.length > 3 ? <div className={`rounded-xl overflow-hidden h-5 px-2 py-3 ${focusedEvent?.affectedcountries?.split(",")?.find((a, i) => a == currentCountryExposure && i > 2) ? 'bg-(--accentblue-100) text-white' : 'bg-(--accentwarmgray-20)'}  font-bold flex items-center justify-center`} onClick={() => setOtherCountryDropdownStatus(!otherCountryDropdownStatus)}>
-                        <div className='text-wrap max-w-40 flex justify-between cursor-pointer'>{currentCountryExposure !== "ALL" ? countryByIso3[currentCountryExposure] : "Other"}</div>
+                        <div className='text-wrap max-w-40 flex justify-between cursor-pointer'>{currentCountryExposure !== "ALL" && focusedEvent?.affectedcountries?.split(",")?.find((a, i) => a == currentCountryExposure && i > 2) ? countryByIso3[currentCountryExposure] : "Other"}</div>
                             <Popover open={otherCountryDropdownStatus} onOpenChange={setOtherCountryDropdownStatus}>
                                 <PopoverTrigger asChild>
                                     <Button

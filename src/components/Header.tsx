@@ -235,8 +235,8 @@ export const Header = () => {
 
     return (
         <div className={`grid ${location.pathname == "/home" ? 'mt-10.5 grid-cols-[316px_1fr]' : 'grid-cols-[1fr] xl:grid-cols-[232px_1fr]'} xl:h-14.75 fixed w-full top-0 z-3 ${dataOptions || menuOptions ? '' : 'overflow-hidden h-14.75'} ${location.pathname == '/home' ? 'overflow-visible' : ''} xl:h-[unset]`}>
-            <div className={`flex flex-col ${menuOptions ? 'z-2 h-73.75' : '-z-10 h-0 overflow-hidden'} ${location.pathname == '/home' ? 'w-58' : 'w-full xl:w-58'} bg-(--accentdarkblue-90) xl:bg-[unset] absolute shadow-xl/40`}>
-                <div className='flex w-16.75 h-14.75 justify-center items-center bg-(--accentdarkblue-90) cursor-pointer' onClick={() => setMenuOptions(!menuOptions)}>
+            <div className={`${location.pathname == "/home" ? "ml-8" : ""} flex flex-col ${menuOptions ? 'z-2 ' : '-z-10 h-0 overflow-hidden'} ${location.pathname == '/home' ? 'w-71' : 'w-full xl:w-58'} bg-(--accentdarkblue-90) xl:bg-[unset] absolute shadow-xl/40`}>
+                <div className={`flex w-16.75 ${location.pathname == "/home" ? "h-16" : "h-14.75"} justify-center items-center bg-(--accentdarkblue-90) cursor-pointer`} onClick={() => setMenuOptions(!menuOptions)}>
                     <div className="flex items-center flex-center">
                         <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
                             <path d="M0.390625 1.67969C0 1.32812 0 0.703125 0.390625 0.351562C0.742188 0 1.32812 0 1.67969 0.351562L7.57812 6.25L13.4766 0.351562C13.8672 0 14.4531 0 14.8047 0.351562C15.1953 0.742188 15.1953 1.32812 14.8047 1.67969L8.90625 7.57812L14.8047 13.4766C15.1953 13.8281 15.1953 14.4531 14.8047 14.8047C14.4531 15.1562 13.8672 15.1562 13.4766 14.8047L7.57812 8.90625L1.67969 14.8047C1.32812 15.1562 0.742188 15.1562 0.390625 14.8047C0 14.4531 0 13.8281 0.390625 13.4766L6.28906 7.57812L0.390625 1.67969Z" fill="white" />
@@ -250,9 +250,9 @@ export const Header = () => {
                     <div className='flex items-center w-full h-14.75 text-white cursor-not-allowed'>Team & Contact us</div>
                 </div>
             </div>
-            {location.pathname == '/home' ? 
+            {location.pathname == '/home' ?
                 <div className='ml-8 flex'>
-                    <div className={`flex bg-(--fundblue) h-16 w-full shadow-[0_4px_10.4px_0_rgba(0,0,0,0.50)]`}>
+                    <div className={`flex h-16 shadow-[0_4px_10.4px_0_rgba(0,0,0,0.50)]`}>
                         <div className='flex cursor-pointer' onClick={() => setMenuOptions(!menuOptions)}>
                             <div className='flex h-16 w-full'>
                                 <div className='relative flex items-center rounded-none h-full w-17.5 border-r bg-(--accentdarkblue-90) xl:bg-(--accentdarkblue-90) text-white'>
@@ -261,12 +261,12 @@ export const Header = () => {
                                 </div>
                             </div>
                         </div>
-                        <Link to="/home" activeOptions={{ exact: true }} className="w-60 rounded-none flex items-center justify-center bg-(--fundblue)  border-none">
-                            <img className="px-9 py-6.25" src={Lockup}></img>
-                        </Link>
                     </div>
+                    <Link to="/home" activeOptions={{ exact: true }} className="z-10 w-60 rounded-none flex items-center justify-center bg-(--fundblue) border-none">
+                        <img className="px-9 py-6.25" src={Lockup}></img>
+                    </Link>
                 </div>
-            : 
+                : 
             <div className={`flex w-full xl:w-58 justify-between xl:justify-start bg-(--fundblue) ${dataOptions ? 'h-0' : 'h-14.75'} overflow-hidden xl:h-14.75`}>
                 <div className='flex cursor-pointer' onClick={() => setMenuOptions(!menuOptions)}>
                     <div className='flex h-14.75 w-full'>
