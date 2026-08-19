@@ -151,7 +151,7 @@ function RouteComponent() {
     const [activeCategory, setActiveCategory] = useState<string>("Overview")
 
     return <div className=''>
-        <div className='h-full relative overflow-hidden pt-30 pb-16 flex flex-col justify-start items-center xl:justify-normal xl:items-start w-full bg-fixed bg-cover' style={{ backgroundImage: `url(${MenuBackground})`}}>
+        <div className='h-full relative overflow-hidden pt-30 pb-16 flex flex-col justify-start items-center xl:justify-normal xl:items-start w-full bg-fixed bg-cover' style={{ backgroundImage: `url(${MenuBackground})`, backgroundPositionY: "bottom 10px"}}>
             <div className='flex justify-center xl:justify-normal xl:pt-20 xl:pl-15 max-w-200'>
                 <div className='w-9/10 xl:w-5/10 grid text-white xl:text-left z-1'>
                     {Object.entries(categoryDetails).map(([key, details]) =>
