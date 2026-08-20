@@ -595,16 +595,16 @@ export const realtimeObject: Record<string, { url: Record<string,string>, colorS
     {
         url: { 
             "GDP": `${URL_RTBASE}/imf_gdp_total_2021_logv3/ImageServer`,
-            "Agriculture": `${URL_RTBASE}`,
-            "Mining": `${URL_RTBASE}`,
-            "Manufacturing": `${URL_RTBASE}`,
-            "Construction": `${URL_RTBASE}`,
-            "Transportation & Warehousing": `${URL_RTBASE}`,
-            "Trade": `${URL_RTBASE}`,
-            "Finance": `${URL_RTBASE}`,
-            "Government": `${URL_RTBASE}`,
-            "Public Services": `${URL_RTBASE}`,
-            "Other Industries": `${URL_RTBASE}`
+            "Agriculture": `${URL_RTBASE}/CANUSA_Gridded_GDP_Agriculture_2021/ImageServer`,
+            "Mining": `${URL_RTBASE}/CANUSA_Gridded_GDP_Mining_and_Oil_and_Gas_2021/ImageServer`,
+            "Electricity": `${URL_RTBASE}/CANUSA_Gridded_GDP_Electricity_2021/ImageServer`,
+            "Manufacturing": `${URL_RTBASE}/CANUSA_Gridded_GDP_Manufacturing_2021/ImageServer`,
+            "Construction": `${URL_RTBASE}/CANUSA_Gridded_GDP_Construction_2021/ImageServer`,
+            "Transportation & Warehousing": `${URL_RTBASE}/CANUSA_Gridded_GDP_Transportation_and_Warehousing_2021/ImageServer`,
+            "Trade": `${URL_RTBASE}/CANUSA_Gridded_GDP_Trade_2021/ImageServer`,   
+            "Finance": `${URL_RTBASE}/CANUSA_Gridded_GDP_Financial_Intermediate_and_Real_Estate_2021/ImageServer`,
+            "Government": `${URL_RTBASE}/CANUSA_Gridded_GDP_Government_and_Public_Administration_2021/ImageServer`,
+            "Other Industries": `${URL_RTBASE}/CANUSA_Gridded_GDP_Other_Services_2021/ImageServer`
         },
         colorScheme: [
             {
