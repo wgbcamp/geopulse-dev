@@ -594,7 +594,7 @@ export const realtimeObject: Record<string, { url: Record<string,string>, colorS
     "GDP":
     {
         url: { 
-            "GDP": `${URL_RTBASE}/imf_gdp_total_2021_logv3/ImageServer`,
+            "GDP": `${URL_RTBASE}/CANUSA_Gridded_GDP_Total_Economy_2021/ImageServer`,
             "Agriculture": `${URL_RTBASE}/CANUSA_Gridded_GDP_Agriculture_2021/ImageServer`,
             "Mining": `${URL_RTBASE}/CANUSA_Gridded_GDP_Mining_and_Oil_and_Gas_2021/ImageServer`,
             "Electricity": `${URL_RTBASE}/CANUSA_Gridded_GDP_Electricity_2021/ImageServer`,
