@@ -1,13 +1,19 @@
+// creates file-based routing for tanstack react router 
 import { createFileRoute } from '@tanstack/react-router'
+
+// react hooks holding state, context, and references
 import { AppStateContext } from '../app';
 import { useState, useRef, useEffect, useCallback, useContext } from 'react'
 
+// this function constructs className strings conditionally and merges tailwindcss classes in javascript
+import { cn } from "@/lib/utils"
+
+// shad cn component imports
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
-import { Button } from "@/components/ui/button"
 import {
   Command,
   CommandEmpty,
@@ -16,50 +22,57 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command"
-import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { Slider } from "@/components/ui/slider"
+
+// imf icons
+import DataIcon from '../assets/data_icon.svg';
+import Exposures from '../assets/Layers.svg';
+
+
+// 3rd party icons
 import { Check } from "lucide-react"
-
-import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer.js";
-import GroupLayer from "@arcgis/core/layers/GroupLayer.js";
-import "@arcgis/map-components/components/arcgis-scale-bar";
-import type {} from "@arcgis/map-components/types/react";
-
-import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
-
-import Map from "@arcgis/core/Map.js";
-import ImageryTileLayer from "@arcgis/core/layers/ImageryTileLayer.js";
-import ClassBreaksRenderer from "@arcgis/core/renderers/ClassBreaksRenderer.js";
-import FeatureLayer from "@arcgis/core/layers/FeatureLayer.js";
-import MapView from "@arcgis/core/views/MapView.js";
-import PointSymbol3D from "@arcgis/core/symbols/PointSymbol3D.js";
-import ObjectSymbol3DLayer from "@arcgis/core/symbols/ObjectSymbol3DLayer.js";
-import VectorTileLayer from "@arcgis/core/layers/VectorTileLayer.js";
-import SimpleRenderer from "@arcgis/core/renderers/SimpleRenderer";
-import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
 import { faPause } from "@fortawesome/free-solid-svg-icons";
-import DataIcon from '../assets/data_icon.svg';
 
-import { Slider } from "@/components/ui/slider"
+// arcgis geographic data layers
+import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer.js";
+import GroupLayer from "@arcgis/core/layers/GroupLayer.js";
+import ImageryTileLayer from "@arcgis/core/layers/ImageryTileLayer.js";
+import FeatureLayer from "@arcgis/core/layers/FeatureLayer.js";
+import VectorTileLayer from "@arcgis/core/layers/VectorTileLayer.js";
 
+// arcgis map components
+import "@arcgis/map-components/components/arcgis-scale-bar";
+import type {} from "@arcgis/map-components/types/react";
+
+// arcgis core utilities
+import Map from "@arcgis/core/Map.js";
+import ClassBreaksRenderer from "@arcgis/core/renderers/ClassBreaksRenderer.js";
+import MapView from "@arcgis/core/views/MapView.js";
+import PointSymbol3D from "@arcgis/core/symbols/PointSymbol3D.js";
+import ObjectSymbol3DLayer from "@arcgis/core/symbols/ObjectSymbol3DLayer.js";
+import SimpleRenderer from "@arcgis/core/renderers/SimpleRenderer";
+import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
+import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
+
+// dataset object configurations
 import { realtimeObject } from '@/config/datasets';
-
-import Exposures from '../assets/Layers.svg';
-
 import { countryByIso3 } from "@/config/isoCountries";
 
 export const Route = createFileRoute('/events')({
     component: Events,
 })
 
-
 function Events() {
 
+    // reads context from provider for  
+    const state = useContext(AppStateContext);
+
+    // state hook that enables/disables exposure sub-category animations
     const [popInState, setPopInState] = useState<string>("initial");
 
-    const state = useContext(AppStateContext);
 
     const [realtimeExposure, setRealtimeExposure] = useState<{ exposure: string, filter: string }>({ exposure: "Population", filter: "Population" });
     const [events, setEvents] = useState<any>(null);
@@ -100,11 +113,11 @@ function Events() {
     const [dataExplainerOpen, setDataExplainerState] = useState(false);
     const [dataExplainerView, setDataExplainerView] = useState("Event Tracking");
 
-    function getMinZoom(containerWidth: number, containerHeight: number): number {
-                const minZoomX = Math.log2(containerWidth / 256);
-                const minZoomY = Math.log2(containerHeight / 256);
-                return Math.max(minZoomX, minZoomY);
-            }
+    // function getMinZoom(containerWidth: number, containerHeight: number): number {
+    //             const minZoomX = Math.log2(containerWidth / 256);
+    //             const minZoomY = Math.log2(containerHeight / 256);
+    //             return Math.max(minZoomX, minZoomY);
+    //         }
 
     // const [currentZoom, setCurrentZoom] = useState(Math.max(2, getMinZoom(window.innerWidth, window.innerHeight)))
     useEffect(() => {
@@ -601,7 +614,7 @@ function Events() {
                 field: "eventtype",
                 uniqueValueInfos: uniqueColorValues
             },
-            definitionExpression: `(fromdate >= timestamp '${toTimestamp(new Date(state.dateRange.from))}' AND fromdate <= timestamp '${toTimestamp(new Date(state.dateRange.to))}'
+            definitionExpression: `(fromdate >= timestamp '${toTimestamp(new Date(state?.dateRange.from))}' AND fromdate <= timestamp '${toTimestamp(new Date(state.dateRange.to))}'
             OR
             todate >= timestamp '${toTimestamp(new Date(state.dateRange.from))}' AND todate <= timestamp '${toTimestamp(new Date(state.dateRange.to))}'
             OR

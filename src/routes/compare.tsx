@@ -36,14 +36,14 @@ function CompareView() {
                     <Region
                         regionId="A"
                         defaultIso3={"CHN"}
-                        geoJson={polygons}
+                        topojson={polygons}
                         sharedYMax={sharedYMax}
                         onDataMax={handleDataMax}
                     />
                     <Region
                         regionId="B"
                         defaultIso3={"BGD"}
-                        geoJson={polygons}
+                        topojson={polygons}
                         sharedYMax={sharedYMax}
                         onDataMax={handleDataMax}
                     />

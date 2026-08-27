@@ -23,7 +23,7 @@ import { Exporting } from '@highcharts/react/options/Exporting';
 import { countryByIso3 } from '@/config/isoCountries';
 import { urlObject, scenarioMapper, scenarioLabel, comparisonTitles, comparisonMapContext, timePeriodLabels } from '@/config/datasets';
 
-export const Region = ({ defaultIso3, geoJson, regionId, sharedYMax, onDataMax }: any) => {
+export const Region = ({ defaultIso3, topojson, regionId, sharedYMax, onDataMax }: any) => {
     const state = useContext(AppStateContext);
 
     type Feature = Record<string, any>;
@@ -162,13 +162,21 @@ export const Region = ({ defaultIso3, geoJson, regionId, sharedYMax, onDataMax }
                 setSubnational({refAreaName: null, refArea: null, iso3: null});
             }
         
-            // retrieve polygons from geoJson object
+            // retrieve polygons from topojson object
             const countryPolygons = {
-                features: geoJson.features.filter((f: any) => f.properties.GID_0 === iso3),
-                iso3: iso3,
-                name: countryByIso3[iso3],
-                type: "FeatureCollection"
+                ...topojson,
+                objects: {
+                    GADM_ADMIN1: {
+                        ...topojson.objects.GADM_ADMIN1,
+                        geometries: topojson.objects.GADM_ADMIN1.geometries.filter(
+                            (g: any) => g.properties.GID_0 === iso3
+                        ),
+                    },
+                },
             };
+
+            console.log("LOOK");
+            console.log(countryPolygons);
 
             // store polygon data for selected country
             setPolygons(countryPolygons);
@@ -200,7 +208,7 @@ export const Region = ({ defaultIso3, geoJson, regionId, sharedYMax, onDataMax }
             // } 
         };
         loadCountryData(iso3);
-    }, [iso3, state?.currentHazard, state?.currentExposure, geoJson]);
+    }, [iso3, state?.currentHazard, state?.currentExposure, topojson]);
 
     // re-process already-fetched data
     useEffect(() => {
