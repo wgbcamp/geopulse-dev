@@ -594,63 +594,63 @@ export const realtimeObject: Record<string, { url: Record<string,string>, colorS
     "GDP":
     {
         url: { 
-            "GDP": `${URL_RTBASE}/imf_gdp_total_2021_logv3/ImageServer`,
-            "Agriculture": `${URL_RTBASE}`,
-            "Mining": `${URL_RTBASE}`,
-            "Manufacturing": `${URL_RTBASE}`,
-            "Construction": `${URL_RTBASE}`,
-            "Transportation & Warehousing": `${URL_RTBASE}`,
-            "Trade": `${URL_RTBASE}`,
-            "Finance": `${URL_RTBASE}`,
-            "Government": `${URL_RTBASE}`,
-            "Public Services": `${URL_RTBASE}`,
-            "Other Industries": `${URL_RTBASE}`
+            "GDP": `${URL_RTBASE}/CANUSA_Gridded_GDP_Total_Economy_2021/ImageServer`,
+            "Agriculture": `${URL_RTBASE}/CANUSA_Gridded_GDP_Agriculture_2021/ImageServer`,
+            "Mining": `${URL_RTBASE}/CANUSA_Gridded_GDP_Mining_and_Oil_and_Gas_2021/ImageServer`,
+            "Electricity": `${URL_RTBASE}/CANUSA_Gridded_GDP_Electricity_2021/ImageServer`,
+            "Manufacturing": `${URL_RTBASE}/CANUSA_Gridded_GDP_Manufacturing_2021/ImageServer`,
+            "Construction": `${URL_RTBASE}/CANUSA_Gridded_GDP_Construction_2021/ImageServer`,
+            "Transportation": `${URL_RTBASE}/CANUSA_Gridded_GDP_Transportation_and_Warehousing_2021/ImageServer`,
+            "Trade": `${URL_RTBASE}/CANUSA_Gridded_GDP_Trade_2021/ImageServer`,   
+            "Finance": `${URL_RTBASE}/CANUSA_Gridded_GDP_Financial_Intermediate_and_Real_Estate_2021/ImageServer`,
+            "Government": `${URL_RTBASE}/CANUSA_Gridded_GDP_Government_and_Public_Administration_2021/ImageServer`,
+            "Other": `${URL_RTBASE}/CANUSA_Gridded_GDP_Other_Services_2021/ImageServer`
         },
         colorScheme: [
             {
-                "minValue": 5.9,
-                "maxValue": 6.081,
+                "minValue": 0.1,
+                "maxValue": 800000,
                 "symbol": {
                     "type": "simple-fill",
                     "color": [50, 48, 50, 1.0]
                 },
-                "label": "< $6.1K"
+                "label": "< $800K"
             },
             {
-                "minValue": 6.081,
-                "maxValue": 7.031,
+                "minValue": 800000,
+                "maxValue": 1200000,
                 "symbol": {
                     "type": "simple-fill",
                     "color": [90, 55, 65, 1.0]
                 },
-                "label": "$104.9K"
+                "label": "$1.2M"
             },
             {
-                "minValue": 7.031,
-                "maxValue": 7.413306,
+                "minValue": 1200000,
+                "maxValue": 10700000,
                 "symbol": {
                     "type": "simple-fill",
                     "color": [160, 70, 100, 1.0]
                 },
-                "label": "$628.0K"
+                "label": "$10.7M"
             },
             {
-                "minValue": 7.413306,
-                "maxValue": 7.885,
+                "minValue": 10700000,
+                "maxValue": 25000000,
                 "symbol": {
                     "type": "simple-fill",
                     "color": [210, 130, 60, 1.0]
                 },
-                "label": "$13.3M"
+                "label": "$25M"
             },
             {
-                "minValue": 7.885,
-                "maxValue": 10.153,
+                "minValue": 25000000,
+                "maxValue": 14220000000,
                 "symbol": {
                     "type": "simple-fill",
                     "color": [240, 249, 33, 1.0]
                 },
-                "label": "> $13.3M"
+                "label": "> $25M"
             }
         ],
         title: "gdp",
