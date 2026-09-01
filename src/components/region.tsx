@@ -241,6 +241,9 @@ export const Region = ({ defaultIso3, topojson, regionId, sharedYMax, onDataMax 
         // fetch all pages sequentially and await each one
 
         for (let start = 0; start < objectIds.length; start += maxRecordsPerQuery) {
+            // track how many requests have been made per loop
+            let attempts = 0;
+
             const end = Math.min(start + maxRecordsPerQuery, objectIds.length);
             const res = await fetch(url, {
                 method: 'POST',
@@ -254,7 +257,19 @@ export const Region = ({ defaultIso3, topojson, regionId, sharedYMax, onDataMax 
             });
 
             const page = await res.json();
-            tableData.push(...page.features.map((f: { attributes: Feature }) => f.attributes));
+            if (page.error) {
+                if (attempts <= 10) {
+                    // reduce interval by last incrememt of for loop if error occurs server-side
+                    start = start - maxRecordsPerQuery;
+                    console.log("Unable to perform query. Sending request again.", page.error);
+                    attempts++;
+                } else {
+                    alert("Unable to perform query. Too many requests. Please try again later.");
+                    break;
+                }
+            } else {
+                tableData.push(...page.features.map((f: { attributes: Feature }) => f.attributes));
+            }
         }
 
         console.log("logging tableData: ", tableData);
