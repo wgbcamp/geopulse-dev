@@ -143,19 +143,39 @@ function Events() {
         query.outSpatialReference = view.current.spatialReference;
         query.maxRecordCountFactor = 5;
 
-        eventFeatureLayer.current!.queryFeatures(query).then((result) => {
-            console.log(result);
-            result.features.forEach((f: any) => {
-                if (!f.geometry) return;
-                var x = result.features.map((feature) => {
-                    return {
-                        attributes: feature.attributes,
-                        geometry: feature.geometry
-                    }
-                }).sort((a, b) => Math.floor(Date.parse(b.attributes.fromdate) / 1000) - Math.floor(Date.parse(a.attributes.fromdate) / 1000));
-                setEvents(x);
+        // track how many server attempts have been made
+        let attempts = 0;
+
+        function runQuery() {
+            eventFeatureLayer.current!.queryFeatures(query).then((result) => {
+                console.log(result);
+                result.features.forEach((f: any) => {
+                    if (!f.geometry) return;
+                    var x = result.features.map((feature) => {
+                        return {
+                            attributes: feature.attributes,
+                            geometry: feature.geometry
+                        }
+                    }).sort((a, b) => Math.floor(Date.parse(b.attributes.fromdate) / 1000) - Math.floor(Date.parse(a.attributes.fromdate) / 1000));
+                    setEvents(x);
+                })
             })
-        });
+                .catch(error => {
+                    if (attempts <= 10) {
+                        console.log("Unable to perform query. Too many requests. Sending request again.", error);
+                        attempts++;
+                        runQuery();
+                    } else {
+                        console.log("Unable to perform query. Too many requests. Please try again later.", error);
+                        unfocusEvent();
+                        alert("Unable to perform query. Too many requests. Please try again later.");
+                    }
+                    
+                }
+            );
+        }
+
+        runQuery();
     }, [eventPopup]);
 
     //event polygon feature layer
@@ -652,51 +672,64 @@ function Events() {
     })
 
     // query feature layer 
-    async function highlightCountry(eventid: any, index?: number) {
+    function highlightCountry(eventid: any, index?: number) {
 
         const newQuery = eventPolygonsLayer.createQuery();
         newQuery.returnGeometry = true;
         newQuery.outFields = ["*"];
         newQuery.where = `eventid = ${eventid}`;
-        const result = await eventPolygonsLayer.queryFeatures(newQuery);
-        console.log("events: ", result);
 
-        // const feature = result.features.filter((x) => x.attributes.episodeid == 1); //features.attributes.eventid
-        // const feature = result.features[index || 0]; //features.attributes.eventid
+        // track how many server attempts have been made
+        let attempts = 0;
 
-        const ascendingFeatures = Object.values(
-            result.features.reduce((groups, feature) => {
-                const id = feature.attributes.episodeid;
-                (groups[id] ??= []).push(feature);
-                return groups;
-            }, {} as Record<number, typeof result.features>)
-        ).sort((a, b) => a[0].attributes.episodeid - b[0].attributes.episodeid);
+        function runQuery() {
+            eventPolygonsLayer.queryFeatures(newQuery).then((result) => {
+                console.log("events: ", result);
 
-        console.log("ASCENDING FEATURES: ", ascendingFeatures);
+                const ascendingFeatures = Object.values(
+                    result.features.reduce((groups, feature) => {
+                        const id = feature.attributes.episodeid;
+                        (groups[id] ??= []).push(feature);
+                        return groups;
+                    }, {} as Record<number, typeof result.features>)
+                ).sort((a, b) => a[0].attributes.episodeid - b[0].attributes.episodeid);
 
-        console.log("feature ", result.features);
+                console.log("ASCENDING FEATURES: ", ascendingFeatures);
+                console.log("feature ", result.features);
 
+                setFocusedFeatures(ascendingFeatures); // Store the features in state
+                console.log("FocusedFeatures: ", ascendingFeatures);
 
+                let combinedExtent: __esri.Extent | null = null;
+                for (const feature of result.features) {
+                    const ext = feature.geometry?.extent;
+                    console.log("feature element extent: ", feature.geometry?.extent?.toJSON());
+                    if (!ext) continue;
+                    combinedExtent = combinedExtent ? combinedExtent.union(ext) : ext;
+                }
 
-        setFocusedFeatures(ascendingFeatures); // Store the features in state
-        console.log("FocusedFeatures: ", ascendingFeatures);
+                if (combinedExtent) {
+                    console.log("combinedExtent: ", combinedExtent.toJSON());
+                    view.current.goTo(combinedExtent);
+                }
 
-        let combinedExtent: __esri.Extent | null = null;
-        for (const feature of result.features) {
-            const ext = feature.geometry?.extent;
-            console.log("feature element extent: ", feature.geometry?.extent?.toJSON());
-            if (!ext) continue;
-            combinedExtent = combinedExtent ? combinedExtent.union(ext) : ext;
+                applyPolygon(ascendingFeatures[ascendingFeatures.length - 1]); // Apply the polygon styling from the first feature (or the specified index)
+            })
+                .catch(error => {
+                    if (attempts <= 10) {
+                        console.log("Unable to perform query. Too many requests. Sending request again.", error);
+                        attempts++;
+                        runQuery();
+                    } else {
+                        console.log("Unable to perform query. Too many requests. Please try again later.", error);
+                        unfocusEvent();
+                        alert("Unable to perform query. Too many requests. Please try again later.");
+                    }
+                    
+                })
         }
+        runQuery();
 
-        if (combinedExtent) {
-            console.log("combinedExtent: ", combinedExtent.toJSON());
-            view.current.goTo(combinedExtent);
-        }
-
-
-
-        applyPolygon(ascendingFeatures[ascendingFeatures.length - 1]); // Apply the polygon styling from the first feature (or the specified index)
     }
 
     const applyPolygon = (features: any) => {
@@ -762,27 +795,49 @@ function Events() {
         // reveal group layer for focused event and blur other layers
         highlightCountry(attributes.eventid);
 
-
         console.log(map.current);
 
         const newQuery = countryExposures.createQuery();
         newQuery.returnGeometry = true;
         newQuery.outFields = ["*"];
         newQuery.where = `eventid = ${attributes.eventid}`;
-        const result = await countryExposures.queryFeatures(newQuery);
-        console.log("theCountryEXPOSURES: ", result);
-        setCurrentCountryExposure("ALL");
-        setFocusedCountryExposures(result.features);
-        setFocusedEvent(attributes);
-        setEventPopup("focused event");
 
-        // hide event dots 
-        document.querySelectorAll<HTMLElement>(".pw").forEach(element => {
-            element.style.visibility = "hidden";
-        })
+        // track how many server attempts have been made
+        let attempts = 0;
 
-        if (!eventFeatureLayer.current) return;
-        eventFeatureLayer.current.renderer.uniqueValueInfos = [];
+        // TESTING
+        function runQuery() {
+            countryExposures.queryFeatures(newQuery).then((result) => {
+                console.log("theCountryEXPOSURES: ", result);
+                setCurrentCountryExposure("ALL");
+                setFocusedCountryExposures(result.features);
+                setFocusedEvent(attributes);
+                setEventPopup("focused event");
+
+                // hide event dots 
+                document.querySelectorAll<HTMLElement>(".pw").forEach(element => {
+                    element.style.visibility = "hidden";
+                })
+
+                if (!eventFeatureLayer.current) return;
+
+                eventFeatureLayer.current.renderer.uniqueValueInfos = [];
+            })
+                .catch(error => {
+                    if (attempts <= 10) {
+                        console.log("Unable to perform query. Too many requests. Sending request again.", error);
+                        runQuery();
+                        attempts++;
+                    } else {
+                        console.log("Unable to perform query. Too many requests. Please try again later.", error);
+                        unfocusEvent();
+                        alert("Unable to perform query. Too many requests. Please try again later.");
+                    }
+
+                })
+        }
+
+        runQuery();
     }
 
     // play through the event by incrementing the slider value which updates the position
@@ -832,7 +887,6 @@ function Events() {
         removeBlur();
         pauseSlider();
         if (!eventFeatureLayer.current) return;
-        console.log("DUD")
         eventFeatureLayer.current.renderer.uniqueValueInfos = uniqueColorValues;
     }
 
