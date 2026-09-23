@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { AppStateContext } from '../app';
+import { AppStateContext, AppActionsContext } from '../app';
 import { useState, useRef, useEffect, useContext } from 'react'
 
 import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
@@ -20,6 +20,8 @@ export const Route = createFileRoute('/grid')({
 function GridView() {
 
 const state = useContext(AppStateContext);
+const actions = useContext(AppActionsContext);
+actions?.setView("Event tracking");
 
   const [position, setPosition] = useState({});
   const [currentDimension, setDimension] = useState("2D");

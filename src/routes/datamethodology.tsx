@@ -1,17 +1,22 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import { AppActionsContext } from '@/app';
+
 import MenuBackground from '../assets/image 18.png'
 import { Button } from "@/components/ui/button"
 import GriddedCapitalStock from "../assets/Gridded_Capital_Stock.png"
 import GriddedGDP from "../assets/Gridded_GDP.png"
 import Events from "../assets/events_thumbnail.png"
 import HazardTemperatureExtremes from "../assets/hazardTemperatureExtreme.svg"
+import { useContext } from 'react';
 
 export const Route = createFileRoute('/datamethodology')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
+    const actions = useContext(AppActionsContext);
+    actions?.setView("DataMethodology");
     const hub = (slug: string) => `https://geopulse-data-imf-dataviz.hub.arcgis.com/datasets/imf-dataviz::${slug}/explore`
     const linkCls = 'w-fit underline underline-offset-2 text-[#9ec5ff] hover:text-white'
     return <div className={`absolute flex justify-center overflow-auto w-full bg-[#1a2868] bg-fixed transition-all `} style={{ backgroundImage: `linear-gradient(90deg, rgba(26,40,104,0.95) 0%, rgba(26,40,104,0.95) 52%, rgba(26,40,104,0.74) 100%), url(${MenuBackground})`, backgroundSize: 'cover' }}>

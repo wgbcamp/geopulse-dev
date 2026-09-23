@@ -919,13 +919,33 @@ export const comparisonMapContext = (
     return `(${parts.join("; ")})`;
 };
 
-export const eventTypes: Record<string, string> = {
-    "AL": "All Events",
-    "EQ": "Earthquakes", 
-    "TC": "Tropical Cyclones", 
-    "DR": "Droughts", 
-    "FL": "Flooding", 
-    "VO": "Volcanic Eruptions", 
-    "WF": "Wildfires"
-
-} 
+export const eventTypes: Record<string, { type: string, color: string }> = {
+    "AL": {
+        type: "All Events",
+        color: ""
+    },
+    "EQ": {
+        type: "Earthquakes",
+        color: "var(--green)"
+    },
+    "TC": {
+        type: "Tropical Cyclones",
+        color: "var(--red)"
+    },
+    "DR": {
+        type: "Droughts",
+        color: "var(--purple)"
+    },
+    "FL": {
+        type: "Flooding",
+        color: "var(--cyan)"
+    },
+    "VO": {
+        type: "Volcanic Eruptions",
+        color: "var(--yellow)"
+    },
+    "WF": {
+        type: "Wildfires",
+        color: "var(--orange)"
+    }
+}

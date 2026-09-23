@@ -42,7 +42,7 @@ import Hamburger from '../assets/Group 51.png'
 import Lockup from '../assets/lockup.svg'
 import DropdownArrow from '../assets/Dropdown-arrow.svg';
 
-import { mapButton } from '../routes/home'
+import { mapButton } from '../routes/homeBackup'
 import { GlobeIcon } from '../assets/GlobeIcon'
 import { ArrowRight } from '../assets/arrow-right'
 
@@ -79,14 +79,13 @@ export const Header = () => {
     const [iso3, setIso3] = useState("");
     
 
-    const swapTable = (hazard: string, exposure: string, threshold: { name: string; threshold: any }, measure: { name: string; id: string }) => {
+    const swapTable = (hazard: string, exposure: string, threshold: { name: string; threshold: any }, measure: { name: string; id: string }, scenario: string) => {
         const findMatchingScenario = new Promise((resolve) => {
-            if (urlObject[hazard][exposure].scenarios.find((element) => scenarioMapper[element] == scenarioMapper[state?.currentScenario])) {
+            if (urlObject[hazard][exposure].scenarios.find((element) => scenarioMapper[element] == scenarioMapper[scenario])) {
                 resolve(true);
             } else {
-                // this resolve should force the scenario back to the first value in the array
-                // resolve(actions?.setScenario(urlObject[state?.currentHazard][state?.currentExposure].scenarios[0]));
                 resolve(true);
+                actions?.setScenario(urlObject[hazard][exposure].scenarios[0]);
             }
         });
 
@@ -137,6 +136,15 @@ export const Header = () => {
         }
     }
 
+     const hazardsArray = [
+        { type: "Earthquake", color: "var(--green)" },
+        { type: "Tropical Cyclone", color: "var(--red)" },
+        { type: "Drought", color: "var(--purple)" },
+        { type: "Flooding", color: "var(--cyan)" },
+        { type: "Volcano", color: "var(--yellow)" },
+        { type: "Wildfire", color: "var(--orange)" }
+    ];
+
     const calendarComponent =
         <Card className={`rounded-none w-full h-22 xl:h-14.75 p-0 px-2 items-center justify-center border-r-0 gap-0 select-none`}>
             <div className='w-full flex flex-col items-center'>
@@ -157,8 +165,8 @@ export const Header = () => {
                             </div>
                         </div>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0 my-2.5 rounded-none flex flex-col items-center">
-                        <div className="w-9/10 flex py-5 justify-evenly gap-2">
+                    <PopoverContent className="w-auto max-h-133.75 overflow-scroll p-0 my-2.5 rounded-none flex flex-col items-center">
+                        <div className="w-9/10 flex flex-wrap py-5 justify-start md:justify-center gap-2">
                             <Button className={`font-bold ${currentDatePreset == "All Data" ? 'bg-(--accentblue-100)' : 'bg-(--primarygray-40) text-black hover:text-white' } cursor-pointer`} onClick={() => datePresets("All Data")}>All Data</Button>
                             <Button className={`font-bold ${currentDatePreset == "Last 3 months" ? 'bg-(--accentblue-100)' : 'bg-(--primarygray-40) text-black hover:text-white' } cursor-pointer`} onClick={() => datePresets("Last 3 months")}>Last 3 months</Button>
                             <Button className={`font-bold ${currentDatePreset == "Last 6 months" ? 'bg-(--accentblue-100)' : 'bg-(--primarygray-40) text-black hover:text-white' } cursor-pointer`} onClick={() => datePresets("Last 6 months")}>Last 6 months</Button>
@@ -244,8 +252,9 @@ export const Header = () => {
                     </div>
                 </div>
                 <div className='pl-7 bg-(--accentdarkblue-90)'>
-                    <Link to="/about" activeOptions={{ exact: true }} className='flex items-center w-full h-14.75 text-white cursor-pointer' onClick={ () => {actions?.setView('About'); setMenuOptions(false); } }>About</Link>
-                    <Link to="/datamethodology" activeOptions={{ exact: true }} className='flex items-center w-full h-14.75 text-white cursor-pointer' onClick={ () => {actions?.setView('DataMethodology'); setMenuOptions(false); } }>Data & Methodology</Link>
+                    <Link to="/about" activeOptions={{ exact: true }} className='flex items-center w-full h-14.75 text-white cursor-pointer' onClick={ () => setMenuOptions(false) }>About</Link>
+                    <Link to="/datamethodology" activeOptions={{ exact: true }} className='flex items-center w-full h-14.75 text-white cursor-pointer' onClick={ () =>  setMenuOptions(false) }>Data & Methodology</Link>
+                    {state?.currentView == "Event tracking" || state?.currentView == "Compare" || state?.currentView == "Grid" ? <div className='flex items-center w-full h-14.75 text-white cursor-pointer' onClick={() => actions?.setDataExplainerState(true)}>Data Explainer</div> : null}
                     <div className='flex items-center w-full h-14.75 text-white cursor-not-allowed'>FAQs</div>
                     <div className='flex items-center w-full h-14.75 text-white cursor-not-allowed'>Team & Contact us</div>
                 </div>
@@ -316,23 +325,28 @@ export const Header = () => {
                 {location.pathname == "/events" ?
                     <div className={`flex flex-col xl:flex-row ${dataOptions ? 'h-full' : 'h-0'} w-full col-start-1 col-end-4 xl:col-start-2 xl:col-end-3 `}>
                         {calendarComponent}
-                        <Card className="rounded-none border-r-0  p-0 flex flex-col items-center justify-center gap-0 h-22 xl:h-14.75 w-full px-2">
+                        <Card className="rounded-none border-r-0 p-0 flex flex-col items-center justify-center gap-0 h-22 xl:h-14.75 w-full px-2">
                             <Popover open={eventFilterOpened} onOpenChange={() => setEventFilterOpened(!eventFilterOpened)}>
                                 <PopoverTrigger asChild>
                                     <div className="flex flex-row items-center w-95/100 h-full justify-between cursor-pointer">
-                                        <div className="text-[14px] font-bold text-end flex items-center pl-2">{eventTypes[state?.eventFilter]}</div>
+                                        <div className="text-[14px] font-bold text-end flex items-center pl-2">{eventTypes[state?.eventFilter].type}</div>
                                         <img src={DropdownArrow} className={`${eventFilterOpened ? "rotate-180" : "rotate-0"}`}></img>
                                     </div>
                                 </PopoverTrigger>
-                                <PopoverContent className="w-56.25 p-0 my-1.25 rounded-none shadow-[0_-10px_10px_-5px_rgba(0,0,0,0.1)]">
-                                    <div className={`flex flex-row justify-center py-2.5 h-[calc(80px*${urlObject[state?.currentHazard][state?.currentExposure].scenarios.length})]`}>
+                                <PopoverContent className="w-56.25 p-0 py-2 my-1.25 rounded-none shadow-[0_-10px_10px_-5px_rgba(0,0,0,0.1)]">
+                                    <div className={`flex flex-row justify-center h-[calc(80px*${urlObject[state?.currentHazard][state?.currentExposure].scenarios.length})]`}>
                                         <ItemGroup>
                                             {Object.entries(eventTypes).map(([x, y]) =>
-                                                <Item key={x} className={`cursor-pointer my-2 ${eventTypes[state?.eventFilter] === eventTypes[x] ? 'font-bold text-(--orange) underline underline-offset-1.25 decoration-0.5' : ""} transition-all duration-200 ease-in`} onClick={() => actions?.setEventFilter(x)}>
-                                                    <ItemContent>
-                                                        <ItemHeader>{eventTypes[x]}</ItemHeader>
-                                                    </ItemContent>
-                                                </Item>
+                                                <div className='flex items-center'>
+                                                    <div className='flex justify-center border-1 rounded-4xl w-4 h-4' style={{ borderColor: eventTypes[x].color }}>
+                                                        <div className='flex items-center justify-center'>
+                                                            <div className="rounded-4xl w-[7px] h-[7px]" style={{ background: eventTypes[x].color }}></div>
+                                                        </div>
+                                                    </div>
+                                                    <Item key={x} className={`cursor-pointer py-3 ${eventTypes[state?.eventFilter].type === eventTypes[x].type ? 'font-bold text-(--orange) underline underline-offset-1.25 decoration-0.5' : ""} transition-all duration-200 ease-in`} onClick={() => actions?.setEventFilter(x)}>
+                                                        {eventTypes[x].type}
+                                                    </Item>
+                                                </div>
                                             )}
                                         </ItemGroup>
                                     </div>
@@ -346,7 +360,7 @@ export const Header = () => {
                                         variant="outline"
                                         role="combobox"
                                         aria-expanded={open}
-                                        className="w-95/100 font-bold justify-between light border-0 shadow-none hover:bg-white cursor-pointer"
+                                        className="w-95/100 p-0 pl-2 font-bold justify-between light border-0 shadow-none hover:bg-white cursor-pointer"
                                     >
                                         <div className='max-w-25 overflow-hidden'>
                                             {state?.countryFilter == "All countries" ? "All countries" : countryByIso3[iso3]}
@@ -413,7 +427,7 @@ export const Header = () => {
                         <div className="text-[11px] font-bold text-(--primaryblack-90)">FORWARD LOOKING</div>
                         <div className="flex flex-end flex-col w-full">
                             <div className="flex flex-row justify-evenly items-start h-full">
-                                <Link to="/compare" activeOptions={{ exact: true }} className='flex flex-col justify-end cursor-pointer w-full' onClick={() => { actions?.setView("Compare"); }}>
+                                <Link to="/compare" activeOptions={{ exact: true }} className='flex flex-col justify-end cursor-pointer w-full'>
                                     <div className="flex flex-row h-8.75 items-center justify-center">
                                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M12.4219 16.4062C13.1641 14.9219 13.6719 12.8516 13.75 10.625H6.25C6.32812 12.8516 6.875 14.9219 7.61719 16.4062C8.47656 18.1641 9.41406 18.75 10 18.75C10.625 18.75 11.5234 18.1641 12.4219 16.4062ZM13.75 9.375C13.6719 7.14844 13.1641 5.11719 12.4219 3.59375C11.5234 1.83594 10.625 1.25 10 1.25C9.41406 1.25 8.47656 1.83594 7.61719 3.59375C6.875 5.11719 6.32812 7.14844 6.25 9.375H13.75ZM15 10.625C14.8828 13.7109 13.9844 16.6016 12.6953 18.3203C16.0156 17.2656 18.4766 14.2578 18.7109 10.625H15ZM18.7109 9.375C18.4766 5.78125 16.0156 2.77344 12.6953 1.67969C13.9844 3.39844 14.8828 6.28906 15 9.375H18.7109ZM5 9.375C5.11719 6.28906 6.01562 3.39844 7.30469 1.67969C3.98438 2.77344 1.52344 5.78125 1.28906 9.375H5ZM1.28906 10.625C1.52344 14.2578 3.98438 17.2656 7.30469 18.3203C6.01562 16.6016 5.11719 13.7109 5 10.625H1.28906ZM10 20C4.49219 20 0 15.5078 0 10C0 4.49219 4.49219 0 10 0C15.5078 0 20 4.49219 20 10C20 15.5078 15.5078 20 10 20Z" fill={`${location.pathname === "/compare" ? "var(--orange)" : "black"}`} />
@@ -425,7 +439,7 @@ export const Header = () => {
                                 <div className='h-full flex items-center'>
                                     <div className={`w-0.5 h-65/100 ${location.pathname === "/compare" || location.pathname === "/grid" ? "bg-(--primarygray-30)" : "bg-(--accentblue-60)"}`}></div>
                                 </div>
-                                <Link to="/grid" activeOptions={{ exact: true }} className='flex flex-col justify-end cursor-pointer w-full' onClick={() => { actions?.setView("Grid"); }}>
+                                <Link to="/grid" activeOptions={{ exact: true }} className='flex flex-col justify-end cursor-pointer w-full'>
                                     <div className="flex flex-row h-8.75 items-center justify-center">
                                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M3.67078 0.396729C1.86271 0.396729 0.396973 1.86246 0.396973 3.67054V16.3293C0.396973 18.1373 1.86271 19.6031 3.67078 19.6031H16.3295C18.1376 19.6031 19.6033 18.1373 19.6033 16.3293V3.67054C19.6033 1.86246 18.1376 0.396729 16.3295 0.396729H3.67078ZM16.3295 1.70625C17.4144 1.70625 18.2938 2.58569 18.2938 3.67054V4.3253L1.7065 4.3253V3.67054C1.7065 2.58569 2.58594 1.70625 3.67078 1.70625H16.3295ZM1.7065 5.63482L18.2938 5.63482V14.365L1.7065 14.365V5.63482ZM1.7065 16.3293V15.6745L18.2938 15.6745V16.3293C18.2938 17.4141 17.4144 18.2936 16.3295 18.2936H3.67078C2.58594 18.2936 1.7065 17.4141 1.7065 16.3293ZM13.9985 9.34514H6.00186L6.7792 8.47062C7.01945 8.20035 6.9951 7.78649 6.72483 7.54625C6.45455 7.30601 6.0407 7.33035 5.80045 7.60062L4.05442 9.56491C3.83391 9.81299 3.83391 10.1868 4.05442 10.4349L5.80045 12.3992C6.0407 12.6695 6.45455 12.6938 6.72483 12.4536C6.9951 12.2133 7.01945 11.7995 6.7792 11.5292L6.00184 10.6547H13.9985L13.2211 11.5292C12.9809 11.7995 13.0052 12.2133 13.2755 12.4536C13.5458 12.6938 13.9596 12.6695 14.1999 12.3992L15.9459 10.4349L15.9551 10.4243C16.047 10.3165 16.1045 10.1785 16.1107 10.0272C16.1114 10.0097 16.1115 9.99207 16.1108 9.9745C16.1048 9.8165 16.0427 9.67284 15.944 9.5628L14.1999 7.60062C13.9596 7.33035 13.5458 7.30601 13.2755 7.54625C13.0052 7.78649 12.9809 8.20035 13.2211 8.47062L13.9985 9.34514Z" fill={`${location.pathname === "/grid" ? "var(--orange)" : "black"}`} />
@@ -485,7 +499,7 @@ export const Header = () => {
                                                             </div>
                                                             <div className={`${riskState === key ? `h-[calc(80px*${value.length})]` : "h-0 hidden"}`}>
                                                                 {Object.entries(value).map(([a, b]) =>
-                                                                    <Item key={a} className={`cursor-pointer my-2 py-1.75 pl-0 ${state?.currentExposure == a && riskState == state?.currentHazard ? "font-extrabold text-(--orange) underline underline-offset-1.25 decoration-0.5" : "font-medium"}`} onClick={() => { () => setRiskState(key); swapTable(key, a, { name: "", threshold: Object.keys(b.threshold?.group || {})[0] }, { id: b.measure[0], name: measureMapper[b.measure[0]] }); }}>
+                                                                    <Item key={a} className={`cursor-pointer my-2 py-1.75 pl-0 ${state?.currentExposure == a && riskState == state?.currentHazard ? "font-extrabold text-(--orange) underline underline-offset-1.25 decoration-0.5" : "font-medium"}`} onClick={() => { () => setRiskState(key); swapTable(key, a, { name: "", threshold: Object.keys(b.threshold?.group || {})[0] }, { id: b.measure[0], name: measureMapper[b.measure[0]] }, state?.currentScenario); }}>
                                                                         <ItemContent>
                                                                             <ItemHeader>{a}</ItemHeader>
                                                                         </ItemContent>

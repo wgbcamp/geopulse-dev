@@ -1,17 +1,14 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { GlobeIcon } from '../assets/GlobeIcon'
 import { ArrowRight } from '../assets/arrow-right'
+{/* arrowRight needs to be chevronRight, line 257 at time of comment */}
+// import { ChevronRight } from '../assets/chevron-right'
 import MenuBackground from '../assets/hero-bg.jpg'
-import LightBackground from '../assets/light-bg.jpg'
 import globeExtrusions from '../assets/globeExtrusions high.webp'
-import overviewPreview from '../assets/overviewPreview.png'
 import trackPreview from '../assets/trackPreview.png'
-import seePreview from '../assets/tile-02.jpg'
+import seePreview from '../assets/seePreview.jpg'
 import estimatePreview from '../assets/estimatePreview.jpg'
-import griddedEconomics from '../assets/griddedEconomicsBackground.jpg'
-import griddedCapitalStock from '../assets/Gridded_Capital_Stock.png'
-import griddedGDP from '../assets/Gridded_GDP.png'
 import exportable from '../assets/exportable.svg'
 import downloadable from '../assets/downloadable.svg'
 import transparentMethodology from '../assets/transparentMethodology.svg'
@@ -25,51 +22,77 @@ export const Route = createFileRoute('/home')({
   component: RouteComponent,
 })
 
-const categoryDetails: Record<string, { title: ReactElement, subtitle: ReactElement }> = {
+// Hero type scales with screen *height* at xl (the way earthgenome.org sizes its hero), so the whole
+// first screen — headline, subtitle and cards — fits any laptop from ~630px to ~1020px of height.
+// Below xl it keeps fixed sizes, since phones and tablets scroll the hero rather than fit it.
+// The title's slope is steeper than a plain svh value (≈45px at 630 tall, ≈70px at 860, ≈87px at
+// 1020) so short screens give up the most size while 13"–16" laptops barely change.
+const heroTitle = 'font-bold text-[60px] xl:text-[clamp(40px,calc(10.9svh_-_24px),88px)] leading-none tracking-[-1.816px]'
+const heroSubtitle = 'tracking-[-1.089px] text-[16px] md:text-[29px] xl:text-[clamp(17px,2.8svh,28px)]'
+
+const categoryDetails: Record<string, { title: ReactElement, subtitle?: ReactElement }> = {
     "Overview": {
-        "title": <span className='font-bold text-[60px] xl:text-[100px] leading-none tracking-[-1.816px]'>Track, See & Estimate Economic Risk</span>,
-        "subtitle": <span className='tracking-[-1.089px] text-[16px] md:text-[29px]'><b>Real-time monitoring</b> of floods, hurricanes, wildfires and geopolitical events — and exactly what they put in harm's way.</span>
+        "title": <span className={heroTitle}>Monitor, Anticipate & Explore Economic Risk</span>,
+        "subtitle": <span className={heroSubtitle}><b>GeoPulse</b> is an IMF platform that maps the exposure of economies to physical hazards at 1 km resolution — quantifying realized and potential risk to people, GDP, capital and land.</span>
     },
-    "Track": {
-        "title": <span className='font-bold text-[60px] xl:text-[100px] leading-none tracking-[-1.816px]'>Track Economic Risk</span>,
-        "subtitle": <span className='tracking-[-1.089px] text-[16px] md:text-[29px]'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</span>
+    "Monitor": {
+        "title": <span className={heroTitle}>Monitor Economic Exposure to Disasters</span>,
+        "subtitle": <span className={heroSubtitle}>Track ongoing <b>natural disasters in real time</b> and assess exposure of populations, GDP, capital stock, and critical infrastructure. Explore past events through interactive maps and downloadable indicators.</span>
     },
-    "See": {
-        "title": <span className='font-bold text-[60px] xl:text-[100px] leading-none tracking-[-1.816px]'>See Forward-Looking Risk</span>,
-        "subtitle": <span className='tracking-[-1.089px] text-[16px] md:text-[29px]'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</span>
+    "Anticipate": {
+        "title": <span className={heroTitle}>Anticipate Future Hazard Exposure</span>,
+        "subtitle": <span className={heroSubtitle}>Explore <b>forward-looking hazard–exposure indicators</b> across different scenarios through year 2100, using interactive maps or national and subnational comparisons.</span>
     },
-    "Estimate": {
-        "title": <span className='font-bold text-[60px] xl:text-[100px] leading-none tracking-[-1.816px]'>Estimate Gridded Economies</span>,
-        "subtitle": <span className='tracking-[-1.089px] text-[16px] md:text-[29px]'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</span>
+    "Explore": {
+        "title": <span className={heroTitle}>IMF Gridded Macroeconomic Layers</span>,
+        // scoped to the two IMF-produced layers (GDP and capital stock); population and land cover are
+        // exposure layers GeoPulse consumes, not IMF products, so they are deliberately not claimed here
+        "subtitle": <span className={heroSubtitle}>Access the <b>gridded macroeconomic statistics</b> behind GeoPulse: new layers for GDP and capital stock, built on 1 km spatial disaggregation of official macroeconomic data.</span>
     },
 }
 
-const cardDetails: { title: string, description: string, misc: ReactElement, number: string }[] = [
+// the hero rests on this entry; the cards below cycle through the rest while the user is idle
+const mainCategory = "Overview"
+// Tuned for pace over full readability: a card window carries the headline and the gist of its
+// subtitle (~32 words in 6s is well above a comprehension read), on the assumption that anyone who
+// wants the whole thing hovers, which pauses the rotation. Note the 700ms fade eats into the front
+// of every window, so the legible time is shorter than the interval.
+const idleMs = 8500     // Overview: most copy of the four, and the resting state, so it holds longest
+const rotationMs = 6000 // each card, kept identical so the rotation does not feel erratic
+
+// `category` keys the hero copy in categoryDetails; `title`/`misc` are all the card shows.
+// `link` must stay in step with the matching entry in overviewCategories below — the card and the
+// section band are two routes into the same component, so they should not disagree.
+const cardDetails: { category: string, title: string, link: string, misc: ReactElement }[] = [
     {
-        title: "Overview",
-        description: "What GeoPulse Does",
-        misc: <span>GLOBAL</span>,
-        number: "01"
+        category: "Monitor",
+        title: "Event Tracking",
+        link: '/events',
+        misc: <span className='flex items-center gap-2 text-(--accentred-100)'>
+            {/* pulsing live dot — dot size is w-[7px]/h-[7px], halo follows it via inset-0 */}
+            <span className='relative flex w-[7px] h-[7px]'>
+                <span className='absolute inset-0 rounded-full bg-current opacity-70 motion-safe:animate-ping' />
+                <span className='relative inline-flex w-[7px] h-[7px] rounded-full bg-current' />
+            </span>
+            LIVE
+        </span>
     },
     {
-        title: "Track",
-        description: "",
-        misc: <li className='text-(--accentred-100)'>LIVE</li>,
-        number: "02"
+        category: "Anticipate",
+        title: "Forward-Looking Risks",
+        link: '/compare',
+        misc: <span>THROUGH 2100</span>
     },
     {
-        title: "See",
-        description: "",
-        misc: <span>2100</span>,
-        number: "03"
-    },
-    {
-        title: "Estimate",
-        description: "",
-        misc: <span>1Km</span>,
-        number: "04"
+        category: "Explore",
+        title: "Data Foundation",
+        link: '/datamethodology',
+        misc: <span>1KM GEOSPATIAL GRIDS</span>
     }
 ];
+
+// the carousel walks the cards in order, then returns to the main entry
+const cycleCategories = cardDetails.map(card => card.category)
 
 export const mapButton = (background: string, foreground: string, icon1: ReactElement, icon2: ReactElement, link: string) =>
     <Link to={link} activeOptions={{ exact: true }} className={`${background} ${foreground} rounded-[100px] h-15 flex items-center justify-center py-5 px-10 gap-2 cursor-pointer`}>
@@ -78,45 +101,37 @@ export const mapButton = (background: string, foreground: string, icon1: ReactEl
         {icon2}
     </Link>;
 
+const externalButton = (background: string, foreground: string, label: string, icon: ReactElement, href: string) =>
+    <a href={href} target="_blank" rel="noopener noreferrer" className={`${background} ${foreground} rounded-[100px] h-15 flex items-center justify-center py-5 px-10 gap-2 cursor-pointer`}>
+        <span className="font-bold text-[18px]">{label}</span>
+        {icon}
+    </a>;
+
 const overviewCategories: { title: string, description: ReactElement, picture: string, order: string, link: string }[] = [
     {
-        title: "Track",
-        description: <div className='max-w-90 flex flex-col gap-5'><span><b>Mauris eget ante ex.</b> Sed non elit tincidunt, vehicula sem vel, ullamcorper elit. Nullam aliquet nisl nulla, in sollicitudin augue placerat at.</span>
-            <span>Sed non elit tincidunt, vehicula sem vel, ullamcorper elit. Nullam aliquet nisl nulla, in sollicitudin augue placerat at.</span></div>,
+        title: "Event Tracking",
+        description: <div className='max-w-90 flex flex-col gap-5'><span>Monitor disaster events as they unfold on an interactive global map, or revisit past events.</span>
+            <span>Overlay event footprints with exposure layers to see where hazards intersect with populations, GDP, capital stock, agriculture, and critical infrastructure.</span>
+            <span>Open an event’s detail card to explore its timeline, severity, and detailed exposure metrics by country, with access to supporting data.</span></div>,
         picture: trackPreview,
         order: "normal",
         link: '/events'
     },
     {
-        title: "See",
-        description: <div className='max-w-90 flex flex-col gap-5'><span><b>Mauris eget ante ex.</b> Sed non elit tincidunt, vehicula sem vel, ullamcorper elit. Nullam aliquet nisl nulla, in sollicitudin augue placerat at.</span>
-            <span>Sed non elit tincidunt, vehicula sem vel, ullamcorper elit. Nullam aliquet nisl nulla, in sollicitudin augue placerat at.</span></div>,
+        title: "Forward-Looking Risks",
+        description: <div className='max-w-90 flex flex-col gap-5'><span>Explore how hazards and exposure may evolve across different scenarios and time horizons, with projections extending through 2100.</span>
+            <span>Compare countries and subnational regions side by side using interactive maps and charts. Download data and maps to support economic analysis, inform policy decisions, and guide adaptation investments.</span></div>,
         picture: seePreview,
         order: "reverse",
-        link: '/grid'
+        link: '/compare'
     },
     {
-        title: "Estimate",
-        description: <div className='max-w-90 flex flex-col gap-5'><span><b>Mauris eget ante ex.</b> Sed non elit tincidunt, vehicula sem vel, ullamcorper elit. Nullam aliquet nisl nulla, in sollicitudin augue placerat at.</span>
-            <span>Sed non elit tincidunt, vehicula sem vel, ullamcorper elit. Nullam aliquet nisl nulla, in sollicitudin augue placerat at.</span></div>,
+        title: "Data Foundation",
+        description: <div className='max-w-90 flex flex-col gap-5'><span>Access the gridded macroeconomic statistics behind GeoPulse. The new IMF layers bring GDP and capital stock to a 1 km grid through Fine-Scale Spatial Disaggregation of Macroeconomic Data.</span>
+            <span>Part of the IMF’s innovative agenda for geospatially enabled macroeconomic statistics, these layers connect national economic measures to local geographies. Download the data to assess economic exposure to hazards and support research and policy analysis.</span></div>,
         picture: estimatePreview,
         order: "normal",
-        link: '/compare'
-    }
-];
-
-const griddedCategories: { title: string, subtitle: string, description: string, picture: string }[] = [
-    {
-        title: "gridded capital stock",
-        subtitle: "Physical Capital, Mapped To The Ground",
-        description: "Capital stock resolved to the same 1 km grid — the buildings, plant and infrastructure a hazard puts directly at risk, quantified the moment it's threatened.",
-        picture: griddedCapitalStock
-    },
-    {
-        title: "gridded gdp",
-        subtitle: "Economic Output, By The Kilometer",
-        description: "National GDP disaggregated to a 1 km grid, so you can see exactly how much output sits inside a flood plain, a wildfire perimeter, or a hurricane track.",
-        picture: griddedGDP
+        link: '/datamethodology'
     }
 ];
 
@@ -148,16 +163,45 @@ const featureCategories: { icon: string, title: string, subtitle: string, positi
 ]
 
 function RouteComponent() {
-    const [activeCategory, setActiveCategory] = useState<string>("Overview")
+    const [activeCategory, setActiveCategory] = useState<string>(mainCategory)
+    const [hovering, setHovering] = useState(false)
 
-    return <div className=''>
-        <div className='h-full relative overflow-hidden pt-30 pb-16 flex flex-col justify-start items-center xl:justify-normal xl:items-start w-full bg-fixed bg-cover' style={{ backgroundImage: `url(${MenuBackground})`, backgroundPositionY: "bottom 10px"}}>
-            <div className='flex justify-center xl:justify-normal xl:pt-20 xl:pl-15 max-w-200'>
+    // While the pointer is on a card the user is driving; otherwise the hero rests on the main
+    // entry, and after idleMs walks the cards once before settling back on it.
+    useEffect(() => {
+        if (hovering || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+        let step = 0
+        let timer: ReturnType<typeof setTimeout>
+
+        const advance = () => {
+            const atEndOfCycle = step >= cycleCategories.length
+            setActiveCategory(atEndOfCycle ? mainCategory : cycleCategories[step])
+            step = atEndOfCycle ? 0 : step + 1
+            timer = setTimeout(advance, atEndOfCycle ? idleMs : rotationMs)
+        }
+
+        timer = setTimeout(advance, idleMs)
+        return () => clearTimeout(timer)
+    }, [hovering])
+
+    // highlight: true only while a card owns the hero, so the resting state dims nothing
+    const highlighting = cycleCategories.includes(activeCategory)
+
+    return <div >
+        {/* At xl the hero is exactly one screen tall with its text + cards centered as one group, as on
+            earthgenome.org. xl:pt-28 clears the fixed header (its bottom edge sits ~106px down on /home);
+            the globe is absolute, so it stays out of the flow being centered. */}
+        <div className='relative overflow-hidden pt-30 pb-16 flex flex-col justify-start items-center xl:min-h-svh xl:pt-28 xl:pb-10 xl:justify-center xl:items-start w-full bg-fixed bg-cover' style={{ backgroundImage: `url(${MenuBackground})`, backgroundPositionY: "bottom 10px"}}>
+            <div className='flex justify-center xl:justify-normal xl:pl-15 max-w-200'>
                 <div className='w-9/10 xl:w-5/10 grid text-white xl:text-left z-1'>
                     {Object.entries(categoryDetails).map(([key, details]) =>
                         <div
                             key={key}
-                            className={`col-start-1 row-start-1 flex flex-col ${key === activeCategory ? '' : 'invisible'}`}
+                            aria-hidden={key !== activeCategory}
+                            className={`col-start-1 row-start-1 flex flex-col gap-3 xl:gap-5 transition-opacity duration-700 ease-in-out
+                                ${/* gap: the title sets leading-none, so title and subtitle otherwise touch */ ''}
+                                ${key === activeCategory ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
                         >
                             {details.title}
                             {details.subtitle}
@@ -165,36 +209,59 @@ function RouteComponent() {
                     )}
                 </div>
             </div>
-            <img className='absolute top-90 xl:-top-4 xl:left-150 w-300 xl:w-510 max-w-none' src={globeExtrusions}></img>
-            <div className="relative grid md:grid-cols-2 xl:grid-cols-4 justify-center xl:w-full max-w-320 gap-5 z-1 md:mt-90 xl:mt-40 xl:pl-15">
+            {/* At xl the globe is sized by screen height, like earthgenome's calc(100svh - 10rem) globe, so it
+                keeps the same composition on every laptop instead of a fixed 2040px crop. The image is
+                4070x3036 with the sphere filling ~81% of its height and ending ~21% short of its right
+                edge — the right offset parks the sphere's edge just inside the viewport and lets the
+                extrusions bleed off. */}
+            <img className='absolute top-90 w-300 max-w-none xl:top-1/2 xl:-translate-y-1/2 xl:h-[105svh] xl:w-auto xl:right-[calc(2rem-30svh)]' src={globeExtrusions}></img>
+            <div
+                className="relative grid md:grid-cols-2 xl:grid-cols-3 justify-center w-fit gap-5 z-1 md:mt-90 xl:mt-[clamp(1.5rem,5svh,3.5rem)] xl:pl-15"
+                onMouseLeave={() => {
+                    setHovering(false)
+                    setActiveCategory(mainCategory)
+                }}
+            >
                 {cardDetails.map((e, i) =>
-                    <div
+                    <Link
                         key={i}
-                        className='flex w-70 h-32 rounded-[6px] shadow-[0_8px_16px_0_rgba(0,0,0,0.14)] bg-white p-5 flex-col justify-between items-start'
-                        onMouseEnter={() => setActiveCategory(e.title)}
+                        to={e.link}
+                        activeOptions={{ exact: true }}
+                        className={`group relative overflow-hidden flex w-70 min-h-32 rounded-[6px] shadow-[0_8px_16px_0_rgba(0,0,0,0.14)] bg-white p-5 flex-col justify-between items-start cursor-pointer
+                            ${/* highlight: dim the cards that are not active — delete this line to remove */ ''}
+                            transition-opacity duration-500 ${!highlighting || e.category === activeCategory ? 'opacity-100' : 'opacity-60'}`}
+                        onMouseEnter={() => {
+                            setHovering(true)
+                            setActiveCategory(e.category)
+                        }}
                     >
+                        {/* --- highlight: countdown bar showing how long this card holds the hero.
+                            Delete this block (and the `relative overflow-hidden` above) to remove. --- */}
+                        {e.category === activeCategory && !hovering &&
+                            <span
+                                key={activeCategory}
+                                className='absolute inset-x-0 top-0 h-1 origin-left bg-(--accentblue-100)'
+                                style={{ animation: `cardCountdown ${rotationMs}ms linear forwards` }}
+                            />
+                        }
+                        {/* --- end countdown bar --- */}
                         <div className='flex flex-col w-full justify-between h-full'>
-                            <div className='w-full flex justify-between'>
-                                <span className={`font-bold ${e.title == activeCategory ? 'text-(--accentblue-100)' : 'text-black'}`}>{e.number}</span>
-                                <ul className={`font-bold list-disc ${e.title == activeCategory ? 'text-(--accentblue-100)' : 'text-black'}`}>{e.misc}</ul>
+                            <div className='w-full flex justify-end'>
+                                <div className={`font-bold transition-colors duration-700 ${e.category == activeCategory ? 'text-(--accentblue-100)' : 'text-black'}`}>{e.misc}</div>
                             </div>
-                            <div className='flex flex-col gap-2'>
-                                <span className={`h-full text-left font-bold leading-[94%] tracking-[-0.34px] text-[24px] text-(--accentblue-100) ${e.title == activeCategory ? 'text-(--accentblue-100)' : 'text-black'}`}>{e.title}</span>
-                                <span className='text-left leading-[94%] tracking-[-0.34px] text-[17px]'>{e.description}</span>
+                            {/* Title + arrow. The arrow closes the diagonal with the badge and marks the card as navigable. */}
+                            <div className={`w-full flex items-center justify-between gap-3 transition-colors duration-700 ${e.category == activeCategory ? 'text-(--accentblue-100)' : 'text-black'}`}>
+                                <span className='text-left uppercase font-bold leading-[110%] tracking-[-0.2px] text-[18px]'>{e.title}</span>
+                                {/* filled disc: bg-current picks up the row's active colour, so the circle
+                                    and the title change together; the chevron stays knocked out in white */}
+                                <div className='w-11 h-11 shrink-0 rounded-full bg-current flex items-center justify-center transition-transform duration-300 group-hover:translate-x-1'>
+                                    <ArrowRight color={'white'} />
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </Link>
                 )}
             </div>
-        </div>
-        <div
-            className='w-full flex flex-col items-center gap-y-5 pt-25 pb-25 bg-cover bg-[linear-gradient(180deg,rgba(44,52,115,0)_0%,rgba(44,52,115,0.3)_100%),var(--menu-bg-image)]'
-            style={{ '--menu-bg-image': `url(${LightBackground})` } as React.CSSProperties}
-        >
-            <span className='text-[60px] font-bold leading-[100%] tracking-[-0.34px]'>Overview</span>
-            <span className='w-9/10 max-w-200 text-center text-[20px] font-bold leading-[140%]'>Mauris eget ante ex. Sed non elit tincidunt, vehicula sem vel, ullamcorper elit. Nullam aliquet nisl nulla, in sollicitudin augue placerat at. Nunc euismod sagittis iaculis. Etiam pretium ex vitae neque sagittis varius.</span>
-            <img src={overviewPreview}></img>
-            {mapButton('bg-(--accentdarkblue-90)', 'text-white', <GlobeIcon color={'var(--primarywhite)'}/>, <ArrowRight color={'var(--primarywhite)'}/>, '/events')}
         </div>
         <div className='w-full flex flex-col items-center bg-white'>
             {overviewCategories.map((e, i) =>
@@ -209,38 +276,6 @@ function RouteComponent() {
                     <img className='pt-10 md:pt-0 md:w-5/10' src={e.picture}></img>
                 </div>
             )}
-        </div>
-        <div className='w-full bg-cover bg-center py-25 flex flex-col items-center' style={{ backgroundImage: `url(${griddedEconomics})` }}>
-            <div className="w-9/10 flex flex-col gap-20">
-            <div className='w-9/10 flex flex-col gap-y-3'>
-                <div className='font-bold leading-[100%] text-white text-left text-[70px] md:text-[80px] tracking-[-1.2px]'>Gridded Economics</div>
-                <div className='text-white text-left text-[20px] leading-[142%] max-w-300'>GeoPulse pairs hazard and exposure layers with new <b>IMF-generated gridded economics</b> — harmonized globally at an unprecedented 1km resolution, far beyond macroeconomic statistics, down to the local level where impacts are felt.</div>
-            </div>
-            <div className='flex flex-col lg:flex-row gap-7.5'>
-                {griddedCategories.map((e, i) =>
-                    <div className='flex flex-col md:flex-row items-center md:items-stretch p-10 rounded-[6px] border-[0.5px] border-[#A7A7A7] bg-white gap-5'>
-                        <div className="flex w-full md:w-5/10">
-                            <div className="flex flex-col gap-4">
-                                <span className='uppercase font-bold text-[14px] text-left leading-[100%] text-(--accentlightgreen-100)'>{e.title}</span>
-                                <span className='font-bold text-[24px] leading-[120%] text-left'>{e.subtitle}</span>
-                                <span className='text-[16px] leading-[130%] text-left max-w-105'>{e.description}</span>
-                                <div className="flex gap-2">
-                                    <span className='uppercase font-bold leading-[126%] text-[14px]'>Explore</span>
-                                    <div className='w-3'><ArrowRight color={'var(--primaryblack-100)'}/></div>
-                                    
-                                </div>
-                            </div>
-                        </div>
-                        <div className='w-full md:w-5/10 flex items-center justify-start'>
-                            <div className='relative flex items-center'>
-                                <img src={e.picture} className=''></img>
-                                {/* <div className='absolute inset-0 rounded-full bg-[linear-gradient(180deg,rgba(45,52,116,0)_0%,rgba(45,52,116,0.8)_100%)]'></div> */}
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </div>
-            </div>
         </div>
         <div className='w-full bg-cover py-25 flex flex-col xl:flex-row bg-position-[50%] bg-no-repeat items-center' style={{ backgroundImage: `url(${whiteGeo})` }}>
             <div className='flex w-full justify-center'>
@@ -270,30 +305,23 @@ function RouteComponent() {
             </div>
         </div>
         <div
-            className='w-full bg-cover py-25 flex flex-col items-center'
+            className='w-full bg-cover pt-16 flex flex-col items-center'
             style={{
                 backgroundImage: `url(${carsBackground})`,
             }}
         >
-            <div className='leading-[100%] tracking-[-0.34px] font-bold text-[60px] w-9/10 text-white pb-7.5'>
+            <div className='leading-[100%] tracking-[-0.34px] font-bold text-[60px] w-9/10 pb-7 text-white '>
                 Advancing Global Data Standards
             </div>
-            <span className='leading-[140%] text-[20px] text-center text-white w-9/10 max-w-220 pb-12'>Designed and sponsored within the IMF on secure cloud infrastructure, GeoPulse fills priority data gaps identified by the G20 Data Gaps Initiative — bringing IMF‑generated risk indicators into a consistent, accessible format for surveillance and policy analysis.</span>
-            <div className='relative'>
-                <img src={overviewPreview}></img>
-                <div className='absolute inset-0 top-28 w-full flex justify-center'>
-                    <div className='w-69'>
-                        {mapButton('bg-white', 'text-(--accentdarkblue-90)', <GlobeIcon color={'var(--accentdarkblue-90)'} />, <ArrowRight color={'var(--accentdarkblue-90)'} />, '/events')}
-                    </div>
+            <span className='leading-[140%] text-[20px] text-center text-white w-9/10 max-w-220 pb-10'>The G20 Data Gaps Initiative (DGI‑3) sets out 14 recommendations across four statistical areas. GeoPulse addresses <b>Recommendation 5 — climate physical and transition risks</b> — bringing IMF‑generated indicators into a consistent, accessible format for surveillance and policy analysis.</span>
+            {externalButton('bg-white', 'text-(--accentdarkblue-90)', 'About the Data Gaps Initiative', <ArrowRight color={'var(--accentdarkblue-90)'} />, 'https://www.imf.org/en/news/seminars/conferences/g20-data-gaps-initiative')}
+            <div className='w-full flex justify-center items-center py-25'>
+                <div className='flex w-9/10 flex-col items-center gap-9.25'>
+                    <img src={IMFLogo}></img>
+                    <span className='text-white font-bold leading-[140%]'>© 2026 INTERNATIONAL MONETARY FUND. ALL RIGHTS RESERVED | <u>Privacy Policy</u> | <u>Copyright & Usage</u></span>
                 </div>
-                {/* <div className='absolute inset-0 bg-[linear-gradient(180deg,rgba(45,52,116,0)_0%,rgba(45,52,116,0.8)_100%)]'></div> */}
             </div>
         </div>
-        <div className='w-full flex justify-center items-center py-25 bg-(--accentdarkblue-100)'>
-            <div className='flex flex-col items-center gap-9.25'>
-                <img src={IMFLogo}></img>
-                <span className='text-white font-bold leading-[140%]'>© 2026 INTERNATIONAL MONETARY FUND. ALL RIGHTS RESERVED | <u>Privacy Policy</u> | <u>Copyright & Usage</u></span>
-            </div>
-        </div>
+        
     </div>
 }
