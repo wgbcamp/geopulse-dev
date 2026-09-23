@@ -330,3 +330,10 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* --- hero card countdown bar: drives the active-card highlight in src/routes/home.tsx.
+   Inert on its own — removing the block in home.tsx is enough to drop the feature. --- */
+@keyframes cardCountdown {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
