@@ -489,6 +489,37 @@ function Events() {
                             returnType: "Default",
                         },
                     },
+                    // per-feature random timing so markers don't pulse in unison
+                    {
+                        type: "CIMPrimitiveOverride",
+                        primitiveName: "animationOverride",
+                        propertyName: "StartTimeOffset",
+                        valueExpressionInfo: {
+                            type: "CIMExpressionInfo",
+                            expression: "return Random() * 3;",
+                            returnType: "Numeric",
+                        },
+                    },
+                    {
+                        type: "CIMPrimitiveOverride",
+                        primitiveName: "animationOverride",
+                        propertyName: "Duration",
+                        valueExpressionInfo: {
+                            type: "CIMExpressionInfo",
+                            expression: "return 1.4 + Random() * 1;",
+                            returnType: "Numeric",
+                        },
+                    },
+                    {
+                        type: "CIMPrimitiveOverride",
+                        primitiveName: "animationOverride",
+                        propertyName: "RepeatDelay",
+                        valueExpressionInfo: {
+                            type: "CIMExpressionInfo",
+                            expression: "return 0.5 + Random() * 2;",
+                            returnType: "Numeric",
+                        },
+                    },
                 ],
                 symbol: {
                     type: "CIMPointSymbol",
