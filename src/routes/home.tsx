@@ -280,7 +280,7 @@ function RouteComponent() {
                 </div>
             )}
         </div>
-        <div className='w-full bg-cover py-25 flex flex-col xl:flex-row bg-position-[50%] bg-no-repeat items-center' style={{ backgroundImage: `url(${whiteGeo})` }}>
+        <div className='w-full bg-cover py-25 flex flex-col xl:flex-row bg-position-[50%] bg-no-repeat items-center'>
             <div className='flex w-full justify-center'>
                 <span className='w-9/10 tracking-[-1.2px] leading-[100%] font-bold text-[50px] md:text-[80px] max-w-250'>Built to be Used, Cited & Trusted</span>
             </div>
