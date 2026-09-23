@@ -4,7 +4,7 @@ import { GlobeIcon } from '../assets/GlobeIcon'
 import { ArrowRight } from '../assets/arrow-right'
 {/* arrowRight needs to be chevronRight, line 257 at time of comment */}
 // import { ChevronRight } from '../assets/chevron-right'
-import MenuBackground from '../assets/hero-bg.jpg'
+import { TopoBackground } from '../components/TopoBackground'
 import globeExtrusions from '../assets/globeExtrusions high.webp'
 import trackPreview from '../assets/trackPreview.png'
 import seePreview from '../assets/seePreview.jpg'
@@ -188,13 +188,16 @@ function RouteComponent() {
     // highlight: true only while a card owns the hero, so the resting state dims nothing
     const highlighting = cycleCategories.includes(activeCategory)
 
-    return <div >
+    {/* `relative isolate` bounds the contour background to this page and keeps it behind every
+        section; sections with their own image or colour (cars, footer…) simply cover it. */}
+    return <div className='relative isolate bg-white'>
+        <TopoBackground />
         {/* At xl the hero is exactly one screen tall with its text + cards centered as one group, as on
             earthgenome.org. xl:pt-28 clears the fixed header (its bottom edge sits ~106px down on /home);
             the globe is absolute, so it stays out of the flow being centered. */}
-        <div className='relative overflow-hidden pt-30 pb-16 flex flex-col justify-start items-center xl:min-h-svh xl:pt-28 xl:pb-10 xl:justify-center xl:items-start w-full bg-fixed bg-cover' style={{ backgroundImage: `url(${MenuBackground})`, backgroundPositionY: "bottom 10px"}}>
+        <div className='relative overflow-hidden pt-30 pb-16 flex flex-col justify-start items-center xl:min-h-svh xl:pt-28 xl:pb-10 xl:justify-center xl:items-start w-full'>
             <div className='flex justify-center xl:justify-normal xl:pl-15 max-w-200'>
-                <div className='w-9/10 xl:w-5/10 grid text-white xl:text-left z-1'>
+                <div className='w-9/10 xl:w-5/10 grid text-black xl:text-left z-1'>
                     {Object.entries(categoryDetails).map(([key, details]) =>
                         <div
                             key={key}
@@ -263,7 +266,7 @@ function RouteComponent() {
                 )}
             </div>
         </div>
-        <div className='w-full flex flex-col items-center bg-white'>
+        <div className='w-full flex flex-col items-center'>
             {overviewCategories.map((e, i) =>
                 <div className={`w-full md:max-w-500 flex items-center ${e.order == "normal" ? 'flex-col md:flex-row' : 'flex-col md:flex-row-reverse'} pt-10 md:pt-0`}>
                     <div className='w-9/10 md:w-5/10 flex flex-col text-left items-center justify-center'>
