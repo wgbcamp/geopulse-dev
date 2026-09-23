@@ -14,8 +14,6 @@ body {
   height: 100dvh;
     background-color: #1E1E1E;
   --unselectedview: #c7dff7;
-  color-scheme: dark;
-
   
   --orange: #FF8200;
   --primaryblue: rgb(0,76,151);
@@ -152,7 +150,7 @@ body {
     100% { transform: translate(-50%, -50%) scale(6.5); opacity: 0; }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .draggable { transform: translateY(var(--drag-y)); }
 }
 

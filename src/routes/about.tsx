@@ -1,12 +1,18 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import { AppActionsContext } from '@/app';
+
 import MenuBackground from '../assets/image 18.png'
+import { useContext } from 'react';
 
 export const Route = createFileRoute('/about')({
   component: About,
 })
 
 function About() {
+
+    const actions = useContext(AppActionsContext);
+    actions?.setView('About');
 
     return <div className={`h-full bg-[#1a2868] bg-fixed transition-all overflow-auto`} style={{ backgroundImage: `linear-gradient(90deg, rgba(26,40,104,0.95) 0%, rgba(26,40,104,0.95) 52%, rgba(26,40,104,0.74) 100%), url(${MenuBackground})`, backgroundSize: 'cover' }}>
         <div className={` flex justify-center`}>

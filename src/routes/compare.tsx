@@ -1,7 +1,7 @@
 import { useContext, useState, useCallback, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 
-import { AppStateContext } from '../app';
+import { AppStateContext, AppActionsContext } from '../app';
 
 import { Region } from "../components/region"
 import { Thresholds } from "../components/thresholds"
@@ -13,6 +13,9 @@ export const Route = createFileRoute('/compare')({
 })
 
 function CompareView() {
+
+    const actions = useContext(AppActionsContext);
+    actions?.setView("Compare");
 
     const [polygons, setPolygons] = useState<any>(null);
 

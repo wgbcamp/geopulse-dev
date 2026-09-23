@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as HomeBackupRouteImport } from './routes/homeBackup'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as GridRouteImport } from './routes/grid'
 import { Route as EventsRouteImport } from './routes/events'
@@ -17,6 +18,11 @@ import { Route as CompareRouteImport } from './routes/compare'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 
+const HomeBackupRoute = HomeBackupRouteImport.update({
+  id: '/homeBackup',
+  path: '/homeBackup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HomeRoute = HomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -61,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/events': typeof EventsRoute
   '/grid': typeof GridRoute
   '/home': typeof HomeRoute
+  '/homeBackup': typeof HomeBackupRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByTo {
   '/events': typeof EventsRoute
   '/grid': typeof GridRoute
   '/home': typeof HomeRoute
+  '/homeBackup': typeof HomeBackupRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +88,7 @@ export interface FileRoutesById {
   '/events': typeof EventsRoute
   '/grid': typeof GridRoute
   '/home': typeof HomeRoute
+  '/homeBackup': typeof HomeBackupRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/grid'
     | '/home'
+    | '/homeBackup'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +110,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/grid'
     | '/home'
+    | '/homeBackup'
   id:
     | '__root__'
     | '/'
@@ -109,6 +120,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/grid'
     | '/home'
+    | '/homeBackup'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -119,10 +131,18 @@ export interface RootRouteChildren {
   EventsRoute: typeof EventsRoute
   GridRoute: typeof GridRoute
   HomeRoute: typeof HomeRoute
+  HomeBackupRoute: typeof HomeBackupRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/homeBackup': {
+      id: '/homeBackup'
+      path: '/homeBackup'
+      fullPath: '/homeBackup'
+      preLoaderRoute: typeof HomeBackupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/home': {
       id: '/home'
       path: '/home'
@@ -183,6 +203,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventsRoute: EventsRoute,
   GridRoute: GridRoute,
   HomeRoute: HomeRoute,
+  HomeBackupRoute: HomeBackupRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

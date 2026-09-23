@@ -1,8 +1,8 @@
 // creates file-based routing for tanstack react router 
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 
 // react hooks holding state, context, and references
-import { AppStateContext } from '../app';
+import { AppStateContext, AppActionsContext } from '../app';
 import { useState, useRef, useEffect, useCallback, useContext } from 'react'
 
 // this function constructs className strings conditionally and merges tailwindcss classes in javascript
@@ -67,8 +67,11 @@ export const Route = createFileRoute('/events')({
 
 function Events() {
 
-    // reads context from provider for  
+    // reads context from provider for app-level state functions 
     const state = useContext(AppStateContext);
+    const actions = useContext(AppActionsContext);
+
+    actions?.setView("Event tracking");
 
     // state hook that enables/disables exposure sub-category animations
     const [popInState, setPopInState] = useState<string>("initial");
@@ -109,9 +112,6 @@ function Events() {
     const graphicsLayer = useRef<GraphicsLayer>(null);
     const outlineLayer = useRef<GraphicsLayer>(null);
     const groupLayer = useRef<GroupLayer>(null);
-
-    const [dataExplainerOpen, setDataExplainerState] = useState(false);
-    const [dataExplainerView, setDataExplainerView] = useState("Event Tracking");
 
     // function getMinZoom(containerWidth: number, containerHeight: number): number {
     //             const minZoomX = Math.log2(containerWidth / 256);
@@ -249,7 +249,7 @@ function Events() {
                 map: map.current,
                 zoom: Math.max(2, minZoom),
                 // center: [-40.9465, 0.775],
-                center: [state.countryCoordinates.longitude, state.countryCoordinates.latitude],
+                center: [state?.countryCoordinates.longitude, state?.countryCoordinates.latitude],
                 constraints: {
                     minZoom: Math.floor(minZoom),
                     maxZoom: 11,
@@ -640,11 +640,11 @@ function Events() {
                 field: "eventtype",
                 uniqueValueInfos: uniqueColorValues
             },
-            definitionExpression: `(fromdate >= timestamp '${toTimestamp(new Date(state?.dateRange.from))}' AND fromdate <= timestamp '${toTimestamp(new Date(state.dateRange.to))}'
+            definitionExpression: `(fromdate >= timestamp '${toTimestamp(new Date(state?.dateRange.from))}' AND fromdate <= timestamp '${toTimestamp(new Date(state?.dateRange.to))}'
             OR
-            todate >= timestamp '${toTimestamp(new Date(state.dateRange.from))}' AND todate <= timestamp '${toTimestamp(new Date(state.dateRange.to))}'
+            todate >= timestamp '${toTimestamp(new Date(state?.dateRange.from))}' AND todate <= timestamp '${toTimestamp(new Date(state?.dateRange.to))}'
             OR
-            fromdate <= timestamp '${toTimestamp(new Date(state.dateRange.from))}' AND todate >= timestamp '${toTimestamp(new Date(state.dateRange.to))}'
+            fromdate <= timestamp '${toTimestamp(new Date(state?.dateRange.from))}' AND todate >= timestamp '${toTimestamp(new Date(state?.dateRange.to))}'
         )`
         });
 
@@ -1001,10 +1001,11 @@ function Events() {
 
     const MAX_Y = 90;
     const MIN_Y = window.innerHeight - 50;
-    const SNAP_TO_MAX_HEIGHT = window.innerHeight - 50;
+    const INITIAL_HEIGHT = window.innerHeight - 50;
+    const SNAP_TO_MAX_HEIGHT = window.innerHeight + 75;
     const SNAP_TO_MIN_HEIGHT = 90;
 
-    const [y, setY] = useState(SNAP_TO_MAX_HEIGHT);
+    const [y, setY] = useState(INITIAL_HEIGHT);
     const dragRef = useRef({ active: false, startY: 0, startOffset: 0 });
 
     const onPointerDown = (e) => {
@@ -1019,7 +1020,8 @@ function Events() {
         setY(dragRef.current.startOffset + delta);
     };
 
-    const onPointerUp = () => {
+    const onPointerUp = (event) => {
+        event.preventDefault();
         dragRef.current.active = false;
         if (y > MIN_Y) setY(SNAP_TO_MAX_HEIGHT);
         if (y < MAX_Y) setY(SNAP_TO_MIN_HEIGHT);
@@ -1117,11 +1119,11 @@ function Events() {
                     </div>
                 </div>
             </div>
-            <div className={`absolute z-2 bottom-0 md:top-50 md:transition-all md:duration-300 md:ease-in-out ${eventPopup == "all events" ? "md:right-0" : "md:-right-100 invisible"} md:visible max-h-full md:h-70/100 w-full md:w-[300px] flex flex-col bg-white shadow-lg/40 cursor-default draggable`} style={{
+            <div className={`absolute z-2 bottom-65 md:bottom-0 md:transition-[right] md:duration-300 md:ease-in-out ${eventPopup == "all events" ? "md:right-0" : "md:-right-100 invisible"} md:visible max-h-full md:h-85/100 w-full md:w-[325px] flex flex-col bg-white md:shadow-[inset_0px_-16px_10px_-10px_rgba(0,0,0,0.35)] cursor-default draggable`} style={{
                 "--drag-y": `${y}px`,
                 touchAction: "none"
             }}>
-                <div onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp}>
+                <div onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={(e) => onPointerUp(e)}>
                     <div className='h-4 w-full flex items-end justify-center md:hidden'>
                         <div className='w-15 h-1 bg-(--accentcoolgray-60) rounded-xl'></div>
                     </div>
@@ -1144,7 +1146,7 @@ function Events() {
                                 year: "numeric"
                             })}</p>
                             <div className='flex w-full justify-between '>
-                                <div className="flex h-6.25 items-center justify-center font-bold cursor-pointer text-[var(--accentblue-100)] border-solid border border-gray-400 rounded-sm px-[5px] mb-[6px] mt-[9px] text-[11px]" onClick={() => focusOnEvent(event.geometry, event.attributes)}>
+                                <div className="flex h-6.25 leading-[0.75] items-center justify-center font-bold cursor-pointer text-[var(--accentblue-100)] border-solid border border-gray-400 rounded-sm px-[5px] mb-[6px] mt-[9px] text-[11px]" onClick={() => focusOnEvent(event.geometry, event.attributes)}>
                                     DETAILS
                                 </div>
                                 {event.attributes.iscurrent == "true" ?
@@ -1159,30 +1161,34 @@ function Events() {
                         </div>
                     ))}
                 </div>
-                <div className="h-[10px] bg-[var(--darkblue)] flex items-center justify-center text-white font-bold"></div>
             </div>
-            <div className={`absolute bottom-0 right-0 md:top-40 md:bottom-[unset] md:transition-all md:duration-300 md:ease-in-out ${eventPopup == "focused event" ? "md:right-0 visible" : "md:-right-100 invisible"} h-40/100 md:h-70/100 w-full md:w-[325px] pt-3 shadow-lg/40 md:rounded-tl-md flex flex-col items-start bg-white cursor-default transition-all ease-in-out duration-300 overflow-y-auto`}>
-                <div className="pt-3 w-full flex items-center justify-between pl-4">
+            <div className={`absolute bottom-0 right-0 md:transition-all md:duration-300 md:ease-in-out ${eventPopup == "focused event" ? "md:right-0 visible" : "md:-right-100 invisible"} h-5/10 md:h-85/100 w-full md:w-[325px] pt-3 shadow-lg/40 md:rounded-tl-md flex gap-5 flex-col items-start bg-white cursor-default transition-all ease-in-out duration-300 overflow-y-auto`}>
+                <div className="w-full flex items-center justify-between px-4">
                     {focusedEvent.iscurrent == "true" ?
                         <div className="flex h-6.25 justify-center  items-center bg-(--accentred-100) rounded-sm shadow-lg/10 font-bold text-white px-[5px] mb-[6px] mt-[9px] text-[11px]">
                             <div>ONGOING</div>
                         </div>
                         :
-                        <b className="flex h-6.25 justify-center  items-center bg-(--accentblue-100) rounded-sm shadow-lg/10 font-bold text-white px-[5px] mb-[6px] mt-[9px] text-[11px]">PAST EVENT</b>
+                        <b className="flex h-6.25 justify-center  items-center bg-(--accentblue-100) rounded-sm shadow-lg/10 font-bold text-white px-[5px] mb-[6px] mt-[9px] text-[11px]"><span className='leading-[0.75]'>PAST EVENT</span></b>
                     }
                     <div className='text-[14px] mr-2 text-(--accentblue-100) font-bold cursor-pointer' onClick={() => unfocusEvent()}> Close details [X]</div>
                 </div>
-                <div className="text-[20px] h-[38px] font-bold text-left flex w-full pt-2 pl-4">{focusedEvent.description?.length > 25 ? focusedEvent.description.slice(0, 27).trimEnd() + "..." : focusedEvent.description}</div>
+                <div className="text-[20px] h-[38px] font-bold text-left flex w-full px-4">{focusedEvent.description?.length > 25 ? focusedEvent.description.slice(0, 27).trimEnd() + "..." : focusedEvent.description}</div>
                 {focusedFeatures?.length > 1 ?
                     <div className='w-full'>
-                        <div className="pt-[20px] text-(--accentblue-100) font-bold text-[12px] text-center w-full">Timeline</div>
+                        <div className="text-(--accentblue-100) font-bold text-[12px] text-center w-full">Timeline</div>
                         <div className="flex flex-row justify-center items-start w-full pb-[36px]">
-                            <div className="flex items-center justify-center text-[25px] w-[25px] h-[25px] mr-3 text-white bg-(--accentblue-100) rounded-4xl">
-                                {focusedSliderPlaying ? <FontAwesomeIcon icon={faPause} size="2xs" color="white" onClick={() => playEvent("pause")} /> : <FontAwesomeIcon icon={faPlay} size="2xs" color="white" onClick={() => playEvent("play")} />}
-                            </div>
-                            <div className="flex flex-col h-full w-7/10">
+                                {focusedSliderPlaying ? <div className='flex items-center justify-center z-2 text-6.25 w-6.25 h-6.25 text-white bg-(--accentblue-100) rounded-4xl' onClick={() => playEvent("pause")}><FontAwesomeIcon icon={faPause} size="2xs" color="white" /></div> 
+                                : 
+                                <div className='z-2 flex items-center justify-center text-6.25 w-6.25 h-6.25 text-white bg-(--accentblue-100) rounded-4xl' onClick={() => playEvent("play")}>
+                                    <svg width="7" height="13" viewBox="0 0 7 13" fill="none" xmlns="http://www.w3.org/2000/svg" className='ml-1'>
+                                        <path d="M0 0L6.44985 6.44985L0 12.8997V0Z" fill="white" />
+                                    </svg>
+                                </div>
+                                }
+                            <div className="flex flex-col h-full ml-3 w-7/10">
                                 <Slider
-                                    className='mr-6 [&_[data-slot=slider-track]]:bg-(--orange) cursor-pointer '
+                                    className='mr-6 z-2 [&_[data-slot=slider-track]]:bg-(--orange) cursor-pointer '
                                     step={1}
                                     min={0}
                                     // if there are no features, set max to 10 for demonstrative purposes
@@ -1229,106 +1235,106 @@ function Events() {
                         </div>
                     </div>
                     : null}
-                <div className="pt-5 font-bold text-[14px] pl-4">Event Severity:</div>
-                <div></div>
-                <div className={`text-[14px] px-2 ml-4 rounded-md text-white font-extrabold`} style={{ backgroundColor: `var(--${focusedEvent.alertlevel?.toLowerCase()})` }}
-                >Level {focusedEvent.alertscore}
+                <div className='pt-5 flex items-center'>
+                    <div className="font-bold text-[14px] pl-4">Event Severity</div>
+                    <div className={`text-[14px] px-2 py-2 ml-2 rounded-md h-5 text-white font-extrabold flex items-center justify-center`} style={{ backgroundColor: `var(--${focusedEvent.alertlevel?.toLowerCase()})` }}>
+                        <span className='leading-[0.9] h-3'>Level {focusedEvent.alertscore}</span>
+                    </div>
                 </div>
 
-
-
-                <div className="pt-5 font-bold text-[14px] pl-4">View affected economies</div>
-                <div className='text-left flex flex-wrap text-[14px] pb-4 pl-4 pt-2 gap-3'>
-                        <div className={`rounded-xl h-5 whitespace-nowrap px-3 py-3 ${currentCountryExposure == "ALL" ? "bg-(--accentblue-100) text-white" : "bg-(--accentwarmgray-20)"} font-bold flex items-center justify-center cursor-pointer`} onClick={() => setCurrentCountryExposure("ALL")}>
-                            <div>Total</div>
-                        </div>
-                    {focusedEvent?.affectedcountries?.split(",")?.map((a: string, i: number) => {
-                            if ( i < 3) {
-                                return (
-                                    <div className={`rounded-xl h-5 whitespace-nowrap px-3 py-3 ${currentCountryExposure == a ? "bg-(--accentblue-100) text-white" : "bg-(--accentwarmgray-20)"} font-bold flex items-center justify-center cursor-pointer`} onClick={() => { setCurrentCountryExposure(a); console.log(focusedCountryExposures.indexOf(focusedCountryExposures.find((c: any) => c.attributes.areaid == a))) }}>
-                                        <div>{countryByIso3[a]}</div>
-                                    </div>
-                                )
+                <div className='flex flex-col gap-3'>
+                    <div className="font-bold text-[14px] pl-4 text-left">View affected economies</div>
+                    <div className='text-left flex flex-wrap text-[14px] pl-4 gap-3'>
+                            <div className={`[text-box-edge:cap_alphabetic] leading-none rounded-xl h-6 whitespace-nowrap px-3  ${currentCountryExposure == "ALL" ? "bg-(--accentblue-100) text-white" : "bg-(--accentwarmgray-20)"} font-bold flex items-center justify-center cursor-pointer`} onClick={() => setCurrentCountryExposure("ALL")}>
+                                <div className='leading-[0.75]'>Total</div>
+                            </div>
+                        {focusedEvent?.affectedcountries?.split(",")?.map((a: string, i: number) => {
+                                if ( i < 3) {
+                                    return (
+                                        <div className={`rounded-xl h-6 whitespace-nowrap px-3  ${currentCountryExposure == a ? "bg-(--accentblue-100) text-white" : "bg-(--accentwarmgray-20)"} font-bold flex items-center justify-center cursor-pointer`} onClick={() => { setCurrentCountryExposure(a); console.log(focusedCountryExposures.indexOf(focusedCountryExposures.find((c: any) => c.attributes.areaid == a))) }}>
+                                            <div>{countryByIso3[a]}</div>
+                                        </div>
+                                    )
+                                }
                             }
-                        }
-                    )}
-                    {focusedEvent?.affectedcountries?.split(",")?.length > 3 ? <div className={`rounded-xl overflow-hidden h-5 px-2 py-3 ${focusedEvent?.affectedcountries?.split(",")?.find((a, i) => a == currentCountryExposure && i > 2) ? 'bg-(--accentblue-100) text-white' : 'bg-(--accentwarmgray-20)'}  font-bold flex items-center justify-center`} onClick={() => setOtherCountryDropdownStatus(!otherCountryDropdownStatus)}>
-                        <div className='text-wrap max-w-40 flex justify-between cursor-pointer'>{currentCountryExposure !== "ALL" && focusedEvent?.affectedcountries?.split(",")?.find((a, i) => a == currentCountryExposure && i > 2) ? countryByIso3[currentCountryExposure] : "Other"}</div>
-                            <Popover open={otherCountryDropdownStatus} onOpenChange={setOtherCountryDropdownStatus}>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        variant="outline"
-                                        role="combobox"
-                                        aria-expanded={otherCountryDropdownStatus}
-                                        className="w-4 h-5.25 font-bold justify-between light border-0 shadow-none p-0 bg-transparent hover:bg-transparent cursor-pointer"
-                                    >
-                                        
-                                        <svg className={`${otherCountryDropdownStatus ? "rotate-180" : "rotate-0"}`} width="14" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M10 18.75C14.8438 18.75 18.75 14.8438 18.75 10C18.75 5.15625 14.8438 1.25 10 1.25C5.15625 1.25 1.25 5.15625 1.25 10C1.25 14.8438 5.15625 18.75 10 18.75ZM10 0C15.5078 0 20 4.49219 20 10C20 15.5078 15.5078 20 10 20C4.49219 20 0 15.5078 0 10C0 4.49219 4.49219 0 10 0ZM5.19531 9.17969C4.96094 8.94531 4.96094 8.55469 5.19531 8.32031C5.42969 8.08594 5.82031 8.08594 6.05469 8.32031L10 12.2266L13.9453 8.32031C14.1797 8.08594 14.5703 8.08594 14.8047 8.32031C15.0781 8.55469 15.0781 8.94531 14.8047 9.17969L10.4297 13.5547C10.1953 13.8281 9.80469 13.8281 9.57031 13.5547L5.19531 9.17969Z" fill={`${focusedEvent?.affectedcountries?.split(",")?.find((a, i) => a == currentCountryExposure && i > 2) ? "white" : "black"}`} />
-                                        </svg>
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-60 p-0 light rounded-none">
-                                    <Command>
-                                        <CommandInput placeholder="Search country..." className="h-9" />
-                                        <CommandList>
-                                            <CommandEmpty>Country not found.</CommandEmpty>
-                                            <CommandGroup>
-                                                {focusedEvent?.affectedcountries?.split(",")?.map((a, i) => {
-                                                    if (i > 2) {
-                                                        return (
-                                                            <CommandItem
-                                                                className="data-[selected=true]:bg-white text-left"
-                                                                key="all"
-                                                                value="All countries"
-                                                                onSelect={() => {
-                                                                    setOtherCountryDropdownStatus(false);
-                                                                    setCurrentCountryExposure(a);
-                                                                }}
-                                                            >
-                                                                <div className='w-90 text-wrap'>
-                                                                    <div>{countryByIso3[a]}</div>
-                                                                </div>
-                                                                <Check
-                                                                    className={cn(
-                                                                        "ml-auto",
-                                                                        currentCountryExposure === a ? "opacity-100" : "opacity-0"
-                                                                    )}
-                                                                />
-                                                            </CommandItem>
-                                                        )
+                        )}
+                        {focusedEvent?.affectedcountries?.split(",")?.length > 3 ? <div className={`rounded-xl overflow-hidden h-5 px-2 py-3 ${focusedEvent?.affectedcountries?.split(",")?.find((a, i) => a == currentCountryExposure && i > 2) ? 'bg-(--accentblue-100) text-white' : 'bg-(--accentwarmgray-20)'}  font-bold flex items-center justify-center`} onClick={() => setOtherCountryDropdownStatus(!otherCountryDropdownStatus)}>
+                            <div className='text-wrap max-w-40 flex justify-between cursor-pointer'>{currentCountryExposure !== "ALL" && focusedEvent?.affectedcountries?.split(",")?.find((a, i) => a == currentCountryExposure && i > 2) ? countryByIso3[currentCountryExposure] : "Other"}</div>
+                                <Popover open={otherCountryDropdownStatus} onOpenChange={setOtherCountryDropdownStatus}>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            variant="outline"
+                                            role="combobox"
+                                            aria-expanded={otherCountryDropdownStatus}
+                                            className="w-4 h-5.25 font-bold justify-between light border-0 shadow-none p-0 bg-transparent hover:bg-transparent cursor-pointer"
+                                        >
+                                            
+                                            <svg className={`${otherCountryDropdownStatus ? "rotate-180" : "rotate-0"}`} width="14" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M10 18.75C14.8438 18.75 18.75 14.8438 18.75 10C18.75 5.15625 14.8438 1.25 10 1.25C5.15625 1.25 1.25 5.15625 1.25 10C1.25 14.8438 5.15625 18.75 10 18.75ZM10 0C15.5078 0 20 4.49219 20 10C20 15.5078 15.5078 20 10 20C4.49219 20 0 15.5078 0 10C0 4.49219 4.49219 0 10 0ZM5.19531 9.17969C4.96094 8.94531 4.96094 8.55469 5.19531 8.32031C5.42969 8.08594 5.82031 8.08594 6.05469 8.32031L10 12.2266L13.9453 8.32031C14.1797 8.08594 14.5703 8.08594 14.8047 8.32031C15.0781 8.55469 15.0781 8.94531 14.8047 9.17969L10.4297 13.5547C10.1953 13.8281 9.80469 13.8281 9.57031 13.5547L5.19531 9.17969Z" fill={`${focusedEvent?.affectedcountries?.split(",")?.find((a, i) => a == currentCountryExposure && i > 2) ? "white" : "black"}`} />
+                                            </svg>
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-60 p-0 light rounded-none">
+                                        <Command>
+                                            <CommandInput placeholder="Search country..." className="h-9" />
+                                            <CommandList>
+                                                <CommandEmpty>Country not found.</CommandEmpty>
+                                                <CommandGroup>
+                                                    {focusedEvent?.affectedcountries?.split(",")?.map((a, i) => {
+                                                        if (i > 2) {
+                                                            return (
+                                                                <CommandItem
+                                                                    className="data-[selected=true]:bg-white text-left"
+                                                                    key="all"
+                                                                    value="All countries"
+                                                                    onSelect={() => {
+                                                                        setOtherCountryDropdownStatus(false);
+                                                                        setCurrentCountryExposure(a);
+                                                                    }}
+                                                                >
+                                                                    <div className='w-90 text-wrap'>
+                                                                        <div>{countryByIso3[a]}</div>
+                                                                    </div>
+                                                                    <Check
+                                                                        className={cn(
+                                                                            "ml-auto",
+                                                                            currentCountryExposure === a ? "opacity-100" : "opacity-0"
+                                                                        )}
+                                                                    />
+                                                                </CommandItem>
+                                                            )
+                                                        }
                                                     }
-                                                }
-                                                )}
-                                            </CommandGroup>
-                                        </CommandList>
-                                    </Command>
-                                </PopoverContent>
-                            </Popover>
-                        </div>
-                        :
-                        null
-                    }
-                    
+                                                    )}
+                                                </CommandGroup>
+                                            </CommandList>
+                                        </Command>
+                                    </PopoverContent>
+                                </Popover>
+                            </div>
+                            :
+                            null
+                        }
+                    </div>
                 </div>
                 <div className="pt-5 flex flex-row w-full text-[12px] font-bold justify-around border-t-1 px-4">
                     <div className='flex flex-col w-40 items-between text-left'>
                         <div className='pb-2 border-solid border-b-1'>LAYER</div>
                         {exposuresArray.filter((a) => a.name !== "Nightlights").map((e: any) =>
-                            <div key={e.name} className='h-[45px] text-[16px] font-medium border-solid border-b-1 flex items-center '>{e.name}</div>
+                            <div key={e.name} className='h-[45px] text-[14px] font-medium border-solid border-b-1 flex items-center '>{e.name}</div>
                         )}
                     </div>
                     <div className='w-full text-left'>
                         <div className='pb-2 border-solid border-b-1 pl-3'>EXPOSURE</div>
                         {exposuresArray.filter((a) => a.name !== "Nightlights").map((e: any) =>
-                            <div key={e.name} className='h-[45px] text-[16px] font-medium border-solid border-b-1 flex items-center border-l-1 pl-3'>{focusedCountryExposures ? fmt.format(focusedCountryExposures[focusedCountryExposures.indexOf(focusedCountryExposures.find((c: any) => c.attributes.areaid == currentCountryExposure))]?.attributes[e.id]) + " " + e.suffix : "N/A"}</div>     
+                            <div key={e.name} className='h-[45px] text-[14px] font-medium border-solid border-b-1 flex items-center border-l-1 pl-3'>{focusedCountryExposures ? fmt.format(focusedCountryExposures[focusedCountryExposures.indexOf(focusedCountryExposures.find((c: any) => c.attributes.areaid == currentCountryExposure))]?.attributes[e.id]) + " " + e.suffix : "N/A"}</div>     
                         )}
                     </div>
                 </div>
                 <div className="pt-[24px] pb-5 text-(--accentblue-100) font-bold text-[12px] text-center w-full"><u className='cursor-pointer'>Explore Methodology</u></div>
             </div>
-            <div className="absolute bottom-0 invisible md:visible h-[175px] w-[350px] bg-[rgba(0,0,0,0.85)] flex flex-col items-center justify-around">
-                <div className="w-8/10 h-5/10 flex flex-col items-center">
+            <div className="absolute bottom-0 invisible md:visible h-20 w-[350px] bg-[rgba(0,0,0,0.85)] flex flex-col items-center justify-around">
+                {/* <div className="w-8/10 h-5/10 flex flex-col items-center">
                     <div className="flex text-white w-full font-extrabold tracking-wide text-[12px] pb-[10px]">
                         <div>EVENT TYPES</div>
                     </div>
@@ -1347,12 +1353,12 @@ function Events() {
                         </div>
 
                     </div>
-                </div>
-                <div className='h-3/10 w-8/10 flex flex-col items-center justify-end'>
+                </div> */}
+                <div className='w-8/10 flex flex-col items-center justify-end'>
                     <div className="flex text-white w-full font-extrabold tracking-wide text-[12px] pb-[10px]">
                         <div>{realtimeObject[realtimeExposure.exposure].title.toUpperCase()} {realtimeObject[realtimeExposure.exposure].unit}</div>
                     </div>
-                    <div className="h-1/10 w-full" style={{ background: `linear-gradient(to right, ${realtimeObject[realtimeExposure.exposure].colorScheme.map((e, i) => 'rgba(' + e.symbol.color.join(",") + ') ' + (i / realtimeObject[realtimeExposure.exposure].colorScheme.length) * 100 + "%," + ' rgba(' + e.symbol.color.join(",") + ') ' + ((i + 1) / realtimeObject[realtimeExposure.exposure].colorScheme.length) * 100 + "% ").join(",")})` }}></div>
+                    <div className="h-2 w-full" style={{ background: `linear-gradient(to right, ${realtimeObject[realtimeExposure.exposure].colorScheme.map((e, i) => 'rgba(' + e.symbol.color.join(",") + ') ' + (i / realtimeObject[realtimeExposure.exposure].colorScheme.length) * 100 + "%," + ' rgba(' + e.symbol.color.join(",") + ') ' + ((i + 1) / realtimeObject[realtimeExposure.exposure].colorScheme.length) * 100 + "% ").join(",")})` }}></div>
                     <div className="h-[20px] w-full flex justify-between">
                         {realtimeObject[realtimeExposure.exposure].colorScheme.map((e, i) =>
                             <div key={i} className="flex flex-col w-full h-[full]">
@@ -1367,381 +1373,12 @@ function Events() {
                 </div>
             </div>
             <arcgis-scale-bar
-                className='calcite-mode-dark z-150 absolute bottom-3 right-4'
+                className='calcite-mode-dark z-150 absolute top-30 right-5 md:top-auto md:right-auto md:bottom-1 md:left-90 max-w-21'
                 ref={scaleBarRef}
                 bar-style="line"
                 unit="metric"
             ></arcgis-scale-bar>
-            {dataExplainerOpen 
-            ? 
-            <div className="absolute z-3 bottom-0 w-full h-full bg-[#00000095] flex items-center justify-center">
-                <div className="h-8/10 w-8/10 max-h-300 max-w-300 bg-white rounded-sm flex flex-col overflow-hidden">
-                    <div className="bg-(--fundblue) h-38 w-full flex flex-col ">
-                        <div className="w-full">
-                            <div className="w-96/100 flex justify-end">
-                                <div className='text-white font-bold pt-5 cursor-pointer' onClick={() => setDataExplainerState(false)}>CLOSE</div>
-                            </div>
-                        </div>
-                        <div className='w-full flex justify-end'>
-                            <div className='w-9/10'>
-                                <div className="w-full flex justify-start">
-                                    <div className="w-96/100 flex">
-                                        <div className='text-white font-bold text-2xl'>Data Explainer</div>
-                                    </div>
-                                </div>
-                                <div className="flex flex-row gap-x-2 overflow-x-auto">
-                                    <div className='flex flex-col w-50'>
-                                        <div className="text-xs text-white pt-3 pb-2 tracking-widest font-semibold">REALTIME</div>
-                                        <div className={`h-10 w-50 font-bold ${dataExplainerView == "Event Tracking" ? "text-(--primaryblue-100) bg-white" : "text-black bg-(--primarygray-40)"} rounded-t-md flex items-center justify-center cursor-pointer`} onClick={() => setDataExplainerView("Event Tracking")}>EVENT TRACKING</div>
-                                    </div>
-                                    <div className='flex flex-col w-100'>
-                                        <div className="text-xs text-white pt-3 pb-2 tracking-widest font-semibold">FORWARD LOOKING</div>
-                                        <div className='flex flex-row gap-x-1'>
-                                            <div className={`h-10 w-50 font-bold ${dataExplainerView == "Grid" ? "text-(--primaryblue-100) bg-white" : "text-black bg-(--primarygray-40)"} rounded-t-md flex items-center justify-center cursor-pointer`} onClick={() => setDataExplainerView("Grid")}>GRID</div>
-                                            <div className={`h-10 w-50 font-bold ${dataExplainerView == "Compare" ? "text-(--primaryblue-100) bg-white" : "text-black bg-(--primarygray-40)"} rounded-t-md flex items-center justify-center cursor-pointer`} onClick={() => setDataExplainerView("Compare")}>COMPARE</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className='flex w-full justify-center overflow-y-scroll my-5'>
-                        <div id="dataExplainer" className='flex flex-col lg:flex-row bg-white mt-12 w-9/10 max-h-291 gap-x-9 justify-start'>
-                            {dataExplainerView == "Event Tracking" ?
-                                <div>
-                                    <div className='flex flex-col gap-y-5 text-left'>
-                                        <section className='font-bold'>Navigating the Real-Time Event Tracking Page</section>
-                                        <p>
-                                            The <b>Real-Time</b> view in GeoPulse provides continuous monitoring of natural hazard events as they unfold around the world.
-                                            The interactive maps identify affected locations, understand the scale of potential impacts, and explore exposure across key
-                                            economic and infrastructure indicators.
-                                        </p>
-
-                                        <div className='flex flex-col gap-y-5 text-left'>
-                                            <section className='font-bold'>Explore Current and Historical Events</section>
-
-                                            <p>
-                                                The Real-Time page displays a global map of recent and ongoing events together with relevant exposure layers.
-                                                Users can explore events by selecting event markers directly on the map or by viewing event details in the panel
-                                                on the right side of the screen.
-                                            </p>
-
-                                            <p>
-                                                The right-side panel provides additional information about the selected event, including:
-                                            </p>
-
-                                            <ul className='list-disc pl-5'>
-                                                <li>Event name and status</li>
-                                                <li>Timeline and duration</li>
-                                                <li>Event severity metrics</li>
-                                                <li>Affected countries or regions</li>
-                                                <li>Estimated exposure and risk indicators</li>
-                                                <li>Links to download supporting data and explore methodology</li>
-                                            </ul>
-                                        </div>
-
-                                        <section className='font-bold'>Refine Your Search</section>
-                                        <p>
-                                            The controls in the top navigation bar allow users to focus the analysis on events of interest.
-                                        </p>
-                                        <p>You can narrow or expand the events displayed by:</p>
-                                        <ul className='list-disc pl-5'>
-                                            <li>
-                                                <b>Selecting a time frame</b> (for example, the last three months, last six months, last year, or a custom date range)
-                                            </li>
-                                            <li><b>Choosing a specific country</b></li>
-                                            <li><b>Filtering by event type</b> to focus on particular hazards</li>
-                                        </ul>
-
-                                        <section className='font-bold'>Understand Exposure Layers</section>
-                                        <p>
-                                            On the left side of the map, users can select from a series of <b>exposure layers</b>. These layers represent key economic,
-                                            demographic, and infrastructure assets that may be affected by natural hazards.
-                                        </p>
-                                        <p>Exposure layers help answer questions such as:</p>
-                                        <ul className='list-disc pl-5'>
-                                            <li>How many people may be affected by an event?</li>
-                                            <li>Which sectoral areas are most vulnerable to economic losses?</li>
-                                        </ul>
-
-                                        <p>
-                                            By turning layers on and off, users can visualize where hazards intersect with important assets and better understand
-                                            the geographic distribution of potential impacts.
-                                        </p>
-
-                                        <p>
-                                            <b>Read More</b> for additional information on the methodology and data sources behind this analysis.
-                                        </p>
-                                    </div>
-                                </div>
-                                :
-                                null
-                            }
-                            {dataExplainerView == "Compare" ?
-                                <div>
-                                    <div className='flex flex-col gap-y-5 pb-5 text-left'>
-                                        <section className='font-bold'>Navigating the Compare View</section>
-
-                                        <p>
-                                            The <b>Compare</b> view illustrates how climate-related hazards and exposures may evolve under different future climate scenarios.
-                                            Designed for benchmarking and strategic planning, this view enables side-by-side comparisons of countries or subnational
-                                            regions, helping users identify areas that may face higher levels of exposure under future climate conditions.
-                                        </p>
-
-                                        <section className='font-bold'>Compare Countries or Subnational Regions</section>
-
-                                        <p>
-                                            The Compare view displays two maps side by side, making it easy to evaluate differences in exposure across locations.
-                                            You can:
-                                        </p>
-
-                                        <ul className='list-disc pl-5 space-y-1'>
-                                            <li>
-                                                Compare <b>two different countries</b> to understand how future climate risks vary across economies.
-                                            </li>
-                                            <li>
-                                                Compare <b>subnational regions within the same country</b> to identify areas that may face higher exposure levels.
-                                            </li>
-                                        </ul>
-
-                                        <section className='font-bold'>Select a Hazard and Exposure Indicator</section>
-
-                                        <p>At the top of the page, users can choose:</p>
-
-                                        <ul className='list-disc pl-5 space-y-1'>
-                                            <li>
-                                                A <b>hazard category</b> (such as coastal flooding, riverine flooding, heat stress, drought, or other available hazards).
-                                            </li>
-                                            <li>
-                                                An <b>exposure layer</b> (such as population, GDP, urban GDP, buildings).
-                                            </li>
-                                            <li>
-                                                A <b>climate scenario</b> (Orderly or Disorderly).
-                                            </li>
-                                            <li>
-                                                A <b>time horizon</b> for analysis.
-                                            </li>
-                                        </ul>
-                                    </div>
-
-                                    <div className='flex flex-col gap-y-5 text-left'>
-                                        <section className='font-bold'>Choose a Climate Scenario</section>
-
-                                        <p>
-                                            GeoPulse allows users to compare future outcomes under different climate pathways.
-                                        </p>
-
-                                        <p>
-                                            <b>Orderly Transition</b> An orderly transition assumes that climate mitigation measures are introduced early and steadily
-                                            over time. In climate science, this represents a lower-emissions pathway where governments, businesses, and societies
-                                            gradually reduce greenhouse gas emissions, limiting the extent of future warming and associated climate impacts.
-                                        </p>
-
-                                        <p>
-                                            <b>Disorderly Transition</b> A disorderly transition assumes delayed or uneven climate action. Under this pathway,
-                                            emissions remain higher for longer before stronger mitigation efforts occur later in the century. This results in
-                                            greater warming and generally higher levels of climate-related exposure and risk.
-                                        </p>
-                                        <div className='flex flex-col gap-y-5 text-left'>
-                                            <section className='font-bold'>Explore Future Time Horizons</section>
-
-                                            <p>
-                                                The time selector allows users to view projections across multiple planning horizons:
-                                            </p>
-                                            <table className='border'>
-                                                <tr className='border'>
-                                                    <th className='border text-center bg-(--primarygray-10)'><b>Future Horizon</b></th>
-                                                    <th className='border text-center bg-(--primarygray-10)'><b>Reference Year</b></th>
-                                                </tr>
-                                                <tr>
-                                                    <td className='border'>Historical</td>
-                                                    <td className='border'>1980-2014</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className='border'>Early-Century</td>
-                                                    <td className='border'>2030</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className='border'>Mid-Century</td>
-                                                    <td className='border'>2050</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className='border'>End-Century</td>
-                                                    <td className='border'>2100</td>
-                                                </tr>
-                                            </table>
-
-                                            <section className='font-bold'>[Add section about hazard sliders]</section>
-
-                                            <section className='font-bold'>Interpret the Maps</section>
-
-                                            <p>
-                                                The maps display exposure levels using a graduated color scale. Darker shades indicate higher levels of exposure relative
-                                                to the selected indicator and scenario.
-                                            </p>
-
-                                            <p>Users can:</p>
-
-                                            <ul className='list-disc pl-5 space-y-1'>
-                                                <li>Hover over regions to view detailed values.</li>
-                                                <li>Identify geographic hotspots.</li>
-                                                <li>Compare exposure patterns between locations.</li>
-                                                <li>Understand where future climate impacts may become more concentrated.</li>
-                                                <li>Download results for further analysis.</li>
-                                            </ul>
-
-                                            <p>
-                                                <b>Read More</b> for additional information on the methodology and data sources behind this analysis.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                                :
-                                null
-                            }
-                            {dataExplainerView == "Grid" ?
-                                <div>
-                                    <div className='flex flex-col gap-y-5 text-left'>
-                                        <section className='font-bold'>Navigating the Grid View</section>
-
-                                        <p>
-                                            The <b>Grid</b> view enables users to explore forward-looking climate risks at a highly granular spatial level.
-                                            Unlike the Compare view, which focuses on benchmarking locations side by side, the Grid view allows users
-                                            to examine how hazards and exposures intersect across the globe using detailed geospatial data.
-                                        </p>
-
-                                        <section className='font-bold'>Select a Hazard, Exposure, and Climate Scenario</section>
-
-                                        <p>
-                                            Using the controls at the top of the page, you can customize the map by selecting:
-                                        </p>
-
-                                        <ul className='list-disc pl-5 space-y-1'>
-                                            <li>
-                                                A <b>hazard category</b> (such as coastal flooding, riverine flooding, heat stress, drought, or other available hazards).
-                                            </li>
-                                            <li>
-                                                An <b>exposure layer</b> (such as population, GDP, urban GDP, buildings).
-                                            </li>
-                                            <li>
-                                                A <b>climate scenario</b> (Orderly or Disorderly).
-                                            </li>
-                                            <li>
-                                                A <b>time horizon</b> for analysis.
-                                            </li>
-                                        </ul>
-
-                                        <section className='font-bold'>Choose a Climate Scenario</section>
-
-                                        <p>
-                                            GeoPulse allows users to compare future risks under different climate pathways.
-                                        </p>
-
-                                        <p>
-                                            <b>Orderly Transition</b> An orderly transition assumes that emissions reductions and climate policies are implemented
-                                            gradually and early. This pathway generally results in lower levels of warming and more moderate future climate impacts.
-                                        </p>
-
-                                        <p>
-                                            <b>Disorderly Transition</b> A disorderly transition assumes delayed or uneven climate action, leading to higher
-                                            greenhouse gas concentrations and greater warming before mitigation efforts take effect. This pathway generally
-                                            produces larger increases in climate-related hazards and exposures.
-                                        </p>
-                                    </div>
-
-                                    <div className='flex flex-col gap-y-5 text-left'>
-                                        <section className='font-bold'>Explore Future Time Horizons</section>
-
-                                        <p>
-                                            The time selector enables users to evaluate exposure across multiple planning horizons.
-                                        </p>
-                                        <table className='border'>
-                                                <tr className='border'>
-                                                    <th className='border text-center bg-(--primarygray-10)'><b>Future Horizon</b></th>
-                                                    <th className='border text-center bg-(--primarygray-10)'><b>Reference Year</b></th>
-                                                </tr>
-                                                <tr>
-                                                    <td className='border'>Historical</td>
-                                                    <td className='border'>1980-2014</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className='border'>Early-Century</td>
-                                                    <td className='border'>2030</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className='border'>Mid-Century</td>
-                                                    <td className='border'>2050</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className='border'>End-Century</td>
-                                                    <td className='border'>2100</td>
-                                                </tr>
-                                            </table>
-
-                                        <section className='font-bold'>Understanding the Bivariate Legend</section>
-
-                                        <p>
-                                            The legend combines two variables into a single visualization. Rather than displaying only hazard intensity or only exposure,
-                                            the map simultaneously shows both dimensions so users can quickly identify where high hazards overlap with high concentrations
-                                            of exposed assets.
-                                        </p>
-
-                                        <p>In the example shown:</p>
-
-                                        <ul className='list-disc pl-5 space-y-1'>
-                                            <li>The <b>vertical axis</b> represents <b>Population Exposure</b> (low to high).</li>
-                                            <li>The <b>horizontal axis</b> represents <b>Flood Height</b> (low to high).</li>
-                                            <li>
-                                                Each grid cell on the map is colored based on the combination of these two variables.
-                                            </li>
-                                        </ul>
-
-                                        <p>The legend can be interpreted as follows:</p>
-
-                                        <table className='border'>
-                                                <tr className='border'>
-                                                    <th className='border text-center bg-(--primarygray-10)'><b>Legend Category</b></th>
-                                                    <th className='border text-center bg-(--primarygray-10)'><b>Meaning</b></th>
-                                                </tr>
-                                                <tr>
-                                                    <td className='border'>Low Hazard + Low Exposure</td>
-                                                    <td className='border'>Areas where flood levels and exposed populations are both relatively low.</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className='border'>High Hazard + Low Exposure</td>
-                                                    <td className='border'>Areas with severe flooding but relatively few people exposed.</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className='border'>Low Hazard + High Exposure</td>
-                                                    <td className='border'>Areas with large populations but relatively lower flood intensity.</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className='border'>High Hazard + High Exposure</td>
-                                                    <td className='border'>Areas where severe flooding coincides with large exposed populations,
-                                                representing potential risk hotspots.</td>
-                                                </tr>
-                                            </table>
-                                        <p>
-                                            The color gradient helps users distinguish between these combinations at a glance. Areas that appear in the most
-                                            intense colors represent locations where both hazard levels and exposure levels are relatively high, making them
-                                            important areas for further analysis and resilience planning.
-                                        </p>
-
-                                        <p>
-                                            <b>Read More</b> for additional information on the methodology and data sources behind this analysis.
-                                        </p>
-                                    </div>
-                                </div>
-                                :
-                                null
-                            }
-                        </div>
-                    </div>
-                </div>
-            </div>
-            :
-            null}
-            <div className='flex flex-col items-center justify-center h-14.75 w-15.25 absolute top-20 right-3 gap-y-1 cursor-pointer bg-(--accentdarkblue-80) rounded-sm' onClick={() => {setDataExplainerState(true)}}>
+            <div className='flex flex-col items-center justify-center -z-1 xl:z-3 h-14.75 w-15.25 absolute top-20 2xl:top-1 right-3 gap-y-1 cursor-pointer bg-(--accentdarkblue-80) rounded-sm' onClick={() => {actions?.setDataExplainerState(true)}}>
                 <img src={DataIcon} width={15}></img>
                 <span className='font-bold text-white text-xs text-base/5'>Data Explainer</span>
             </div>

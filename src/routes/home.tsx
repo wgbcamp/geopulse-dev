@@ -2,11 +2,12 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { GlobeIcon } from '../assets/GlobeIcon'
 import { ArrowRight } from '../assets/arrow-right'
-import { ChevronRight } from '../assets/chevron-right'
-import { TopoBackground } from '../components/TopoBackground'
+{/* arrowRight needs to be chevronRight, line 257 at time of comment */}
+// import { ChevronRight } from '../assets/chevron-right'
+import MenuBackground from '../assets/hero-bg.jpg'
 import globeExtrusions from '../assets/globeExtrusions high.webp'
 import trackPreview from '../assets/trackPreview.png'
-import seePreview from '../assets/anticipatePreview.jpg'
+import seePreview from '../assets/seePreview.jpg'
 import estimatePreview from '../assets/estimatePreview.jpg'
 import exportable from '../assets/exportable.svg'
 import downloadable from '../assets/downloadable.svg'
@@ -187,16 +188,13 @@ function RouteComponent() {
     // highlight: true only while a card owns the hero, so the resting state dims nothing
     const highlighting = cycleCategories.includes(activeCategory)
 
-    {/* `relative isolate` bounds the contour background to this page and keeps it behind every
-        section; sections with their own image or colour (cars, footer…) simply cover it. */}
-    return <div className='relative isolate bg-white'>
-        <TopoBackground />
+    return <div >
         {/* At xl the hero is exactly one screen tall with its text + cards centered as one group, as on
             earthgenome.org. xl:pt-28 clears the fixed header (its bottom edge sits ~106px down on /home);
             the globe is absolute, so it stays out of the flow being centered. */}
-        <div className='relative overflow-hidden pt-30 pb-16 flex flex-col justify-start items-center xl:min-h-svh xl:pt-28 xl:pb-10 xl:justify-center xl:items-start w-full'>
+        <div className='relative overflow-hidden pt-30 pb-16 flex flex-col justify-start items-center xl:min-h-svh xl:pt-28 xl:pb-10 xl:justify-center xl:items-start w-full bg-fixed bg-cover' style={{ backgroundImage: `url(${MenuBackground})`, backgroundPositionY: "bottom 10px"}}>
             <div className='flex justify-center xl:justify-normal xl:pl-15 max-w-200'>
-                <div className='w-9/10 xl:w-5/10 grid text-black xl:text-left z-1'>
+                <div className='w-9/10 xl:w-5/10 grid text-white xl:text-left z-1'>
                     {Object.entries(categoryDetails).map(([key, details]) =>
                         <div
                             key={key}
@@ -257,7 +255,7 @@ function RouteComponent() {
                                 {/* filled disc: bg-current picks up the row's active colour, so the circle
                                     and the title change together; the chevron stays knocked out in white */}
                                 <div className='w-11 h-11 shrink-0 rounded-full bg-current flex items-center justify-center transition-transform duration-300 group-hover:translate-x-1'>
-                                    <ChevronRight color={'white'} />
+                                    <ArrowRight color={'white'} />
                                 </div>
                             </div>
                         </div>
@@ -265,7 +263,7 @@ function RouteComponent() {
                 )}
             </div>
         </div>
-        <div className='w-full flex flex-col items-center'>
+        <div className='w-full flex flex-col items-center bg-white'>
             {overviewCategories.map((e, i) =>
                 <div className={`w-full md:max-w-500 flex items-center ${e.order == "normal" ? 'flex-col md:flex-row' : 'flex-col md:flex-row-reverse'} pt-10 md:pt-0`}>
                     <div className='w-9/10 md:w-5/10 flex flex-col text-left items-center justify-center'>
@@ -279,7 +277,7 @@ function RouteComponent() {
                 </div>
             )}
         </div>
-        <div className='w-full bg-cover py-25 flex flex-col xl:flex-row bg-position-[50%] bg-no-repeat items-center'>
+        <div className='w-full bg-cover py-25 flex flex-col xl:flex-row bg-position-[50%] bg-no-repeat items-center' style={{ backgroundImage: `url(${whiteGeo})` }}>
             <div className='flex w-full justify-center'>
                 <span className='w-9/10 tracking-[-1.2px] leading-[100%] font-bold text-[50px] md:text-[80px] max-w-250'>Built to be Used, Cited & Trusted</span>
             </div>
@@ -307,22 +305,23 @@ function RouteComponent() {
             </div>
         </div>
         <div
-            className='w-full bg-cover py-16 flex flex-col items-center'
+            className='w-full bg-cover pt-16 flex flex-col items-center'
             style={{
                 backgroundImage: `url(${carsBackground})`,
             }}
         >
-            <div className='leading-[100%] tracking-[-0.34px] font-bold text-[60px] w-9/10 text-white pb-7.5'>
+            <div className='leading-[100%] tracking-[-0.34px] font-bold text-[60px] w-9/10 pb-7 text-white '>
                 Advancing Global Data Standards
             </div>
             <span className='leading-[140%] text-[20px] text-center text-white w-9/10 max-w-220 pb-10'>The G20 Data Gaps Initiative (DGI‑3) sets out 14 recommendations across four statistical areas. GeoPulse addresses <b>Recommendation 5 — climate physical and transition risks</b> — bringing IMF‑generated indicators into a consistent, accessible format for surveillance and policy analysis.</span>
             {externalButton('bg-white', 'text-(--accentdarkblue-90)', 'About the Data Gaps Initiative', <ArrowRight color={'var(--accentdarkblue-90)'} />, 'https://www.imf.org/en/news/seminars/conferences/g20-data-gaps-initiative')}
-        </div>
-        <div className='w-full flex justify-center items-center py-25 bg-(--accentdarkblue-100)'>
-            <div className='flex flex-col items-center gap-9.25'>
-                <img src={IMFLogo}></img>
-                <span className='text-white font-bold leading-[140%]'>© 2026 INTERNATIONAL MONETARY FUND. ALL RIGHTS RESERVED | <u>Privacy Policy</u> | <u>Copyright & Usage</u></span>
+            <div className='w-full flex justify-center items-center py-25'>
+                <div className='flex w-9/10 flex-col items-center gap-9.25'>
+                    <img src={IMFLogo}></img>
+                    <span className='text-white font-bold leading-[140%]'>© 2026 INTERNATIONAL MONETARY FUND. ALL RIGHTS RESERVED | <u>Privacy Policy</u> | <u>Copyright & Usage</u></span>
+                </div>
             </div>
         </div>
+        
     </div>
 }

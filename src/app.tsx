@@ -1,7 +1,7 @@
 // import the generated route tree
 import { routeTree } from './routeTree.gen'
 import { RouterProvider, createRouter, createHashHistory } from '@tanstack/react-router'
-import { createContext, useState, useMemo, type Dispatch, type SetStateAction } from 'react'
+import { createContext, useState, type Dispatch, type SetStateAction } from 'react'
 import { type DateRange } from "react-day-picker"
 
 // create a new router instance
@@ -35,6 +35,8 @@ type AppState = {
   eventFilter: string
   countryFilter: string
   countryCoordinates: Coordinates
+  dataExplainerOpen: boolean
+  dataExplainerView: string
 }
 
 // this object sets types for the set state actions
@@ -50,6 +52,8 @@ type AppActions = {
   setEventFilter: Dispatch<SetStateAction<string>>
   setCountryFilter: Dispatch<SetStateAction<string>>
   setCountryCoordinates: Dispatch<SetStateAction<Coordinates>>
+  setDataExplainerState: Dispatch<SetStateAction<boolean>>
+  setDataExplainerView: Dispatch<SetStateAction<string>>
 }
 
 // create context for state values and set state actions
@@ -75,16 +79,18 @@ export function App() {
   const [eventFilter, setEventFilter] = useState<string>("AL")
   const [countryFilter, setCountryFilter] = useState<string>("All countries")
   const [countryCoordinates, setCountryCoordinates] = useState<Coordinates>({ longitude: 42.55108741, latitude: 1.57672606 })
+  const [dataExplainerOpen, setDataExplainerState] = useState(false);
+  const [dataExplainerView, setDataExplainerView] = useState("Event Tracking");
 
   const state = {
     currentView, currentTime, currentScenario, currentHazard,
     currentExposure, currentMeasure, currentThreshold, dateRange,
-    eventFilter, countryFilter, countryCoordinates
+    eventFilter, countryFilter, countryCoordinates, dataExplainerOpen, dataExplainerView
   };
 
   const actions = {
     setView, setTime, setScenario, setHazard, setExposure, setMeasure, setThreshold,
-    setDateRange, setEventFilter, setCountryFilter, setCountryCoordinates
+    setDateRange, setEventFilter, setCountryFilter, setCountryCoordinates, setDataExplainerState, setDataExplainerView
   };
 
 
