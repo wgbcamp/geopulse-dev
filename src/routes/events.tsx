@@ -448,6 +448,12 @@ function Events() {
         };
     }
 
+    // Arcade expression returning min + [0, range) from a hash of the feature's location
+    const pulseRandom = (seed: number, min: number, range: number) => `
+        var g = Geometry($feature);
+        var h = Abs(Sin(g.x * 12.9898 + g.y * 78.233 + ${seed}) * 43758.5453);
+        return ${min} + (h - Floor(h)) * ${range};`;
+
     const eventColor = (value: string) => {
         let x;
         switch (value) {
@@ -489,14 +495,16 @@ function Events() {
                             returnType: "Default",
                         },
                     },
-                    // per-feature random timing so markers don't pulse in unison
+                    // per-feature pseudo-random timing so markers don't pulse in unison;
+                    // seeded from the point location (not Random()) so the scale and
+                    // transparency animations always get identical values and stay in sync
                     {
                         type: "CIMPrimitiveOverride",
                         primitiveName: "animationOverride",
                         propertyName: "StartTimeOffset",
                         valueExpressionInfo: {
                             type: "CIMExpressionInfo",
-                            expression: "return Random() * 3;",
+                            expression: pulseRandom(1, 0, 3),
                             returnType: "Numeric",
                         },
                     },
@@ -506,7 +514,7 @@ function Events() {
                         propertyName: "Duration",
                         valueExpressionInfo: {
                             type: "CIMExpressionInfo",
-                            expression: "return 1.4 + Random() * 1;",
+                            expression: pulseRandom(2, 1.4, 1),
                             returnType: "Numeric",
                         },
                     },
@@ -516,7 +524,7 @@ function Events() {
                         propertyName: "RepeatDelay",
                         valueExpressionInfo: {
                             type: "CIMExpressionInfo",
-                            expression: "return 0.5 + Random() * 2;",
+                            expression: pulseRandom(3, 0.5, 2),
                             returnType: "Numeric",
                         },
                     },
@@ -536,7 +544,6 @@ function Events() {
                                         type: "CIMAnimatedSymbolProperties",
                                         primitiveName: "animationOverride",
                                         playAnimation: true,
-                                        randomizeStartTime: true,
                                         repeatType: "Loop",
                                         repeatDelay: 1,
                                         duration: 1.8,
@@ -550,7 +557,6 @@ function Events() {
                                         type: "CIMAnimatedSymbolProperties",
                                         primitiveName: "animationOverride",
                                         playAnimation: true,
-                                        randomizeStartTime: true,
                                         repeatType: "Loop",
                                         repeatDelay: 1,
                                         duration: 1.8,

@@ -23,6 +23,5 @@ package-lock.json
 *.njsproj
 *.sln
 *.sw?
-.env
 .tanstack
 *.tsbuildinfo
