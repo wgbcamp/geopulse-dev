@@ -200,8 +200,17 @@ export function TopoBackground({ className = '' }: { className?: string }) {
             strokeLinecap='round'
             strokeLinejoin='round'
         >
+            <defs>
+                {/* soft light wash that fades the lines toward the middle of the page */}
+                <radialGradient id='topoWash' cx='50%' cy='35%' r='75%'>
+                    <stop offset='0%' stopColor='#fff' stopOpacity={0.85} />
+                    <stop offset='55%' stopColor='#fff' stopOpacity={0.25} />
+                    <stop offset='100%' stopColor='#fff' stopOpacity={0} />
+                </radialGradient>
+            </defs>
             <path ref={minorRef} stroke='#cdd1d5' strokeWidth={1} />
             <path ref={majorRef} stroke='#b6bcc3' strokeWidth={1.1} />
+            <rect width='100%' height='100%' fill='url(#topoWash)' />
         </svg>
     )
 }
