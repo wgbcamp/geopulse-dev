@@ -2,7 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { GlobeIcon } from '../assets/GlobeIcon'
 import { ArrowRight } from '../assets/arrow-right'
-{/* arrowRight needs to be chevronRight, line 257 at time of comment */}
+{/* arrowRight needs to be chevronRight, line 257 at time of comment */ }
 // import { ChevronRight } from '../assets/chevron-right'
 import { TopoBackground } from '../components/TopoBackground'
 import globeExtrusions from '../assets/globeExtrusions high.webp'
@@ -19,7 +19,7 @@ import IMFLogo from '../assets/IMF-logo 1.png'
 import type { ReactElement } from 'react'
 
 export const Route = createFileRoute('/home')({
-  component: RouteComponent,
+    component: RouteComponent,
 })
 
 // Hero type scales with screen *height* at xl (the way earthgenome.org sizes its hero), so the whole
@@ -27,7 +27,7 @@ export const Route = createFileRoute('/home')({
 // Below xl it keeps fixed sizes, since phones and tablets scroll the hero rather than fit it.
 // The title's slope is steeper than a plain svh value (≈45px at 630 tall, ≈70px at 860, ≈87px at
 // 1020) so short screens give up the most size while 13"–16" laptops barely change.
-const heroTitle = 'font-bold text-[60px] xl:text-[clamp(40px,calc(10.9svh_-_24px),88px)] leading-none tracking-[-1.816px]'
+const heroTitle = 'font-bold text-[40px] xl:text-[clamp(40px,calc(10.9svh_-_24px),88px)] leading-none tracking-[-1.816px]'
 const heroSubtitle = 'tracking-[-1.089px] text-[16px] md:text-[29px] xl:text-[clamp(17px,2.8svh,28px)]'
 
 const categoryDetails: Record<string, { title: ReactElement, subtitle?: ReactElement }> = {
@@ -195,116 +195,123 @@ function RouteComponent() {
         {/* At xl the hero is exactly one screen tall with its text + cards centered as one group, as on
             earthgenome.org. xl:pt-28 clears the fixed header (its bottom edge sits ~106px down on /home);
             the globe is absolute, so it stays out of the flow being centered. */}
-        <div className='relative overflow-hidden pt-30 pb-16 flex flex-col justify-start items-center xl:min-h-svh xl:pt-28 xl:pb-10 xl:justify-center xl:items-start w-full'>
-            <div className='flex justify-center xl:justify-normal xl:pl-15 max-w-200'>
-                <div className='w-9/10 xl:w-5/10 grid text-black xl:text-left z-1'>
-                    {Object.entries(categoryDetails).map(([key, details]) =>
-                        <div
-                            key={key}
-                            aria-hidden={key !== activeCategory}
-                            className={`col-start-1 row-start-1 flex flex-col gap-3 xl:gap-5 transition-opacity duration-700 ease-in-out
-                                ${/* gap: the title sets leading-none, so title and subtitle otherwise touch */ ''}
-                                ${key === activeCategory ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-                        >
-                            {details.title}
-                            {details.subtitle}
-                        </div>
-                    )}
-                </div>
-            </div>
-            {/* At xl the globe is sized by screen height, like earthgenome's calc(100svh - 10rem) globe, so it
-                keeps the same composition on every laptop instead of a fixed 2040px crop. The image is
-                4070x3036 with the sphere filling ~81% of its height and ending ~21% short of its right
-                edge — the right offset parks the sphere's edge just inside the viewport and lets the
-                extrusions bleed off. */}
-            <img className='absolute top-90 w-300 max-w-none xl:top-1/2 xl:-translate-y-1/2 xl:h-[105svh] xl:w-auto xl:right-[calc(2rem-30svh)]' src={globeExtrusions}></img>
-            <div
-                className="relative grid md:grid-cols-2 xl:grid-cols-3 justify-center w-fit gap-5 z-1 md:mt-90 xl:mt-[clamp(1.5rem,5svh,3.5rem)] xl:pl-15"
-                onMouseLeave={() => {
-                    setHovering(false)
-                    setActiveCategory(mainCategory)
-                }}
-            >
-                {cardDetails.map((e, i) =>
-                    <Link
-                        key={i}
-                        to={e.link}
-                        activeOptions={{ exact: true }}
-                        className={`group relative overflow-hidden flex w-70 min-h-32 rounded-[6px] shadow-[0_8px_16px_0_rgba(0,0,0,0.14)] bg-white p-5 flex-col justify-between items-start cursor-pointer
-                            ${/* highlight: dim the cards that are not active — delete this line to remove */ ''}
-                            transition-opacity duration-500 ${!highlighting || e.category === activeCategory ? 'opacity-100' : 'opacity-60'}`}
-                        onMouseEnter={() => {
-                            setHovering(true)
-                            setActiveCategory(e.category)
+        <div className='flex justify-center'>
+            <div className='w-92/100 max-w-500 2xl:h-200 absolute overflow-hidden top-40 pb-16 grid grid-cols-1 lg:grid-cols-[0.5fr_1fr]'>
+                    <div className='col-span-full flex flex-col gap-y-10 2xl:justify-between'>
+                    <div className='lg:w-auto max-w-120 lg:max-w-100 grid text-black text-left z-1'>
+                        {Object.entries(categoryDetails).map(([key, details]) =>
+                            <div
+                                key={key}
+                                aria-hidden={key !== activeCategory}
+                                className={`col-start-1 row-start-1 flex flex-col gap-3 xl:gap-5 transition-opacity duration-200 ease-in-out
+                                    ${/* gap: the title sets leading-none, so title and subtitle otherwise touch */ ''}
+                                    ${key === activeCategory ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                            >
+                                {details.title}
+                                {details.subtitle}
+                            </div>
+                        )}
+                    </div>
+                    <div
+                        className="relative col-span-full flex flex-col lg:flex-row  justify-center w-fit gap-5 z-10"
+                        onMouseLeave={() => {
+                            setHovering(false)
+                            setActiveCategory(mainCategory)
                         }}
                     >
-                        {/* --- highlight: countdown bar showing how long this card holds the hero.
-                            Delete this block (and the `relative overflow-hidden` above) to remove. --- */}
-                        {e.category === activeCategory && !hovering &&
-                            <span
-                                key={activeCategory}
-                                className='absolute inset-x-0 top-0 h-1 origin-left bg-(--accentblue-100)'
-                                style={{ animation: `cardCountdown ${rotationMs}ms linear forwards` }}
-                            />
-                        }
-                        {/* --- end countdown bar --- */}
-                        <div className='flex flex-col w-full justify-between h-full'>
-                            <div className='w-full flex justify-end'>
-                                <div className={`font-bold transition-colors duration-700 ${e.category == activeCategory ? 'text-(--accentblue-100)' : 'text-black'}`}>{e.misc}</div>
-                            </div>
-                            {/* Title + arrow. The arrow closes the diagonal with the badge and marks the card as navigable. */}
-                            <div className={`w-full flex items-center justify-between gap-3 transition-colors duration-700 ${e.category == activeCategory ? 'text-(--accentblue-100)' : 'text-black'}`}>
-                                <span className='text-left uppercase font-bold leading-[110%] tracking-[-0.2px] text-[18px]'>{e.title}</span>
-                                {/* filled disc: bg-current picks up the row's active colour, so the circle
-                                    and the title change together; the chevron stays knocked out in white */}
-                                <div className='w-11 h-11 shrink-0 rounded-full bg-current flex items-center justify-center transition-transform duration-300 group-hover:translate-x-1'>
-                                    <ArrowRight color={'white'} />
+                        {cardDetails.map((e, i) =>
+                            <Link
+                                key={i}
+                                to={e.link}
+                                activeOptions={{ exact: true }}
+                                className={`relative overflow-hidden flex w-70 min-h-32 border border-[#A7A7A7] rounded-[6px] shadow-[0_8px_16px_0_rgba(0,0,0,0.14)] bg-white p-5 flex-col justify-between items-start cursor-pointer
+                                ${/* highlight: dim the cards that are not active — delete this line to remove */ ''}
+                                transition-opacity duration-500 ${!highlighting || e.category === activeCategory ? 'opacity-100' : 'opacity-60'}`}
+                                onMouseEnter={() => {
+                                    setHovering(true)
+                                    setActiveCategory(e.category)
+                                }}
+                            >
+                                {/* --- highlight: countdown bar showing how long this card holds the hero.
+                                Delete this block (and the `relative overflow-hidden` above) to remove. --- */}
+                                {e.category === activeCategory && !hovering &&
+                                    <span
+                                        key={activeCategory}
+                                        className='absolute inset-x-0 top-0 h-1 origin-left bg-(--accentblue-100)'
+                                        style={{ animation: `cardCountdown ${rotationMs}ms linear forwards` }}
+                                    />
+                                }
+                                {/* --- end countdown bar --- */}
+                                <div className='flex flex-col w-full justify-between h-full'>
+                                    <div className='w-full flex justify-end'>
+                                        <div className={`font-bold transition-colors duration-700 ${e.category == activeCategory ? 'text-(--accentblue-100)' : 'text-black'}`}>{e.misc}</div>
+                                    </div>
+                                    {/* Title + arrow. The arrow closes the diagonal with the badge and marks the card as navigable. */}
+                                    <div className={`w-full flex items-center justify-between gap-3 transition-colors duration-700 ${e.category == activeCategory ? 'text-(--accentblue-100)' : 'text-black'}`}>
+                                        <span className='text-left uppercase font-bold leading-[110%] tracking-[-0.2px] text-[18px]'>{e.title}</span>
+                                        {/* filled disc: bg-current picks up the row's active colour, so the circle
+                                        and the title change together; the chevron stays knocked out in white */}
+                                        <div className='w-11 h-11 shrink-0 rounded-full bg-current flex items-center justify-center transition-transform duration-300 group-hover:translate-x-1'>
+                                            <ArrowRight color={'white'} />
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    </Link>
-                )}
+                            </Link>
+                        )}
+                    </div>
+                    
+                </div>
+            </div>
+            <div className='w-92/100 max-w-500 h-320 lg:h-auto relative overflow-hidden pt-20 pb-16 grid grid-cols-1 md:grid-cols-[40%_1fr] grid-rows-[1fr] lg:grid-rows-[1fr_150px] justify-start items-center'>
+            
+                {/* At xl the globe is sized by screen height, like earthgenome's calc(100svh - 10rem) globe, so it
+                    keeps the same composition on every laptop instead of a fixed 2040px crop. The image is
+                    4070x3036 with the sphere filling ~81% of its height and ending ~21% short of its right
+                    edge — the right offset parks the sphere's edge just inside the viewport and lets the
+                    extrusions bleed off. */}
+                <img className='col-start-2 row-start-2 md:row-start-1' src={globeExtrusions}></img>
             </div>
         </div>
-        <div className='w-full flex flex-col items-center'>
+        <div className='w-full flex flex-col items-center pt-15'>
             {overviewCategories.map((e, i) =>
                 <div className={`w-full md:max-w-500 flex items-center ${e.order == "normal" ? 'flex-col md:flex-row' : 'flex-col md:flex-row-reverse'} pt-10 md:pt-0`}>
                     <div className='w-9/10 md:w-5/10 flex flex-col text-left items-center justify-center'>
-                        <div className='lg:w-5/10 flex flex-col gap-y-5 justify-start items-start'>
-                            <div className='max-w-90 font-bold text-[80px] tracking-[-1.2px] leading-[100%]'>{e.title}</div>
+                        <div className='lg:w-7/10 flex flex-col gap-y-5 justify-start items-start'>
+                            <div className='font-bold text-[40px] md:text-[4cqw] tracking-[-1.2px] leading-[100%]'>{e.title}</div>
                             {e.description}
-                            {mapButton('bg-(--accentdarkblue-90)', 'text-white', <GlobeIcon color={'var(--primarywhite)'}/>, <ArrowRight color={'var(--primarywhite)'}/>, e.link)}
+                            {mapButton('bg-(--accentdarkblue-90)', 'text-white', <GlobeIcon color={'var(--primarywhite)'} />, <ArrowRight color={'var(--primarywhite)'} />, e.link)}
                         </div>
                     </div>
                     <img className='pt-10 md:pt-0 md:w-5/10' src={e.picture}></img>
                 </div>
             )}
         </div>
+
         <div className='w-full bg-cover py-25 flex flex-col xl:flex-row bg-position-[50%] bg-no-repeat items-center'>
             <div className='flex w-full justify-center'>
-                <span className='w-9/10 tracking-[-1.2px] leading-[100%] font-bold text-[50px] md:text-[80px] max-w-250'>Built to be Used, Cited & Trusted</span>
+                <span className='w-9/10 tracking-[-1.2px] leading-[100%] font-bold text-[50px] md:text-[60px] max-w-250'>Built to be Used, Cited & Trusted</span>
             </div>
             <div className='flex w-full justify-center items-center'>
-                    <div className='grid grid-cols-1 grid-rows-1 md:grid-cols-2 gap-10 md:gap-10 py-10 w-9/10'>
-                        <div className='grid grid-cols-1 grid-rows-2 gap-10 h-140'>
-                            {featureCategories.filter((i) => i.position < 2).map((e, i) =>
-                                <div className={`flex p-10 flex-col items-start gap-4 rounded-[6px] border-[0.5px] bg-white shadow-[0_10px_14px_0_rgba(0,0,0,0.12)] text-left`}>
-                                    <img src={e.icon}></img>
-                                    <span className='text-[24px] font-bold leading-[120%]'>{e.title}</span>
-                                    <span className='text-[16px] leading-[140%]'>{e.subtitle}</span>
-                                </div>
-                            )}
-                        </div>
-                        <div className='grid grid-cols-1 grid-rows-2 gap-10 md:mt-20 h-140'>
-                            {featureCategories.filter((i) => i.position > 1).map((e, i) =>
-                                <div className={`flex p-10 flex-col items-start gap-4 rounded-[6px] border-[0.5px] bg-white shadow-[0_10px_14px_0_rgba(0,0,0,0.12)] text-left`}>
-                                    <img src={e.icon}></img>
-                                    <span className='text-[24px] font-bold leading-[120%]'>{e.title}</span>
-                                    <span className='text-[16px] leading-[140%]'>{e.subtitle}</span>
-                                </div>
-                            )}
-                        </div>
+                <div className='grid grid-cols-1 grid-rows-1 md:grid-cols-2 gap-10 md:gap-10 py-10 w-9/10'>
+                    <div className='grid grid-cols-1 grid-rows-2 gap-10 h-140'>
+                        {featureCategories.filter((i) => i.position < 2).map((e, i) =>
+                            <div className={`flex p-10 flex-col items-start gap-4 rounded-[6px] border-[0.5px] bg-white shadow-[0_10px_14px_0_rgba(0,0,0,0.12)] text-left`}>
+                                <img src={e.icon}></img>
+                                <span className='text-[24px] font-bold leading-[120%]'>{e.title}</span>
+                                <span className='text-[16px] leading-[140%]'>{e.subtitle}</span>
+                            </div>
+                        )}
                     </div>
+                    <div className='grid grid-cols-1 grid-rows-2 gap-10 md:mt-20 h-140'>
+                        {featureCategories.filter((i) => i.position > 1).map((e, i) =>
+                            <div className={`flex p-10 flex-col items-start gap-4 rounded-[6px] border-[0.5px] bg-white shadow-[0_10px_14px_0_rgba(0,0,0,0.12)] text-left`}>
+                                <img src={e.icon}></img>
+                                <span className='text-[24px] font-bold leading-[120%]'>{e.title}</span>
+                                <span className='text-[16px] leading-[140%]'>{e.subtitle}</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
         </div>
         <div
@@ -325,6 +332,6 @@ function RouteComponent() {
                 </div>
             </div>
         </div>
-        
+
     </div>
 }
