@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { GlobeIcon } from '../assets/GlobeIcon'
 import { ArrowRight } from '../assets/arrow-right'
 {/* arrowRight needs to be chevronRight, line 257 at time of comment */ }
@@ -17,6 +17,17 @@ import whiteGeo from '../assets/white-geo.jpg'
 import carsBackground from '../assets/cars-bg.jpg'
 import IMFLogo from '../assets/IMF-logo 1.png'
 import type { ReactElement } from 'react'
+import { useRef, useEffect } from 'react'
+
+import FeatureLayer from "@arcgis/core/layers/FeatureLayer.js";
+import Map from "@arcgis/core/Map.js";
+import SceneView from "@arcgis/core/views/SceneView.js";
+import SimpleRenderer from "@arcgis/core/renderers/SimpleRenderer";
+import PointSymbol3D from "@arcgis/core/symbols/PointSymbol3D.js";
+import ObjectSymbol3DLayer from "@arcgis/core/symbols/ObjectSymbol3DLayer.js";
+import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
+import Legend from "@arcgis/core/widgets/Legend.js";
+import Layer from "@arcgis/core/layers/Layer.js";
 
 export const Route = createFileRoute('/home')({
     component: RouteComponent,
@@ -161,11 +172,194 @@ const featureCategories: { icon: string, title: string, subtitle: string, positi
         position: 3
     }
 ]
-
+const stops = [
+    {
+        value: 0,
+        size: 100000,
+        color: "#FFFFE1"
+    },
+    {
+        value: 400000,
+        size: 250000,
+        color: "#F3758C"
+    },
+    {
+        value: 7000000,
+        size: 1500000,
+        color: "#7D2898"
+    },
+    {
+        value: 30000000,
+        size: 3500000,
+        color: "#4C1E6E"
+    }
+];
 function RouteComponent() {
+
+    const ref = useRef(null);
+    let map = useRef<Map | null>(null);
+    const view = useRef<SceneView>(new SceneView);
+
+    const graticule = new FeatureLayer({
+        url: "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/World_graticule_15deg/FeatureServer",
+        opacity: 0.6,
+        legendEnabled: false
+    });
+
+    useEffect(() => {
+        if (ref.current) {
+            map.current = new Map({
+                layers: [graticule],
+                ground: {
+                    surfaceColor: "#eaf2ff"
+                }
+            });
+
+            view.current = new SceneView({
+                map: map.current,
+                container: ref.current,
+                camera: {
+                    position: {
+                        spatialReference: {
+                            latestWkid: 4326,
+                            wkid: 4326
+                        },
+                        x: 50.34885653510194,
+                        y: 18.68409306191745,
+                        z: 19134228.85529455
+                    },
+                    heading: 0,
+                    tilt: 0.1
+                },
+                alphaCompositingEnabled: true,
+                environment: {
+                    background: {
+                        type: "color",
+                        color: [0, 0, 0, 0]
+                    },
+                    atmosphereEnabled: false,
+                    starsEnabled: false,
+                    lighting: {
+                        type: "virtual",
+                    }
+                }
+            });
+            view.current.ui.empty("top-left");
+            // window.view = view;
+
+            // create 5 population layers, one for each year
+            for (let i = 2000; i <= 2020; i += 5) {
+                const layer = new FeatureLayer({
+                    url: "https://services2.arcgis.com/cFEFS0EWrhfDeVw9/arcgis/rest/services/World_population/FeatureServer",
+                    opacity: 0,
+                    outFields: ["*"],
+                    renderer: getRenderer(i),
+                    title: "Population " + i.toString(),
+                    legendEnabled: false
+                });
+                map.current?.layers.push(layer);
+            }
+
+
+            // generates a renderer based on the year attribute
+            function getRenderer(year: number) {
+                return new SimpleRenderer({
+                    symbol: new PointSymbol3D({
+                        symbolLayers: [new ObjectSymbol3DLayer({
+                            resource: {
+                                primitive: "cube"
+                            },
+                            anchor: "bottom",
+                            width: 80000
+                        })]
+                    }),
+                    visualVariables: [{
+                        type: "color",
+                        field: "pop" + year,
+                        stops: stops,
+                        legendOptions: {
+                            title: "Number of persons/grid unit"
+                        }
+                    }, {
+                        type: "size",
+                        field: "pop" + year,
+                        stops: stops,
+                        axis: "height",
+                        legendOptions: {
+                            showLegend: false
+                        }
+                    }, {
+                        type: "size",
+                        axis: "width-and-depth",
+                        useSymbolValue: true, // uses the width value defined in the symbol layer (80,000)
+                        legendOptions: {
+                            showLegend: false
+                        }
+                    }]
+                });
+            }
+
+            // utility function to get the layer currently displayed
+            function getCurrentLayer() {
+                const layer = map.current?.layers.find(function (layer) {
+                    return (layer.title === "Population " + currentYear);
+                });
+                return layer as any;
+            }
+
+            let popLayerView: any;
+            let oldLayer;
+            let currentHighlight = null;
+            let currentYear = 2000;
+            let currentLayer = getCurrentLayer();
+            const loader: any = document.getElementById("loader");
+
+            view.current.whenLayerView(currentLayer)
+                .then(function (lyrView) {
+                    popLayerView = lyrView;
+                    reactiveUtils.whenOnce(() => !popLayerView.updating).then(() => {
+                        fadeIn(currentLayer);
+                        currentLayer.legendEnabled = true;
+                        ref.current.style.opacity = 1;
+                    });
+                });
+
+            function fadeIn(layer: any) {
+                const opacity = parseFloat((layer.opacity + 0.2).toFixed(2));
+                layer.opacity = opacity;
+                if (layer.opacity < 1) {
+                    window.requestAnimationFrame(function () {
+                        fadeIn(layer);
+                    });
+                }
+            }
+
+            function rotateGlobe() {
+                if (!view.current.interacting) {
+                    const camera = view.current.camera.clone();
+                    camera.position.longitude += 0.1;
+                    view.current.camera = camera;
+                }
+                requestAnimationFrame(rotateGlobe);
+            }
+
+            view.current.when(() => {
+                rotateGlobe();
+            });
+        }
+
+
+
+        return () => {
+            // view.current.destroy();
+
+        }
+    }, []);
+
+
+
     const [activeCategory, setActiveCategory] = useState<string>(mainCategory)
     const [hovering, setHovering] = useState(false)
-
     // While the pointer is on a card the user is driving; otherwise the hero rests on the main
     // entry, and after idleMs walks the cards once before settling back on it.
     useEffect(() => {
@@ -187,151 +381,142 @@ function RouteComponent() {
 
     // highlight: true only while a card owns the hero, so the resting state dims nothing
     const highlighting = cycleCategories.includes(activeCategory)
+    return (
 
-    {/* `relative isolate` bounds the contour background to this page and keeps it behind every
-        section; sections with their own image or colour (cars, footer…) simply cover it. */}
-    return <div className='relative isolate bg-white'>
-        <TopoBackground />
-        {/* At xl the hero is exactly one screen tall with its text + cards centered as one group, as on
-            earthgenome.org. xl:pt-28 clears the fixed header (its bottom edge sits ~106px down on /home);
-            the globe is absolute, so it stays out of the flow being centered. */}
-        <div className='flex justify-center'>
-            <div className='w-92/100 max-w-500 2xl:h-200 absolute overflow-hidden top-40 pb-16 grid grid-cols-1 lg:grid-cols-[0.5fr_1fr]'>
-                    <div className='col-span-full flex flex-col gap-y-10 2xl:justify-between'>
-                    <div className='lg:w-auto max-w-120 lg:max-w-100 grid text-black text-left z-1'>
-                        {Object.entries(categoryDetails).map(([key, details]) =>
-                            <div
-                                key={key}
-                                aria-hidden={key !== activeCategory}
-                                className={`col-start-1 row-start-1 flex flex-col gap-3 xl:gap-5 transition-opacity duration-200 ease-in-out
+        <div className='relative isolate bg-white'>
+            <TopoBackground />
+            <div className='flex justify-center'>
+                <div className='w-92/100 max-w-500 2xl:h-210 absolute overflow-hidden top-40 pb-16 grid grid-cols-1 lg:grid-cols-[0.5fr_1fr]'>
+                    <div className='col-span-full flex flex-col gap-y-10 lg:gap-y-30 2xl:justify-between'>
+                        <div className='lg:w-auto max-w-120 lg:max-w-100 grid text-black text-left z-1'>
+                            {Object.entries(categoryDetails).map(([key, details]) =>
+                                <div
+                                    key={key}
+                                    aria-hidden={key !== activeCategory}
+                                    className={`md:max-w-80 lg:max-w-120 2xl:max-w-max col-start-1 row-start-1 flex flex-col gap-3 xl:gap-5 transition-opacity duration-200 ease-in-out
                                     ${/* gap: the title sets leading-none, so title and subtitle otherwise touch */ ''}
                                     ${key === activeCategory ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-                            >
-                                {details.title}
-                                {details.subtitle}
-                            </div>
-                        )}
-                    </div>
-                    <div
-                        className="relative col-span-full flex flex-col lg:flex-row  justify-center w-fit gap-5 z-10"
-                        onMouseLeave={() => {
-                            setHovering(false)
-                            setActiveCategory(mainCategory)
-                        }}
-                    >
-                        {cardDetails.map((e, i) =>
-                            <Link
-                                key={i}
-                                to={e.link}
-                                activeOptions={{ exact: true }}
-                                className={`relative overflow-hidden flex w-70 min-h-32 border border-[#A7A7A7] rounded-[6px] shadow-[0_8px_16px_0_rgba(0,0,0,0.14)] bg-white p-5 flex-col justify-between items-start cursor-pointer
+                                >
+                                    {details.title}
+                                    {details.subtitle}
+                                </div>
+                            )}
+                        </div>
+                        <div
+                            className="relative col-span-full flex flex-col lg:flex-row  justify-center w-fit gap-5 z-10"
+                            onMouseLeave={() => {
+                                setHovering(false)
+                                setActiveCategory(mainCategory)
+                            }}
+                        >
+                            {cardDetails.map((e, i) =>
+                                <Link
+                                    key={i}
+                                    to={e.link}
+                                    activeOptions={{ exact: true }}
+                                    className={`relative overflow-hidden flex w-70 min-h-32 border border-[#A7A7A7] rounded-[6px] shadow-[0_8px_16px_0_rgba(0,0,0,0.14)] bg-white p-5 flex-col justify-between items-start cursor-pointer
                                 ${/* highlight: dim the cards that are not active — delete this line to remove */ ''}
                                 transition-opacity duration-500 ${!highlighting || e.category === activeCategory ? 'opacity-100' : 'opacity-60'}`}
-                                onMouseEnter={() => {
-                                    setHovering(true)
-                                    setActiveCategory(e.category)
-                                }}
-                            >
-                                {/* --- highlight: countdown bar showing how long this card holds the hero.
+                                    onMouseEnter={() => {
+                                        setHovering(true)
+                                        setActiveCategory(e.category)
+                                    }}
+                                >
+                                    {/* --- highlight: countdown bar showing how long this card holds the hero.
                                 Delete this block (and the `relative overflow-hidden` above) to remove. --- */}
-                                {e.category === activeCategory && !hovering &&
-                                    <span
-                                        key={activeCategory}
-                                        className='absolute inset-x-0 top-0 h-1 origin-left bg-(--accentblue-100)'
-                                        style={{ animation: `cardCountdown ${rotationMs}ms linear forwards` }}
-                                    />
-                                }
-                                {/* --- end countdown bar --- */}
-                                <div className='flex flex-col w-full justify-between h-full'>
-                                    <div className='w-full flex justify-end'>
-                                        <div className={`font-bold transition-colors duration-700 ${e.category == activeCategory ? 'text-(--accentblue-100)' : 'text-black'}`}>{e.misc}</div>
-                                    </div>
-                                    {/* Title + arrow. The arrow closes the diagonal with the badge and marks the card as navigable. */}
-                                    <div className={`w-full flex items-center justify-between gap-3 transition-colors duration-700 ${e.category == activeCategory ? 'text-(--accentblue-100)' : 'text-black'}`}>
-                                        <span className='text-left uppercase font-bold leading-[110%] tracking-[-0.2px] text-[18px]'>{e.title}</span>
-                                        {/* filled disc: bg-current picks up the row's active colour, so the circle
+                                    {e.category === activeCategory && !hovering &&
+                                        <span
+                                            key={activeCategory}
+                                            className='absolute inset-x-0 top-0 h-1 origin-left bg-(--accentblue-100)'
+                                            style={{ animation: `cardCountdown ${rotationMs}ms linear forwards` }}
+                                        />
+                                    }
+                                    {/* --- end countdown bar --- */}
+                                    <div className='flex flex-col w-full justify-between h-full'>
+                                        <div className='w-full flex justify-end'>
+                                            <div className={`font-bold transition-colors duration-700 ${e.category == activeCategory ? 'text-(--accentblue-100)' : 'text-black'}`}>{e.misc}</div>
+                                        </div>
+                                        {/* Title + arrow. The arrow closes the diagonal with the badge and marks the card as navigable. */}
+                                        <div className={`w-full flex items-center justify-between gap-3 transition-colors duration-700 ${e.category == activeCategory ? 'text-(--accentblue-100)' : 'text-black'}`}>
+                                            <span className='text-left uppercase font-bold leading-[110%] tracking-[-0.2px] text-[18px]'>{e.title}</span>
+                                            {/* filled disc: bg-current picks up the row's active colour, so the circle
                                         and the title change together; the chevron stays knocked out in white */}
-                                        <div className='w-11 h-11 shrink-0 rounded-full bg-current flex items-center justify-center transition-transform duration-300 group-hover:translate-x-1'>
-                                            <ArrowRight color={'white'} />
+                                            <div className='w-11 h-11 shrink-0 rounded-full bg-current flex items-center justify-center transition-transform duration-300 group-hover:translate-x-1'>
+                                                <ArrowRight color={'white'} />
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </Link>
-                        )}
+                                </Link>
+                            )}
+                        </div>
+
                     </div>
-                    
+                </div>
+                <div className='w-92/100 max-w-500 h-320 lg:h-auto relative overflow-hidden pt-20 pb-16 grid grid-cols-1 md:grid-cols-[40%_1fr] grid-rows-[500px_1fr] md:grid-rows-[1fr_150px] justify-start items-center'>
+                    <div className={`h-250 md:col-start-2 row-start-2 md:row-start-1 opacity-0 transition-opacity duration-1200`} ref={ref}></div>
                 </div>
             </div>
-            <div className='w-92/100 max-w-500 h-320 lg:h-auto relative overflow-hidden pt-20 pb-16 grid grid-cols-1 md:grid-cols-[40%_1fr] grid-rows-[1fr] lg:grid-rows-[1fr_150px] justify-start items-center'>
-            
-                {/* At xl the globe is sized by screen height, like earthgenome's calc(100svh - 10rem) globe, so it
-                    keeps the same composition on every laptop instead of a fixed 2040px crop. The image is
-                    4070x3036 with the sphere filling ~81% of its height and ending ~21% short of its right
-                    edge — the right offset parks the sphere's edge just inside the viewport and lets the
-                    extrusions bleed off. */}
-                <img className='col-start-2 row-start-2 md:row-start-1' src={globeExtrusions}></img>
+            <div className='w-full flex flex-col items-center pt-15'>
+                {overviewCategories.map((e, i) =>
+                    <div className={`w-full md:max-w-500 flex items-center ${e.order == "normal" ? 'flex-col md:flex-row' : 'flex-col md:flex-row-reverse'} pt-10 md:pt-0`} key={i}>
+                        <div className='w-9/10 md:w-5/10 flex flex-col text-left items-center justify-center'>
+                            <div className='lg:w-7/10 flex flex-col gap-y-5 justify-start items-start'>
+                                <div className='font-bold text-[40px] md:text-[4cqw] xl:text-[100px] tracking-[-1.2px] leading-[100%]'>{e.title}</div>
+                                {e.description}
+                                {mapButton('bg-(--accentdarkblue-90)', 'text-white', <GlobeIcon color={'var(--primarywhite)'} />, <ArrowRight color={'var(--primarywhite)'} />, e.link)}
+                            </div>
+                        </div>
+                        <img className='pt-10 md:pt-0 md:w-5/10' src={e.picture}></img>
+                    </div>
+                )}
             </div>
-        </div>
-        <div className='w-full flex flex-col items-center pt-15'>
-            {overviewCategories.map((e, i) =>
-                <div className={`w-full md:max-w-500 flex items-center ${e.order == "normal" ? 'flex-col md:flex-row' : 'flex-col md:flex-row-reverse'} pt-10 md:pt-0`}>
-                    <div className='w-9/10 md:w-5/10 flex flex-col text-left items-center justify-center'>
-                        <div className='lg:w-7/10 flex flex-col gap-y-5 justify-start items-start'>
-                            <div className='font-bold text-[40px] md:text-[4cqw] tracking-[-1.2px] leading-[100%]'>{e.title}</div>
-                            {e.description}
-                            {mapButton('bg-(--accentdarkblue-90)', 'text-white', <GlobeIcon color={'var(--primarywhite)'} />, <ArrowRight color={'var(--primarywhite)'} />, e.link)}
+
+            <div className='w-full bg-cover py-25 flex flex-col xl:flex-row bg-position-[50%] bg-no-repeat items-center'>
+                <div className='flex w-full justify-center'>
+                    <span className='w-9/10 tracking-[-1.2px] leading-[100%] font-bold text-[50px] md:text-[60px] max-w-250'>Built to be Used, Cited & Trusted</span>
+                </div>
+                <div className='flex w-full justify-center items-center'>
+                    <div className='grid grid-cols-1 grid-rows-1 md:grid-cols-2 gap-10 md:gap-10 py-10 w-9/10'>
+                        <div className='grid grid-cols-1 grid-rows-2 gap-10 h-140'>
+                            {featureCategories.filter((i) => i.position < 2).map((e, i) =>
+                                <div className={`flex p-10 flex-col items-start gap-4 rounded-[6px] border-[0.5px] bg-white shadow-[0_10px_14px_0_rgba(0,0,0,0.12)] text-left`} key={i}>
+                                    <img src={e.icon}></img>
+                                    <span className='text-[24px] font-bold leading-[120%]'>{e.title}</span>
+                                    <span className='text-[16px] leading-[140%]'>{e.subtitle}</span>
+                                </div>
+                            )}
+                        </div>
+                        <div className='grid grid-cols-1 grid-rows-2 gap-10 md:mt-20 h-140'>
+                            {featureCategories.filter((i) => i.position > 1).map((e, i) =>
+                                <div className={`flex p-10 flex-col items-start gap-4 rounded-[6px] border-[0.5px] bg-white shadow-[0_10px_14px_0_rgba(0,0,0,0.12)] text-left`} key={i}>
+                                    <img src={e.icon}></img>
+                                    <span className='text-[24px] font-bold leading-[120%]'>{e.title}</span>
+                                    <span className='text-[16px] leading-[140%]'>{e.subtitle}</span>
+                                </div>
+                            )}
                         </div>
                     </div>
-                    <img className='pt-10 md:pt-0 md:w-5/10' src={e.picture}></img>
                 </div>
-            )}
-        </div>
-
-        <div className='w-full bg-cover py-25 flex flex-col xl:flex-row bg-position-[50%] bg-no-repeat items-center'>
-            <div className='flex w-full justify-center'>
-                <span className='w-9/10 tracking-[-1.2px] leading-[100%] font-bold text-[50px] md:text-[60px] max-w-250'>Built to be Used, Cited & Trusted</span>
             </div>
-            <div className='flex w-full justify-center items-center'>
-                <div className='grid grid-cols-1 grid-rows-1 md:grid-cols-2 gap-10 md:gap-10 py-10 w-9/10'>
-                    <div className='grid grid-cols-1 grid-rows-2 gap-10 h-140'>
-                        {featureCategories.filter((i) => i.position < 2).map((e, i) =>
-                            <div className={`flex p-10 flex-col items-start gap-4 rounded-[6px] border-[0.5px] bg-white shadow-[0_10px_14px_0_rgba(0,0,0,0.12)] text-left`}>
-                                <img src={e.icon}></img>
-                                <span className='text-[24px] font-bold leading-[120%]'>{e.title}</span>
-                                <span className='text-[16px] leading-[140%]'>{e.subtitle}</span>
-                            </div>
-                        )}
-                    </div>
-                    <div className='grid grid-cols-1 grid-rows-2 gap-10 md:mt-20 h-140'>
-                        {featureCategories.filter((i) => i.position > 1).map((e, i) =>
-                            <div className={`flex p-10 flex-col items-start gap-4 rounded-[6px] border-[0.5px] bg-white shadow-[0_10px_14px_0_rgba(0,0,0,0.12)] text-left`}>
-                                <img src={e.icon}></img>
-                                <span className='text-[24px] font-bold leading-[120%]'>{e.title}</span>
-                                <span className='text-[16px] leading-[140%]'>{e.subtitle}</span>
-                            </div>
-                        )}
+            <div
+                className='w-full bg-cover pt-16 flex flex-col items-center'
+                style={{
+                    backgroundImage: `url(${carsBackground})`,
+                }}
+            >
+                <div className='leading-[100%] tracking-[-0.34px] font-bold text-[60px] w-9/10 pb-7 text-white '>
+                    Advancing Global Data Standards
+                </div>
+                <span className='leading-[140%] text-[20px] text-center text-white w-9/10 max-w-220 pb-10'>The G20 Data Gaps Initiative (DGI‑3) sets out 14 recommendations across four statistical areas. GeoPulse addresses <b>Recommendation 5 — climate physical and transition risks</b> — bringing IMF‑generated indicators into a consistent, accessible format for surveillance and policy analysis.</span>
+                {externalButton('bg-white', 'text-(--accentdarkblue-90)', 'About the Data Gaps Initiative', <ArrowRight color={'var(--accentdarkblue-90)'} />, 'https://www.imf.org/en/news/seminars/conferences/g20-data-gaps-initiative')}
+                <div className='w-full flex justify-center items-center py-25'>
+                    <div className='flex w-9/10 flex-col items-center gap-9.25'>
+                        <img src={IMFLogo}></img>
+                        <span className='text-white font-bold leading-[140%]'>© 2026 INTERNATIONAL MONETARY FUND. ALL RIGHTS RESERVED | <u>Privacy Policy</u> | <u>Copyright & Usage</u></span>
                     </div>
                 </div>
             </div>
-        </div>
-        <div
-            className='w-full bg-cover pt-16 flex flex-col items-center'
-            style={{
-                backgroundImage: `url(${carsBackground})`,
-            }}
-        >
-            <div className='leading-[100%] tracking-[-0.34px] font-bold text-[60px] w-9/10 pb-7 text-white '>
-                Advancing Global Data Standards
-            </div>
-            <span className='leading-[140%] text-[20px] text-center text-white w-9/10 max-w-220 pb-10'>The G20 Data Gaps Initiative (DGI‑3) sets out 14 recommendations across four statistical areas. GeoPulse addresses <b>Recommendation 5 — climate physical and transition risks</b> — bringing IMF‑generated indicators into a consistent, accessible format for surveillance and policy analysis.</span>
-            {externalButton('bg-white', 'text-(--accentdarkblue-90)', 'About the Data Gaps Initiative', <ArrowRight color={'var(--accentdarkblue-90)'} />, 'https://www.imf.org/en/news/seminars/conferences/g20-data-gaps-initiative')}
-            <div className='w-full flex justify-center items-center py-25'>
-                <div className='flex w-9/10 flex-col items-center gap-9.25'>
-                    <img src={IMFLogo}></img>
-                    <span className='text-white font-bold leading-[140%]'>© 2026 INTERNATIONAL MONETARY FUND. ALL RIGHTS RESERVED | <u>Privacy Policy</u> | <u>Copyright & Usage</u></span>
-                </div>
-            </div>
-        </div>
 
-    </div>
+        </div>
+    )
 }

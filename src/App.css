@@ -68,6 +68,10 @@ body {
   all: unset;
 }
 
+.esri-attribution__powered-by {
+  height: 0;
+}
+
 .pw {
     position: absolute;
     transform: translate(-50%, -50%);

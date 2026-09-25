@@ -42,7 +42,7 @@ import Hamburger from '../assets/Group 51.png'
 import Lockup from '../assets/lockup.svg'
 import DropdownArrow from '../assets/Dropdown-arrow.svg';
 
-import { mapButton } from '../routes/homeBackup'
+import { mapButton } from '../routes/home'
 import { GlobeIcon } from '../assets/GlobeIcon'
 import { ArrowRight } from '../assets/arrow-right'
 
