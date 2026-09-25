@@ -453,7 +453,7 @@ function RouteComponent() {
                     </div>
                 </div>
                 <div className='w-92/100 max-w-500 h-320 lg:h-auto relative overflow-hidden pt-20 pb-16 grid grid-cols-1 md:grid-cols-[40%_1fr] grid-rows-[500px_1fr] md:grid-rows-[1fr_150px] justify-start items-center'>
-                    <div className={`h-250 md:col-start-2 row-start-2 md:row-start-1 opacity-0 transition-opacity duration-1200`} ref={ref}></div>
+                    <div className={`h-250 md:col-start-2 row-start-2 md:row-start-1 opacity-0 transition-opacity duration-1200 pointer-events-none`} ref={ref}></div>
                 </div>
             </div>
             <div className='w-full flex flex-col items-center pt-15'>
