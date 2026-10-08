@@ -1,6 +1,7 @@
 // creates file-based routing for tanstack react router
-import { createFileRoute, Link } from "@tanstack/react-router";
-
+import { createFileRoute, Link } from "@tanstack/react-router"
+import { z } from 'zod'
+import { useNavigate } from '@tanstack/react-router'
 // react hooks holding state, context, and references
 import { AppStateContext, AppActionsContext } from "../app";
 import { useState, useRef, useEffect, useCallback, useContext } from "react";
@@ -58,8 +59,14 @@ import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import { realtimeObject, eventTypes } from "@/config/datasets";
 import { countryByIso3 } from "@/config/isoCountries";
 
+// provide search schema for query string parameters
+const searchSchema = z.object({
+  eventid: z.coerce.number().catch(0)
+});
+
 export const Route = createFileRoute("/events")({
   component: Events,
+  validateSearch: searchSchema
 });
 
 function Events() {
@@ -68,6 +75,9 @@ function Events() {
   const actions = useContext(AppActionsContext);
 
   actions?.setView("Event tracking");
+
+  // store the value from the query string parameter
+  const eventid = Route.useSearch().eventid;
 
   // state hook that enables/disables exposure sub-category animations
   const [popInState, setPopInState] = useState<string>("initial");
@@ -78,6 +88,7 @@ function Events() {
   }>({ exposure: "Population", filter: "Population" });
   const [events, setEvents] = useState<any>(null);
   const [focusedEvent, setFocusedEvent] = useState<any>("");
+  const [eventsList, setEventsList] = useState<boolean>(false);
   const [eventPopup, setEventPopup] = useState<string>("all events");
   const [focusedFeatures, setFocusedFeatures] = useState<any>(null);
   const [focusedSliderValue, setFocusedSliderValue] = useState<number[]>([0]);
@@ -172,6 +183,27 @@ function Events() {
     });
   }, [events]);
 
+  useEffect(() => {
+    // When the query string parameter matches an eventid, load the event only once when page loads
+    if (events && !eventsList) {
+      if (eventid !== 0) {
+        events.forEach((e: any) => {
+          if (e.attributes.eventid == eventid) {
+            focusOnEvent({
+              longitude: e.geometry.longitude,
+              latitude: e.geometry.latitude,
+            },
+              e.attributes,)
+          }
+        })
+      } else {
+        actions?.setLoadingOverlay(false);
+      }
+      setEventsList(true);
+    }
+  }, [events])
+
+
   // Every time the eventPopup changes, return the results of the query of the events feature
   // layer, sorted by end date, then set the events on the events sidebar and the mapView.
   const queryEvents = useCallback(() => {
@@ -180,7 +212,7 @@ function Events() {
       !view.current ||
       !pulseContainerRef.current
     )
-      return;
+    return;
 
     const query = eventFeatureLayer.current!.createQuery();
     query.returnGeometry = true;
@@ -218,7 +250,7 @@ function Events() {
     }
 
     runQuery();
-  }, [eventPopup]);
+  }, []);
 
   // gdacs event polygon feature layer
   const eventPolygonsLayer = new FeatureLayer({
@@ -411,8 +443,6 @@ function Events() {
       groupLayer.current.layers.reorder(exposureLayerForGroup.current, 0);
       groupLayer.current.layers.reorder(unweightedEventLayer.current, 1);
       groupLayer.current.layers.reorder(weightedEventLayer.current, 2);
-
-      console.log("LOOK", groupLayer.current.layers);
 
       // if an event is focused and focusedFeatures exists, apply blur, darken, and greyscale to layers outside of the group layer
       if (focusedFeatures?.length > 0) {
@@ -755,7 +785,7 @@ function Events() {
     });
 
   // query feature layer
-  function highlightCountry(eventid: any, index?: number) {
+  function highlightCountry(eventid: any) {
     const newQuery = eventPolygonsLayer.createQuery();
     newQuery.returnGeometry = true;
     newQuery.outFields = ["*"];
@@ -877,6 +907,17 @@ function Events() {
     }
   };
 
+  // uses tanstack router method to update query in url
+  const navigate = Route.useNavigate();
+  const updateURL = (newURL: string) => {
+    navigate({
+      search: (prev) => ({
+        ...prev,          // Keep existing search params
+        eventid: newURL // Update or add a specific parameter
+      })
+    })
+  }
+
   useEffect(() => {
     setFocusedSliderValue([focusedFeatures?.length - 1]);
   }, [focusedFeatures]);
@@ -891,6 +932,9 @@ function Events() {
     removeBlur(); // remove blur from previous event if it exists
     setFocusedSliderValue([0]); // reset slider value to 0 when focusing on a new event
     console.log(coors);
+
+    // update url
+    updateURL(attributes.eventid);
 
     if (!map.current) return;
 
@@ -1070,8 +1114,8 @@ function Events() {
       suffix: "",
     },
     {
-      name: "GDP",
-      id: "gdp",
+      name: "GDP 3",
+      id: "gdp 3",
       icon: (
         <svg
           width="17"
@@ -1085,21 +1129,42 @@ function Events() {
       ),
       categories: [
         "Agriculture",
-        "Mining",
-        "Electricity",
-        "Construction",
-        "Manufacturing",
-        "Transportation",
-        "Trade",
-        "Finance",
-        "Government",
-        "Other",
+        "Industry",
+        "Services"
       ],
       suffix: "USD",
     },
+    // {
+    //   name: "GDP 10",
+    //   id: "gdp 10",
+    //   icon: (
+    //     <svg
+    //       width="17"
+    //       height="13"
+    //       viewBox="0 0 17 13"
+    //       fill="white"
+    //       xmlns="http://www.w3.org/2000/svg"
+    //     >
+    //       <path d="M2.05814 1.02911C1.47929 1.02911 1.02907 1.47933 1.02907 2.05818V3.08725C2.15461 3.08725 3.08721 2.15465 3.08721 1.02911H2.05814ZM1.02907 4.11632V8.2326C2.73347 8.2326 4.11628 9.61541 4.11628 11.3198H12.3488C12.3488 9.61541 13.7316 8.2326 15.436 8.2326V4.11632C13.7316 4.11632 12.3488 2.73351 12.3488 1.02911H4.11628C4.11628 2.73351 2.73347 4.11632 1.02907 4.11632ZM13.3779 11.3198H14.407C14.9858 11.3198 15.436 10.8696 15.436 10.2907V9.26167C14.3105 9.26167 13.3779 10.1943 13.3779 11.3198ZM1.02907 9.26167V10.2907C1.02907 10.8696 1.47929 11.3198 2.05814 11.3198H3.08721C3.08721 10.1943 2.15461 9.26167 1.02907 9.26167ZM15.436 3.08725V2.05818C15.436 1.47933 14.9858 1.02911 14.407 1.02911H13.3779C13.3779 2.15465 14.3105 3.08725 15.436 3.08725ZM0 2.05818C0 0.932634 0.932594 3.95775e-05 2.05814 3.95775e-05H14.407C15.5325 3.95775e-05 16.4651 0.932634 16.4651 2.05818V10.2907C16.4651 11.4163 15.5325 12.3489 14.407 12.3489H2.05814C0.932594 12.3489 0 11.4163 0 10.2907V2.05818ZM10.2907 6.17446C10.2907 5.04891 9.3581 4.11632 8.23256 4.11632C7.10701 4.11632 6.17442 5.04891 6.17442 6.17446C6.17442 7.3 7.10701 8.2326 8.23256 8.2326C9.3581 8.2326 10.2907 7.3 10.2907 6.17446ZM5.14535 6.17446C5.14535 4.47006 6.52816 3.08725 8.23256 3.08725C9.93696 3.08725 11.3198 4.47006 11.3198 6.17446C11.3198 7.87886 9.93696 9.26167 8.23256 9.26167C6.52816 9.26167 5.14535 7.87886 5.14535 6.17446Z" />
+    //     </svg>
+    //   ),
+    //   categories: [
+    //     "Agriculture",
+    //     "Mining",
+    //     "Electricity",
+    //     "Construction",
+    //     "Manufacturing",
+    //     "Transportation",
+    //     "Trade",
+    //     "Finance",
+    //     "Government",
+    //     "Other",
+    //   ],
+    //   suffix: "USD",
+    // },
     {
       name: "Urban GDP",
-      id: "gdp",
+      id: "gdp 10",
       icon: (
         <svg
           width="19"
@@ -1228,6 +1293,10 @@ function Events() {
       setEventLoaded(false);
     }
   }, [polygonsLoaded, eventLoaded]);
+
+  useEffect(() => {
+    unfocusEvent();
+  },[state?.dateRange, state?.eventFilter, state?.countryFilter])
 
   return (
     <div className="w-full h-full relative overflow-hidden">
@@ -1439,7 +1508,7 @@ function Events() {
                   >
                     DETAILS
                   </div>
-                  {event.attributes.iscurrent == "true" ? (
+                  {event.attributes.iscurrent == 1 ? (
                     <div className="flex justify-center items-center bg-(--accentred-100) rounded-sm shadow-lg/10 font-bold text-white px-[5px] mb-[6px] mt-[9px] text-[11px]">
                       <div>ONGOING</div>
                     </div>
@@ -1453,7 +1522,7 @@ function Events() {
         className={`absolute bottom-0 right-0 md:transition-all md:duration-300 md:ease-in-out ${eventPopup == "focused event" ? "md:right-0 visible" : "md:-right-100 invisible"} h-5/10 md:h-85/100 w-full md:w-[350px] pt-3 shadow-lg/40 md:rounded-tl-md flex gap-5 flex-col items-start bg-white cursor-default transition-all ease-in-out duration-300 overflow-y-auto`}
       >
         <div className="w-full flex items-center justify-between px-4">
-          {focusedEvent.iscurrent == "true" ? (
+          {focusedEvent.iscurrent == 1 ? (
             <div className="flex h-6.25 justify-center  items-center bg-(--accentred-100) rounded-sm shadow-lg/10 font-bold text-white px-[5px] mb-[6px] mt-[9px] text-[11px]">
               <div>ONGOING</div>
             </div>

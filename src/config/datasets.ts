@@ -617,9 +617,66 @@ export const realtimeObject: Record<
     title: "night-time luminosity",
     unit: "(nW/cm²/sr)",
   },
-  GDP: {
+  "GDP 3": {
     url: {
-      GDP: `${URL_RTBASE}/CANUSA_Gridded_GDP_Total_Economy_2021/ImageServer`,
+      "GDP 3": `${URL_RTBASE}/global_total_GVA_2022_constant2015USD_1km/ImageServer`,
+      Agriculture: `${URL_RTBASE}/global_agriculture_GVA_2022_constant2015USD_1km/ImageServer`,
+      Industry: `${URL_RTBASE}/global_industry_GVA_2022_constant2015USD_1km/ImageServer`,
+      Services: `${URL_RTBASE}/global_services_GVA_2022_constant2015USD_1km/ImageServer`,
+    },
+    colorScheme: [
+      {
+        minValue: 0,
+        maxValue: 400,
+        symbol: {
+          type: "simple-fill",
+          color: [50, 48, 50, 1.0],
+        },
+        label: "< $400",
+      },
+      {
+        minValue: 400,
+        maxValue: 1600,
+        symbol: {
+          type: "simple-fill",
+          color: [90, 55, 65, 1.0],
+        },
+        label: "$1.6K",
+      },
+      {
+        minValue: 1600,
+        maxValue: 30000,
+        symbol: {
+          type: "simple-fill",
+          color: [160, 70, 100, 1.0],
+        },
+        label: "$30K",
+      },
+      {
+        minValue: 30000,
+        maxValue: 12500000,
+        symbol: {
+          type: "simple-fill",
+          color: [210, 130, 60, 1.0],
+        },
+        label: "$12.5M",
+      },
+      {
+        minValue: 12500000,
+        maxValue: 96000000000,
+        symbol: {
+          type: "simple-fill",
+          color: [240, 249, 33, 1.0],
+        },
+        label: "> $12.5M",
+      },
+    ],
+    title: "gdp 3",
+    unit: "(Purchasing Power Parity, USD)",
+  },
+  "GDP 10": {
+    url: {
+      "GDP 10": `${URL_RTBASE}/CANUSA_Gridded_GDP_Total_Economy_2021/ImageServer`,
       Agriculture: `${URL_RTBASE}/CANUSA_Gridded_GDP_Agriculture_2021/ImageServer`,
       Mining: `${URL_RTBASE}/CANUSA_Gridded_GDP_Mining_and_Oil_and_Gas_2021/ImageServer`,
       Electricity: `${URL_RTBASE}/CANUSA_Gridded_GDP_Electricity_2021/ImageServer`,
@@ -678,7 +735,7 @@ export const realtimeObject: Record<
         label: "> $25M",
       },
     ],
-    title: "gdp",
+    title: "gdp 10",
     unit: "(Purchasing Power Parity, USD)",
   },
   "Urban GDP": {

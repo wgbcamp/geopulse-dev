@@ -37,7 +37,7 @@ function CompareView() {
       <div className="w-9/10 dark flex flex-col lg:flex-row gap-5 pt-32">
         <Region
           regionId="A"
-          defaultIso3={"CHN"}
+          defaultIso3={"NLD"}
           topojson={polygons}
           sharedYMax={sharedYMax}
           onDataMax={handleDataMax}

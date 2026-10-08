@@ -108,7 +108,7 @@ export function App() {
   const [dataExplainerOpen, setDataExplainerState] = useState(false);
   const [dataExplainerView, setDataExplainerView] = useState("Event Tracking");
   const [loadingOverlay, setLoadingOverlay] = useState<string | boolean>(
-    "initial",
+    true,
   );
 
   const state = {
