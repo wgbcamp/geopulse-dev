@@ -61,7 +61,7 @@ import { countryByIso3 } from "@/config/isoCountries";
 
 // provide search schema for query string parameters
 const searchSchema = z.object({
-  eventid: z.coerce.number().catch(0)
+  eventid: z.coerce.number().catch(0).transform((val) => (val === 0 ? undefined : val))
 });
 
 export const Route = createFileRoute("/events")({
@@ -186,14 +186,14 @@ function Events() {
   useEffect(() => {
     // When the query string parameter matches an eventid, load the event only once when page loads
     if (events && !eventsList) {
-      if (eventid !== 0) {
+      if (eventid !== 0 && eventid!== undefined) {
         events.forEach((e: any) => {
           if (e.attributes.eventid == eventid) {
             focusOnEvent({
               longitude: e.geometry.longitude,
               latitude: e.geometry.latitude,
             },
-              e.attributes,)
+              e.attributes)
           }
         })
       } else {
