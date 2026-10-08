@@ -7,13 +7,11 @@ import {
 
 import { Header } from "../components/Header";
 import DataExplainer from "@/components/dataExplainer";
-import LoadingOverlay from "@/components/loadingOverlay";
 
 const RootComponent = () => {
   return (
     <>
       <HeadContent />
-      <LoadingOverlay />
       <DataExplainer />
       <Header />
       <Outlet />
