@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState } from "react";
+import { useNavigate } from '@tanstack/react-router'
 
 import "@/config/isoCountries";
 
@@ -26,10 +26,13 @@ import { isoCountries, countryByIso3 } from "@/config/isoCountries";
 type ComboBoxProps = {
   iso3: string;
   setIso3: React.Dispatch<React.SetStateAction<string>>;
+  regionId: string;
 };
 
-export const ComboBox = ({ iso3, setIso3 }: ComboBoxProps) => {
+export const ComboBox = ({ iso3, setIso3, regionId }: ComboBoxProps) => {
   const [open, setOpen] = React.useState(false);
+  const navigate = useNavigate();
+  let queryParameter: any;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -57,6 +60,27 @@ export const ComboBox = ({ iso3, setIso3 }: ComboBoxProps) => {
                   onSelect={() => {
                     setOpen(false);
                     setIso3(country.iso3);
+
+                    switch (regionId) {
+                      case "A":
+                        navigate({
+                          to: '.',
+                          search: (prev) => ({
+                            ...prev,          // Keep existing search params
+                            country1: country.iso3 // Update or add a specific parameter
+                          }),
+                        })
+                        break;
+                      case "B":
+                        navigate({
+                          to: '.',
+                          search: (prev) => ({
+                            ...prev,          // Keep existing search params
+                            country2: country.iso3 // Update or add a specific parameter
+                          }),
+                        })
+                    }
+                     
                   }}
                 >
                   {country.name}

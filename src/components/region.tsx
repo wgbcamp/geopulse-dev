@@ -514,7 +514,7 @@ export const Region = ({
 
   return (
     <Card className="bg-[#1E1E1E] w-full dark flex items-center justify-center shadow-md">
-      <ComboBox iso3={iso3} setIso3={setIso3} />
+      <ComboBox iso3={iso3} setIso3={setIso3} regionId={regionId}/>
       {chartData && mapChartData ? (
         <div className="w-full h-full">
           <div className="flex flex-col w-full justify-center items-center">

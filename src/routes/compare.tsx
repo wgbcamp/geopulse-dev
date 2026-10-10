@@ -1,5 +1,6 @@
 import { useContext, useState, useCallback, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { z } from 'zod'
 
 import { AppStateContext, AppActionsContext } from "../app";
 
@@ -8,8 +9,15 @@ import { Thresholds } from "../components/thresholds";
 
 import { comparisonNote } from "../config/datasets";
 
+
+const searchSchema = z.object({
+  country1: z.coerce.string().default('NLD'),
+  country2: z.coerce.string().default('BGD')
+});
+
 export const Route = createFileRoute("/compare")({
   component: CompareView,
+  validateSearch: searchSchema
 });
 
 function CompareView() {
@@ -17,6 +25,9 @@ function CompareView() {
   actions?.setView("Compare");
 
   const [polygons, setPolygons] = useState<any>(null);
+
+  const country1 = Route.useSearch().country1;
+  const country2 = Route.useSearch().country2;
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_BASE}/GADM_ADMIN1.json`)
@@ -37,14 +48,14 @@ function CompareView() {
       <div className="w-9/10 dark flex flex-col lg:flex-row gap-5 pt-32">
         <Region
           regionId="A"
-          defaultIso3={"NLD"}
+          defaultIso3={country1}
           topojson={polygons}
           sharedYMax={sharedYMax}
           onDataMax={handleDataMax}
         />
         <Region
           regionId="B"
-          defaultIso3={"BGD"}
+          defaultIso3={country2}
           topojson={polygons}
           sharedYMax={sharedYMax}
           onDataMax={handleDataMax}

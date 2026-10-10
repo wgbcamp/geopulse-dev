@@ -817,7 +817,7 @@ export const Header = () => {
                                     </svg>
                                   </div>
                                   <div
-                                    className={`${riskState === key ? `h-[calc(80px*${value.length})]` : "h-0 hidden"}`}
+                                    className={`${riskState === key ? `ml-7` : "h-0 hidden"}`}
                                   >
                                     {Object.entries(value).map(([a, b]) => (
                                       <Item
