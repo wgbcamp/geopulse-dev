@@ -1348,12 +1348,12 @@ function Events() {
               <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M0.390625 1.67969C0 1.32812 0 0.703125 0.390625 0.351562C0.742188 0 1.32812 0 1.67969 0.351562L7.57812 6.25L13.4766 0.351562C13.8672 0 14.4531 0 14.8047 0.351562C15.1953 0.742188 15.1953 1.32812 14.8047 1.67969L8.90625 7.57812L14.8047 13.4766C15.1953 13.8281 15.1953 14.4531 14.8047 14.8047C14.4531 15.1562 13.8672 15.1562 13.4766 14.8047L7.57812 8.90625L1.67969 14.8047C1.32812 15.1562 0.742188 15.1562 0.390625 14.8047C0 14.4531 0 13.8281 0.390625 13.4766L6.28906 7.57812L0.390625 1.67969Z" fill="var(--accentblue-100)"></path></svg>
             </div>
           </div>
-          <div className="text-[20px] h-[38px] font-bold text-left flex w-full px-4">
+          <div className="text-[20px] font-bold text-left flex w-full px-4">
             {focusedEvent.description}
           </div>
           {focusedFeatures?.length > 1 ? (
             <div className="w-full">
-              <div className="text-(--accentblue-100) font-bold text-[12px] text-center w-full pt-4">
+              <div className="text-(--accentblue-100) font-bold text-[12px] text-center w-full py-4">
                 Timeline
               </div>
               <div className="flex flex-row justify-center items-start w-full pb-[36px]">
@@ -1668,7 +1668,7 @@ function Events() {
           </div>
         </div>
         <arcgis-scale-bar
-          className="calcite-mode-dark z-15 absolute top-30 right-5 md:top-auto md:right-auto md:bottom-1 md:left-90 max-w-21"
+          className="calcite-mode-dark z-2 absolute top-30 right-5 md:top-auto md:right-auto md:bottom-1 md:left-90 max-w-21"
           ref={scaleBarRef}
           bar-style="line"
           unit="metric"

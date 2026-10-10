@@ -10,7 +10,7 @@ export default function () {
       {state?.dataExplainerOpen ? (
         <div className="absolute z-10 bottom-0 w-full h-full bg-[#00000095] flex items-center justify-center">
           <div className="h-full w-full md:h-8/10 md:w-8/10 max-w-300 bg-white md:rounded-sm flex flex-col overflow-hidden">
-            <div className="bg-(--fundblue) h-38 w-full flex flex-col ">
+            <div className="bg-(--fundblue) h-44 w-full flex flex-col ">
               <div className="w-full">
                 <div className="w-96/100 flex justify-end">
                   <div
@@ -21,11 +21,11 @@ export default function () {
                   </div>
                 </div>
               </div>
-              <div className="w-full flex justify-end">
+              <div className="w-full flex justify-center">
                 <div className="w-9/10">
                   <div className="w-full flex justify-start">
-                    <div className="w-96/100 flex">
-                      <div className="text-white font-bold text-2xl">
+                    <div className="w-9/10 flex justify-start">
+                      <div className="text-white font-bold text-2xl text-left w-full pb-6">
                         Data Explainer
                       </div>
                     </div>
