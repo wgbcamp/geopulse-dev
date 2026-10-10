@@ -31,6 +31,11 @@ th {
   padding: 10px;
 }
 
+.esri-view .esri-popup__main-container {
+  width: fit-content;
+  max-width: 340px;
+}
+
 .esri-view .esri-view-surface--touch-none:focus::after {
   outline: none !important;
 }

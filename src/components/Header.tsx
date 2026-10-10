@@ -256,7 +256,7 @@ export const Header = () => {
             <div className="w-4/10 flex py-5 justify-around gap-2">
               <Button
                 className={`w-5/10 font-bold bg-(--accentblue-100) cursor-pointer`}
-                onClick={() => actions?.setDateRange(temporaryDate)}
+                onClick={() => {actions?.setDateRange(temporaryDate); setCalendarOpened(false);}}
               >
                 Apply
               </Button>

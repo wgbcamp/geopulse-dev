@@ -356,6 +356,9 @@ function Events() {
             breakpoint: false,
             buttonEnabled: false,
           },
+          visibleElements: {
+            closeButton: false
+          }
         },
       });
 
@@ -1023,6 +1026,7 @@ function Events() {
     setFocusedEvent("");
     removeBlur();
     pauseSlider();
+    updateURL("");
     if (!eventFeatureLayer.current) return;
     eventFeatureLayer.current.renderer.uniqueValueInfos = uniqueColorValues;
   };
@@ -1302,7 +1306,7 @@ function Events() {
                   </p>
                   <div className="flex w-full justify-between ">
                     <div
-                      className="flex h-6.25 leading-[0.75] items-center justify-center font-bold cursor-pointer text-[var(--accentblue-100)] border-solid border border-gray-400 rounded-sm px-[5px] mb-[6px] mt-[9px] text-[11px]"
+                      className="flex h-6.25 [text-box:trim-both_cap_alphabetic] items-center justify-center font-bold cursor-pointer bg-(--accentblue-100) text-white rounded-sm shadow-lg/10 px-[5px] mb-[6px] mt-[9px] text-[11px]"
                       onClick={() =>
                         focusOnEvent(event.geometry, event.attributes)
                       }
@@ -1310,8 +1314,12 @@ function Events() {
                       DETAILS
                     </div>
                     {event.attributes.iscurrent == 1 ? (
-                      <div className="flex justify-center items-center bg-(--accentred-100) rounded-sm shadow-lg/10 font-bold text-white px-[5px] mb-[6px] mt-[9px] text-[11px]">
-                        <div>ONGOING</div>
+                      <div className="flex justify-center items-center text-(--accentred-100) gap-1.5 font-bold px-[5px] my-[6px] text-[11px]">
+                        <span className="relative flex w-[7px] h-[7px] items-center">
+                          <span className="absolute inset-0 rounded-full bg-current opacity-70  transition-all duration-12500 motion-safe:animate-ping" />
+                          <span className="relative inline-flex w-[7px] h-[7px] rounded-full bg-current" />
+                        </span>
+                        <div className="[text-box:trim-both_cap_alphabetic]">ONGOING</div>
                       </div>
                     ) : null}
                   </div>
@@ -1329,7 +1337,7 @@ function Events() {
               </div>
             ) : (
               <b className="flex h-6.25 justify-center  items-center bg-(--accentblue-100) rounded-sm shadow-lg/10 font-bold text-white px-[5px] mb-[6px] mt-[9px] text-[11px]">
-                <span className="leading-[0.75]">PAST EVENT</span>
+                <span className="[text-box:trim-both_cap_alphabetic]">PAST EVENT</span>
               </b>
             )}
             <div
@@ -1437,10 +1445,10 @@ function Events() {
             </div>
             <div className="text-left flex flex-wrap text-[14px] pl-4 gap-3">
               <div
-                className={`[text-box-edge:cap_alphabetic] leading-none rounded-xl h-6 whitespace-nowrap px-3  ${currentCountryExposure == "ALL" ? "bg-(--accentblue-100) text-white" : "bg-(--accentwarmgray-20)"} font-bold flex items-center justify-center cursor-pointer`}
+                className={`[text-box:trim-both_cap_alphabetic] rounded-xl h-6 whitespace-nowrap px-3  ${currentCountryExposure == "ALL" ? "bg-(--accentblue-100) text-white" : "bg-(--accentwarmgray-20)"} font-bold flex items-center justify-center cursor-pointer`}
                 onClick={() => setCurrentCountryExposure("ALL")}
               >
-                <div className="leading-[0.75]">Total</div>
+                <div className="[text-box:trim-both_cap_alphabetic]">Total</div>
               </div>
               {focusedEvent?.affectedcountries
                 ?.split(",")
