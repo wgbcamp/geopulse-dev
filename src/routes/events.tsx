@@ -1249,7 +1249,8 @@ function Events() {
                         state?.countryFilter == "All countries"),
                   ).length
                 }{" "}
-                Events in Date Range
+                {state?.eventFilter == "AL" ? "Events" : eventTypes[state?.eventFilter].type } 
+                {state?.countryFilter == "All countries" ? "" : ` in ${countryByIso3[state?.countryFilter]}`}
               </b>
             </div>
           </div>
@@ -1335,18 +1336,16 @@ function Events() {
               className="text-[14px] mr-2 text-(--accentblue-100) font-bold cursor-pointer"
               onClick={() => unfocusEvent()}
             >
-              {" "}
-              Close details [X]
+             
+              <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M0.390625 1.67969C0 1.32812 0 0.703125 0.390625 0.351562C0.742188 0 1.32812 0 1.67969 0.351562L7.57812 6.25L13.4766 0.351562C13.8672 0 14.4531 0 14.8047 0.351562C15.1953 0.742188 15.1953 1.32812 14.8047 1.67969L8.90625 7.57812L14.8047 13.4766C15.1953 13.8281 15.1953 14.4531 14.8047 14.8047C14.4531 15.1562 13.8672 15.1562 13.4766 14.8047L7.57812 8.90625L1.67969 14.8047C1.32812 15.1562 0.742188 15.1562 0.390625 14.8047C0 14.4531 0 13.8281 0.390625 13.4766L6.28906 7.57812L0.390625 1.67969Z" fill="var(--accentblue-100)"></path></svg>
             </div>
           </div>
           <div className="text-[20px] h-[38px] font-bold text-left flex w-full px-4">
-            {focusedEvent.description?.length > 25
-              ? focusedEvent.description.slice(0, 32).trimEnd() + "..."
-              : focusedEvent.description}
+            {focusedEvent.description}
           </div>
           {focusedFeatures?.length > 1 ? (
             <div className="w-full">
-              <div className="text-(--accentblue-100) font-bold text-[12px] text-center w-full">
+              <div className="text-(--accentblue-100) font-bold text-[12px] text-center w-full pt-4">
                 Timeline
               </div>
               <div className="flex flex-row justify-center items-start w-full pb-[36px]">
@@ -1432,23 +1431,9 @@ function Events() {
               </div>
             </div>
           ) : null}
-          <div className="pt-5 flex items-center">
-            <div className="font-bold text-[14px] pl-4">Event Severity</div>
-            <div
-              className={`text-[14px] px-2 py-2 ml-2 rounded-md h-5 text-white font-extrabold flex items-center justify-center`}
-              style={{
-                backgroundColor: `var(--${focusedEvent.alertlevel?.toLowerCase()})`,
-              }}
-            >
-              <span className="leading-[0.9] h-3">
-                Level {focusedEvent.alertscore}
-              </span>
-            </div>
-          </div>
-
           <div className="flex flex-col gap-3">
             <div className="font-bold text-[14px] pl-4 text-left">
-              View affected economies
+              View Affected Economies
             </div>
             <div className="text-left flex flex-wrap text-[14px] pl-4 gap-3">
               <div
@@ -1599,7 +1584,7 @@ function Events() {
                                 c.attributes.areaid == currentCountryExposure,
                             ),
                           )
-                        ]?.attributes[key.toLowerCase()],
+                        ]?.attributes[layer.eventAttribute],
                       ) +
                       " " +
                       layer.suffix
@@ -1628,7 +1613,7 @@ function Events() {
                                   c.attributes.areaid == currentCountryExposure,
                               ),
                             )
-                          ]?.attributes[key.toLowerCase() + "_pct"],
+                          ]?.attributes[layer.eventAttribute + "_pct"],
                         ) +
                         " " +
                         "%"
