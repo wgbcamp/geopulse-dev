@@ -244,9 +244,7 @@ function Events() {
         })
         .catch((error) => {
           console.log(error);
-          alert(
-            "Unable to perform query. Too many requests. Please try again later.",
-          );
+          runQuery();
         });
     }
 
@@ -838,10 +836,7 @@ function Events() {
         })
         .catch((error) => {
           console.log(error);
-          alert(
-            "Unable to perform query. Too many requests. Please try again later.",
-          );
-          setPolygonsLoaded(true);
+          runQuery();
         });
     }
     runQuery();
@@ -972,11 +967,7 @@ function Events() {
         })
         .catch((error) => {
           console.log(error);
-          alert(
-            "Unable to perform query. Too many requests. Please try again later.",
-          );
-          unfocusEvent();
-          setEventLoaded(true);
+          runQuery();
         });
     }
 
