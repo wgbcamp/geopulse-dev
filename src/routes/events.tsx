@@ -1022,11 +1022,14 @@ function Events() {
   };
 
   const unfocusEvent = () => {
+    if (eventPopup == "focused event") {
+      updateURL("");
+    }
     setEventPopup("all events");
     setFocusedEvent("");
     removeBlur();
     pauseSlider();
-    updateURL("");
+
     if (!eventFeatureLayer.current) return;
     eventFeatureLayer.current.renderer.uniqueValueInfos = uniqueColorValues;
   };
