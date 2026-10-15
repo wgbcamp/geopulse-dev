@@ -287,19 +287,13 @@ function GridView() {
   },[vtlayer.current])
 
   function isolateField(value: number) {
-    console.log(value);
-    if (map.current && vtlayer.current && vtlayer.current.renderer) {
+    if (map.current && vtlayer.current) {
       map.current.remove(vtlayer.current);
-      var isolatedValues = valuesArray;
+      let isolatedValues = valuesArray;
       if (isolatedField !== value) {
-        for (var i = 0; i < vtlayer.current.renderer.uniqueValueInfos.length; i++) {
-          if (vtlayer.current.renderer.uniqueValueInfos[i].value == value) {
-            isolatedValues = [isolatedValues[i]];
-            break;
-          }
-        }
+        // look up in the full list, not the current renderer (which may already be filtered)
+        isolatedValues = valuesArray.filter((v) => v.value == value);
         setIsolatedField(value);
-        console.log(value);
       } else {
         setIsolatedField(null);
       }
@@ -311,11 +305,7 @@ function GridView() {
         }),
       });
       map.current.add(vtlayer.current);
-      return () => {
-              // vtlayer.current.destroy();
-
-    };
-    };
+    }
   }
 
   const showTooltip = (value: string) => {
