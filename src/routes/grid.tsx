@@ -11,6 +11,7 @@ import UniqueValueRenderer from "@arcgis/core/renderers/UniqueValueRenderer.js";
 import ScaleBar from "@arcgis/core/widgets/ScaleBar.js";
 
 import { gridObject } from "@/config/datasets";
+import { Thresholds } from "@/components/thresholds";
 import ImageryTileLayer from "@arcgis/core/layers/ImageryTileLayer";
 
 export const Route = createFileRoute("/grid")({
@@ -340,6 +341,7 @@ function GridView() {
   return (
     <div className="h-full">
       <div className="w-full h-full bg-[#1D2224] " ref={ref}></div>
+      <Thresholds />
       <div className='absolute bottom-0 left-0 flex flex-col items-start justify-end rounded-xs bg-white w-50 h-45'>
         <div id="newLegend" onMouseLeave={() => hideTooltip()} className='w-full'>
           <div className='absolute bottom-40 w-full flex  justify-center'>
