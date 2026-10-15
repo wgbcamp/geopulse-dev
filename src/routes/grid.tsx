@@ -5,7 +5,6 @@ import { useState, useRef, useEffect, useContext } from "react";
 import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
 import Map from "@arcgis/core/Map.js";
 import MapView from "@arcgis/core/views/MapView.js";
-import SceneView from "@arcgis/core/views/SceneView.js";
 import UniqueValueRenderer from "@arcgis/core/renderers/UniqueValueRenderer.js";
 
 import ScaleBar from "@arcgis/core/widgets/ScaleBar.js";
