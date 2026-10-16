@@ -9,7 +9,7 @@ import UniqueValueRenderer from "@arcgis/core/renderers/UniqueValueRenderer.js";
 
 import ScaleBar from "@arcgis/core/widgets/ScaleBar.js";
 
-import { gridObject } from "@/config/datasets";
+import { gridObject, buildGridLegend } from "@/config/datasets";
 import { Thresholds } from "@/components/thresholds";
 import ImageryTileLayer from "@arcgis/core/layers/ImageryTileLayer";
 import VectorTileLayer from "@arcgis/core/layers/VectorTileLayer.js";
@@ -242,6 +242,16 @@ function GridView() {
     },
   ];
 
+  const legend = state ? buildGridLegend(state) : undefined;
+
+  // tooltip text for a legend cell, e.g. "High Population & Medium Flood Height"
+  const levels = ["Low", "Medium", "High"];
+  const shortLabel = (label: string) => label.replace(/\s*\(.*\)$/, ""); // drop "(count)" etc.
+  const cellLabel = (field: number) =>
+    legend
+      ? `${levels[Math.floor((field - 1) / 3)]} ${shortLabel(legend.exposure)} & ${levels[(field - 1) % 3]} ${shortLabel(legend.hazard)}`
+      : "";
+
   useEffect(() => {
     if (!map.current) return;
 
@@ -277,10 +287,10 @@ function GridView() {
       if (hasImageryTileLayer) {
         response.results.forEach((e) => {
           if (e.type == 'raster') {
-            for (const [key, value] of Object.entries(colors)) {
+            for (const value of Object.values(colors)) {
               if (e.pixelValue[0] == value.field) {
                 if (isolatedField == null || isolatedField == value.field) {
-                  showTooltip(key);
+                  showTooltip(cellLabel(value.field));
                   setHoveredField(value.field);
                 }
               }
@@ -343,30 +353,35 @@ function GridView() {
     <div className="h-full">
       <div className="w-full h-full bg-[#1D2224] " ref={ref}></div>
       <Thresholds />
-      <div className='absolute bottom-0 left-0 flex flex-col items-start justify-end rounded-xs bg-white w-50 h-45'>
+      {legend && (
+      <div className='absolute bottom-0 left-0 flex flex-col items-start justify-end rounded-xs bg-white w-50 h-51'>
         <div id="newLegend" onMouseLeave={() => hideTooltip()} className='w-full'>
-          <div className='absolute bottom-40 w-full flex  justify-center'>
+          <div className='absolute bottom-46 w-full flex  justify-center'>
             <div id="tooltip" className='invisible opacity-0 shadow-xl/20 rounded-md flex h-15 w-40 items-center justify-center bg-(--accentdarkblue-80) transition-all delay-150 duration-300 ease-in-out'>
               <div className='text-white text-[10px] w-9/10'><strong>{tooltipValue}</strong></div>
             </div>
           </div>
           <div className='w-5/10 flex'>
             <div className='flex w-10 h-30 items-center justify-center'>
-              <div className="text-[10px] rotate-270 whitespace-nowrap"><strong>Population (count)</strong></div>
+              <div className="text-[10px] rotate-270 whitespace-nowrap"><strong>{legend.exposure}</strong></div>
             </div>
             <div className="">
               <div className='flex w-30 h-30 flex-wrap flex-row-reverse'>
-                {Object.entries(colors).map(([key, value], index) => (
-                  <div key={key} style={{ backgroundColor: value.colorValue, borderColor: (hoveredField == value.field) ? "#e08b84" : (isolatedField == value.field) ? "#e15449" : value.colorValue}} className={`cursor-pointer w-10 h-10 border-2 transition-all duration-100`} onClick={() => isolateField(value.field)} onMouseOver={() => { showTooltip(key, index), setHoveredField(value.field); }} onMouseOut={() => setHoveredField(null)} onTouchStart={() => showTooltip(key, index)}></div>
+                {Object.values(colors).map((value) => (
+                  <div key={value.field} style={{ backgroundColor: value.colorValue, borderColor: (hoveredField == value.field) ? "#e08b84" : (isolatedField == value.field) ? "#e15449" : value.colorValue}} className={`cursor-pointer w-10 h-10 border-2 transition-all duration-100`} onClick={() => isolateField(value.field)} onMouseOver={() => { showTooltip(cellLabel(value.field)); setHoveredField(value.field); }} onMouseOut={() => setHoveredField(null)} onTouchStart={() => showTooltip(cellLabel(value.field))}></div>
                 ))}
               </div>
               <div className='w-full h-10 flex justify-center items-center'>
-                <div className="text-[10px]"><strong>Flood Height (meters)</strong></div>
+                <div className="text-[10px]"><strong>{legend.hazard}</strong></div>
               </div>
             </div>
           </div>
         </div>
+        <div className='w-full px-2 pb-1 text-[9px] text-left text-[#555555]'>
+          {legend.source}
+        </div>
       </div>
+      )}
     </div>
   );
 }
