@@ -12,6 +12,7 @@ import ScaleBar from "@arcgis/core/widgets/ScaleBar.js";
 import { gridObject } from "@/config/datasets";
 import { Thresholds } from "@/components/thresholds";
 import ImageryTileLayer from "@arcgis/core/layers/ImageryTileLayer";
+import VectorTileLayer from "@arcgis/core/layers/VectorTileLayer.js";
 
 export const Route = createFileRoute("/grid")({
   component: GridView,
@@ -36,8 +37,19 @@ function GridView() {
 
   useEffect(() => {
     if (ref.current) {
+      // same unlabelled base + boundaries as the real-time view
+      const baseLayer = new VectorTileLayer({
+        url: "https://cdn.arcgis.com/sharing/rest/content/items/d7397603e9274052808839b70812be50/resources/styles/root.json",
+        title: "base",
+      });
+      const boundariesLayer = new VectorTileLayer({
+        url: "https://cdn.arcgis.com/sharing/rest/content/items/e8ecee3086f34b06b85229d832a1c14a/resources/styles/root.json",
+        title: "boundaries",
+        opacity: 0.25,
+      });
+
       map.current = new Map({
-        basemap: "dark-gray",
+        layers: [baseLayer, boundariesLayer],
       });
 
       view.current = new MapView({
