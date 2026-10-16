@@ -6,44 +6,6 @@ export const URL_RTBASE =
   "https://tiledimageservices9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services";
 export const URL_GRIDBASE = URL_RTBASE;
 
-export const gridObject: Record<
-  string,
-  Record<string, Record<string, Record<number, string>>>
-> = {
-  "Riverine Flooding": {
-    Population: {
-      rcp4p5: {
-        1980: `${URL_GRIDBASE}/riverine_population_historical_1980_rp1000/ImageServer`,
-        2030: `${URL_GRIDBASE}/riverine_population_rcp4p5_2030_rp1000/ImageServer`,
-        2050: `${URL_GRIDBASE}/riverine_population_rcp4p5_2050_rp1000/ImageServer`,
-        2080: `${URL_GRIDBASE}/riverine_population_rcp4p5_2080_rp1000/ImageServer`,
-      },
-      rcp8p5: {
-        1980: `${URL_GRIDBASE}/riverine_population_historical_1980_rp1000/ImageServer`,
-        2030: `${URL_GRIDBASE}/riverine_population_rcp8p5_2030_rp1000/ImageServer`,
-        2050: `${URL_GRIDBASE}/riverine_population_rcp8p5_2050_rp1000/ImageServer`,
-        2080: `${URL_GRIDBASE}/riverine_population_rcp8p5_2080_rp1000/ImageServer`,
-      },
-    },
-  },
-  "Coastal Flooding": {
-    Population: {
-      rcp4p5: {
-        1980: `${URL_GRIDBASE}/coastal_population_historical_1980_rp1000/ImageServer`,
-        2030: `${URL_GRIDBASE}/coastal_population_rcp4p5_2030_rp1000/ImageServer`,
-        2050: `${URL_GRIDBASE}/coastal_population_rcp4p5_2050_rp1000/ImageServer`,
-        2080: `${URL_GRIDBASE}/coastal_population_rcp4p5_2080_rp1000/ImageServer`,
-      },
-      rcp8p5: {
-        1980: `${URL_GRIDBASE}/coastal_population_historical_1980_rp1000/ImageServer`,
-        2030: `${URL_GRIDBASE}/coastal_population_rcp8p5_2030_rp1000/ImageServer`,
-        2050: `${URL_GRIDBASE}/coastal_population_rcp8p5_2050_rp1000/ImageServer`,
-        2080: `${URL_GRIDBASE}/coastal_population_rcp8p5_2080_rp1000/ImageServer`,
-      },
-    },
-  },
-};
-
 export const urlObject: Record<
   string,
   Record<
