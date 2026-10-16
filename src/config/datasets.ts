@@ -327,7 +327,8 @@ export const urlObject: Record<
       measure: ["ID_PW_EXP", "TN_PW_EXP", "HD_PW_EXP"],
       scenarios: ["SSP126", "SSP245", "SSP370"],
       gridUrl: `${URL_GRIDBASE}/bivar_temps_population_{scenario}_{time}_{threshold}/ImageServer`,
-      gridThreshold: { _Z: "id", H_20: "tr20", H_26: "tr", H_32: "tr32", H_30: "hd30", H_35: "hd35", H_40: "hd40" },
+      // threshold key -> original CCKP variable, used as the service-name suffix
+      gridThreshold: { _Z: "id", H_20: "tr", H_26: "tr26", H_32: "tr32", H_30: "hd30", H_35: "hd35", H_40: "hd40" },
       gridLegend: {
         exposure: "Population (count)",
         hazard: "{measure} {threshold}°C",
