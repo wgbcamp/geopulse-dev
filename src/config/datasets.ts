@@ -56,6 +56,10 @@ export const urlObject: Record<
       scenarios: string[];
       source: string;
       value: string;
+      gridUrl?: string;
+      gridThreshold?: Record<string, string>;
+      gridMeasure?: Record<string, string>;
+      gridLegend?: { exposure: string; hazard: string; source: string };
     }
   >
 > = {
@@ -64,6 +68,12 @@ export const urlObject: Record<
       url: `${URL_BASE}/riverine_population_table/FeatureServer/0/query`,
       measure: ["RF_PW_EXP"],
       scenarios: ["rcp4p5", "rcp8p5"],
+      gridUrl: `${URL_GRIDBASE}/bivar_riverine_population_{scenario}_{time}_{threshold}/ImageServer`,
+      gridLegend: {
+        exposure: "Population (count)",
+        hazard: "Flood Height (meters)",
+        source: "Sources: Aqueduct; WorldPop.",
+      },
       threshold: {
         type: "RETURN_PERIOD",
         group: {
@@ -93,6 +103,12 @@ export const urlObject: Record<
       url: `${URL_BASE}/riverine_buildings_table/FeatureServer/0/query`,
       measure: ["RF_BLD_EXP"],
       scenarios: ["rcp4p5", "rcp8p5"],
+      gridUrl: `${URL_GRIDBASE}/bivar_riverine_buildings_{scenario}_{time}_{threshold}/ImageServer`,
+      gridLegend: {
+        exposure: "Buildings (count)",
+        hazard: "Flood Height (meters)",
+        source: "Sources: Aqueduct; Global Building Atlas.",
+      },
       threshold: {
         type: "RETURN_PERIOD",
         group: {
@@ -122,6 +138,12 @@ export const urlObject: Record<
       url: `${URL_BASE}/riverine_gdp_table/FeatureServer/0/query`,
       measure: ["RF_GDP_EXP"],
       scenarios: ["rcp4p5", "rcp8p5"],
+      gridUrl: `${URL_GRIDBASE}/bivar_riverine_gdp_{scenario}_{time}_{threshold}/ImageServer`,
+      gridLegend: {
+        exposure: "GDP (USD)",
+        hazard: "Flood Height (meters)",
+        source: "Sources: Aqueduct; Murakami et al. (2021).",
+      },
       threshold: {
         type: "RETURN_PERIOD",
         group: {
@@ -151,6 +173,12 @@ export const urlObject: Record<
       url: `${URL_BASE}/riverine_ugdp_table/FeatureServer/0/query`,
       measure: ["RF_UGDP_EXP"],
       scenarios: ["rcp4p5", "rcp8p5"],
+      gridUrl: `${URL_GRIDBASE}/bivar_riverine_urban_gdp_{scenario}_{time}_{threshold}/ImageServer`,
+      gridLegend: {
+        exposure: "Urban GDP (USD)",
+        hazard: "Flood Height (meters)",
+        source: "Sources: Aqueduct; Murakami et al. (2021); GHSL.",
+      },
       threshold: {
         type: "RETURN_PERIOD",
         group: {
@@ -182,6 +210,12 @@ export const urlObject: Record<
       url: `${URL_BASE}/coastal_population_table/FeatureServer/0/query`,
       measure: ["CF_PW_EXP"],
       scenarios: ["rcp4p5", "rcp8p5"],
+      gridUrl: `${URL_GRIDBASE}/bivar_coastal_population_{scenario}_{time}_{threshold}/ImageServer`,
+      gridLegend: {
+        exposure: "Population (count)",
+        hazard: "Flood Height (meters)",
+        source: "Sources: Aqueduct; WorldPop.",
+      },
       threshold: {
         type: "RETURN_PERIOD",
         group: {
@@ -211,6 +245,12 @@ export const urlObject: Record<
       url: `${URL_BASE}/coastal_buildings_table/FeatureServer/0/query`,
       measure: ["CF_BLD_EXP"],
       scenarios: ["rcp4p5", "rcp8p5"],
+      gridUrl: `${URL_GRIDBASE}/bivar_coastal_buildings_{scenario}_{time}_{threshold}/ImageServer`,
+      gridLegend: {
+        exposure: "Buildings (count)",
+        hazard: "Flood Height (meters)",
+        source: "Sources: Aqueduct; Global Building Atlas.",
+      },
       threshold: {
         type: "RETURN_PERIOD",
         group: {
@@ -240,6 +280,12 @@ export const urlObject: Record<
       url: `${URL_BASE}/coastal_gdp_table/FeatureServer/0/query`,
       measure: ["CF_GDP_EXP"],
       scenarios: ["rcp4p5", "rcp8p5"],
+      gridUrl: `${URL_GRIDBASE}/bivar_coastal_gdp_{scenario}_{time}_{threshold}/ImageServer`,
+      gridLegend: {
+        exposure: "GDP (USD)",
+        hazard: "Flood Height (meters)",
+        source: "Sources: Aqueduct; Murakami et al. (2021).",
+      },
       threshold: {
         type: "RETURN_PERIOD",
         group: {
@@ -269,6 +315,12 @@ export const urlObject: Record<
       url: `${URL_BASE}/coastal_ugdp_table/FeatureServer/0/query`,
       measure: ["CF_UGDP_EXP"],
       scenarios: ["rcp4p5", "rcp8p5"],
+      gridUrl: `${URL_GRIDBASE}/bivar_coastal_urban_gdp_{scenario}_{time}_{threshold}/ImageServer`,
+      gridLegend: {
+        exposure: "Urban GDP (USD)",
+        hazard: "Flood Height (meters)",
+        source: "Sources: Aqueduct; Murakami et al. (2021); GHSL.",
+      },
       threshold: {
         type: "RETURN_PERIOD",
         group: {
@@ -300,6 +352,8 @@ export const urlObject: Record<
       url: `${URL_BASE}/drought_cropland_table/FeatureServer/0/query`,
       measure: ["CDD_CROP_EXP", "SPEI_CROP_EXP"],
       scenarios: ["SSP126", "SSP245", "SSP370"],
+      gridUrl: `${URL_GRIDBASE}/drought_cropland_{scenario}_{time}_{measure}/ImageServer`,
+      gridMeasure: { CDD_CROP_EXP: "cdd", SPEI_CROP_EXP: "spei12" },
       value: "MEDIAN",
       source:
         "Sources: World Bank Climate Change Knowledge Portal (CMIP6 / WCRP modelling groups); Copernicus / ESA CCI Land Cover; Maes et al. (2025), OECD; and IMF staff calculations.",
@@ -310,6 +364,13 @@ export const urlObject: Record<
       url: `${URL_BASE}/temperature_population_table/FeatureServer/0/query`,
       measure: ["ID_PW_EXP", "TN_PW_EXP", "HD_PW_EXP"],
       scenarios: ["SSP126", "SSP245", "SSP370"],
+      gridUrl: `${URL_GRIDBASE}/bivar_temps_population_{scenario}_{time}_{threshold}/ImageServer`,
+      gridThreshold: { _Z: "id", H_20: "tr20", H_26: "tr", H_32: "tr32", H_30: "hd30", H_35: "hd35", H_40: "hd40" },
+      gridLegend: {
+        exposure: "Population (count)",
+        hazard: "{measure} {threshold}°C",
+        source: "Sources: World Bank CCKP; WorldPop.",
+      },
       threshold: {
         type: "TEMP_THRESHOLD",
         group: {
@@ -339,6 +400,13 @@ export const urlObject: Record<
       url: `${URL_BASE}/temperature_livestock_table/FeatureServer/0/query`,
       measure: ["HD_LW_EXP"],
       scenarios: ["SSP126", "SSP245", "SSP370"],
+      // single threshold, no switch
+      gridUrl: `${URL_GRIDBASE}/bivar_temps_livestock_{scenario}_{time}_hd35/ImageServer`,
+      gridLegend: {
+        exposure: "Livestock (heads)",
+        hazard: "Hot Days > 35°C",
+        source: "Sources: World Bank CCKP; GLW3.",
+      },
       threshold: {
         type: "TEMP_THRESHOLD",
         group: { H_35: "> 35" },
@@ -349,6 +417,52 @@ export const urlObject: Record<
     },
   },
 };
+
+type GridState = {
+  currentHazard: string;
+  currentExposure: string;
+  currentScenario: string;
+  currentTime: number;
+  currentThreshold: { threshold: string };
+  currentMeasure: { id: string };
+};
+
+// Builds the grid-view layer URL for the current selection from urlObject[hazard][exposure].gridUrl.
+// Returns undefined when there is no grid layer for the selection.
+export function buildGridUrl(state: GridState): string | undefined {
+  const config = urlObject[state.currentHazard]?.[state.currentExposure];
+  const gridUrl = config?.gridUrl;
+  if (!gridUrl) return undefined;
+
+  const threshold = state.currentThreshold.threshold;
+  const measure = state.currentMeasure.id;
+
+  // historical is shared across scenarios
+  const scenario = state.currentTime === 1980 ? "historical" : state.currentScenario;
+
+  return gridUrl
+    .replace("{scenario}", scenario.toLowerCase())
+    .replace("{time}", String(state.currentTime))
+    .replace("{threshold}", config.gridThreshold?.[threshold] ?? threshold)
+    .replace("{measure}", config.gridMeasure?.[measure] ?? measure);
+}
+
+// Legend labels for the current selection, with {measure} / {threshold} filled
+// from measureMapper and threshold.group. Undefined = no bivariate legend.
+export function buildGridLegend(
+  state: GridState,
+): { exposure: string; hazard: string; source: string } | undefined {
+  const config = urlObject[state.currentHazard]?.[state.currentExposure];
+  const legend = config?.gridLegend;
+  if (!legend) return undefined;
+
+  const fill = (text: string) =>
+    text
+      .replace("{measure}", measureMapper[state.currentMeasure.id] ?? "")
+      .replace("{threshold}", config.threshold?.group[state.currentThreshold.threshold] ?? "");
+
+  return { exposure: fill(legend.exposure), hazard: fill(legend.hazard), source: legend.source };
+}
 
 export const scenarioMapper: Record<string, string> = {
   rcp4p5: "Orderly",
