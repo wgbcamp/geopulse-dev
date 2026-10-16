@@ -1,9 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  useContext,
-  type ReactElement,
-} from "react";
+import React, { useContext, type ReactElement } from "react";
 import { AppStateContext, AppActionsContext } from "../app";
 import { Item, ItemContent } from "@/components/ui/item";
 
@@ -93,16 +88,12 @@ export const Thresholds = () => {
   const state = useContext(AppStateContext);
   const actions = useContext(AppActionsContext);
 
-  const [thresholdSliderValue, setThresholdSliderValue] = useState<number[]>([
-    0,
-  ]);
-
-  useEffect(() => {
-    handleValueChange([0]);
-  }, [state.currentHazard]);
-
   const config = urlObject[state.currentHazard][state.currentExposure];
   const thresholdGroup = config?.threshold?.group ?? {};
+  // slider position follows the shared threshold, so it survives switching views
+  const thresholdSliderValue = [
+    Math.max(0, Object.keys(thresholdGroup).indexOf(state.currentThreshold.threshold)),
+  ];
 
   const handleValueChange = (value: number[]) => {
     const config = urlObject[state.currentHazard][state.currentExposure];
@@ -114,9 +105,6 @@ export const Thresholds = () => {
 
     actions?.setThreshold({ name: measureName, threshold: thresholdKey });
     actions?.setMeasure({ name: measureName, id: measureId });
-
-    //
-    setThresholdSliderValue(value);
   };
 
   const handleDroughtTabChange = (value: string) => {
@@ -167,7 +155,6 @@ export const Thresholds = () => {
               min={0}
               max={Object.values(thresholdGroup).length - 1}
               step={1}
-              defaultValue={[0]}
               value={thresholdSliderValue}
               onValueChange={handleValueChange}
             />
@@ -184,7 +171,7 @@ export const Thresholds = () => {
                     >
                       <div className="w-px h-2 bg-muted-foreground/50"></div>
                       <span
-                        className={`text-xs w-[42px] mt-0.5 ${value === state.currentThreshold.threshold ? "font-bold text-[black] text-foreground" : "text-muted-foreground"}`}
+                        className={`text-xs w-[42px] mt-0.5 ${key === state.currentThreshold.threshold ? "font-bold text-white" : "text-muted-foreground"}`}
                       >
                         <div className="font-bold">
                           {index >= 1 && index <= 3 ? "Tmin" : "Tmax"}
@@ -204,7 +191,7 @@ export const Thresholds = () => {
                     style={{ left: `${percent}%` }}
                   >
                     <span
-                      className={`text-xs w-[42px] mt-0.5 flex items-end ${label.name === state.currentThreshold.threshold ? "font-bold text-[black] text-foreground" : "text-muted-foreground"}`}
+                      className={`text-xs w-[42px] mt-0.5 flex items-end ${label.name && label.name === measureMapper[state.currentMeasure.id]?.toUpperCase() ? "font-bold text-white" : "text-muted-foreground"}`}
                     >
                       <div
                         dangerouslySetInnerHTML={{ __html: label.svg }}
@@ -248,23 +235,22 @@ export const Thresholds = () => {
               min={0}
               max={Object.values(thresholdGroup).length - 1}
               step={1}
-              defaultValue={[0]}
               value={thresholdSliderValue}
               onValueChange={handleValueChange}
             />
             <div className="relative h-6" style={{ width: "calc(100%*0.9)" }}>
-              {Object.values(thresholdGroup).map((tick: any, index: any) => {
+              {Object.entries(thresholdGroup).map(([key, tick], index: any) => {
                 const percent =
                   (index / (Object.values(thresholdGroup).length - 1)) * 100;
                 return (
                   <div
-                    key={tick}
+                    key={key}
                     className="absolute flex flex-col items-center -translate-x-1/2"
                     style={{ left: `${percent}%` }}
                   >
                     <div className="w-px h-2 bg-muted-foreground/50"></div>
                     <span
-                      className={`text-xs w-[42px] mt-0.5 ${tick === state.currentThreshold.threshold ? "font-bold text-[black] text-foreground" : "text-muted-foreground"}`}
+                      className={`text-xs w-[42px] mt-0.5 ${key === state.currentThreshold.threshold ? "font-bold text-white" : "text-muted-foreground"}`}
                     >
                       <div className="font-bold">{tick}</div>
                       <div
