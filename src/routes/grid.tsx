@@ -9,7 +9,7 @@ import UniqueValueRenderer from "@arcgis/core/renderers/UniqueValueRenderer.js";
 
 import ScaleBar from "@arcgis/core/widgets/ScaleBar.js";
 
-import { gridObject, buildGridLegend } from "@/config/datasets";
+import { buildGridUrl, buildGridLegend } from "@/config/datasets";
 import { Thresholds } from "@/components/thresholds";
 import ImageryTileLayer from "@arcgis/core/layers/ImageryTileLayer";
 import VectorTileLayer from "@arcgis/core/layers/VectorTileLayer.js";
@@ -258,12 +258,15 @@ function GridView() {
     if (vtlayer.current) {
       map.current.remove(vtlayer.current);
       vtlayer.current.destroy();
+      vtlayer.current = null;
     }
+    setIsolatedField(null);
+
+    const url = state ? buildGridUrl(state) : undefined;
+    if (!url) return;
 
     vtlayer.current = new ImageryTileLayer({
-      url: gridObject[state.currentHazard]?.[state.currentExposure]?.[
-        state.currentScenario
-      ]?.[state.currentTime],
+      url,
       renderer: new UniqueValueRenderer({
         field: "Value",
         uniqueValueInfos: valuesArray
@@ -275,6 +278,8 @@ function GridView() {
     state.currentHazard,
     state.currentExposure,
     state.currentScenario,
+    state.currentThreshold,
+    state.currentMeasure,
   ]);
 
   useEffect(() => {
@@ -320,7 +325,7 @@ function GridView() {
         setIsolatedField(null);
       }
       vtlayer.current = new ImageryTileLayer({
-        url: gridObject[state.currentHazard]?.[state.currentExposure]?.[state.currentScenario]?.[state.currentTime],
+        url: state ? buildGridUrl(state) : undefined,
         renderer: new UniqueValueRenderer({
           field: "Value",
           uniqueValueInfos: isolatedValues,
