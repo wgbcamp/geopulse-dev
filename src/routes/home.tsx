@@ -91,9 +91,7 @@ const categoryDetails: Record<
     // exposure layers GeoPulse consumes, not IMF products, so they are deliberately not claimed here
     subtitle: (
       <span className={heroSubtitle}>
-        Access the <b>gridded macroeconomic statistics</b> behind GeoPulse: new
-        layers for GDP and capital stock, built on 1 km spatial disaggregation
-        of official macroeconomic data.
+        Explore the economic data behind GeoPulse with detailed map layers showing where economic activity and assets are concentrated at <b>1 km resolution</b>.
       </span>
     ),
   },
@@ -101,12 +99,8 @@ const categoryDetails: Record<
 
 // the hero rests on this entry; the cards below cycle through the rest while the user is idle
 const mainCategory = "Overview";
-// Tuned for pace over full readability: a card window carries the headline and the gist of its
-// subtitle (~32 words in 6s is well above a comprehension read), on the assumption that anyone who
-// wants the whole thing hovers, which pauses the rotation. Note the 700ms fade eats into the front
-// of every window, so the legible time is shorter than the interval.
-const idleMs = 8500; // Overview: most copy of the four, and the resting state, so it holds longest
-const rotationMs = 6000; // each card, kept identical so the rotation does not feel erratic
+const idleMs = 12000;     // 12 seconds for the main overview
+const rotationMs = 10000; // 10 seconds for each feature card
 
 // `category` keys the hero copy in categoryDetails; `title`/`misc` are all the card shows.
 // `link` must stay in step with the matching entry in overviewCategories below — the card and the
@@ -155,6 +149,7 @@ export const mapButton = (
   icon1: ReactElement,
   icon2: ReactElement,
   link: string,
+  label = "Explore the Map",
 ) => (
   <Link
     to={link}
@@ -162,7 +157,7 @@ export const mapButton = (
     className={`${background} ${foreground} rounded-[100px] h-15 flex items-center justify-center py-5 px-10 gap-2 cursor-pointer`}
   >
     {icon1}
-    <span className="font-bold text-[18px]">Explore the Map</span>
+    <span className="font-bold text-[18px]">{label}</span>
     {icon2}
   </Link>
 );
@@ -197,17 +192,13 @@ const overviewCategories: {
     description: (
       <div className="max-w-90 flex flex-col gap-5">
         <span>
-          Monitor disaster events as they unfold on an interactive global map,
-          or revisit past events.
+          Monitor disaster events as they unfold on an interactive global map, or revisit past events.
         </span>
         <span>
-          Overlay event footprints with exposure layers to see where hazards
-          intersect with populations, GDP, capital stock, agriculture, and
-          critical infrastructure.
+          Map disaster footprints to see where and to what extent people, economic activity, and assets are exposed.
         </span>
         <span>
-          Open an event’s detail card to explore its timeline, severity, and
-          detailed exposure metrics by country, with access to supporting data.
+          Learn more about each event, including its timeline and detailed exposure metrics by country, with access to supporting data.
         </span>
       </div>
     ),
@@ -268,7 +259,7 @@ const featureCategories: {
     icon: exportable,
     title: "Exportable Charts",
     subtitle:
-      "Communicate findings fast and pull publication-ready charts straight from any view.",
+      "Download publication-ready charts to communicate your findings in reports and presentations.",
     position: 0,
   },
   {
@@ -282,7 +273,7 @@ const featureCategories: {
     icon: transparentMethodology,
     title: "Transparent Methodology",
     subtitle:
-      "Documented data sources and methods support correct interpretation and citation.",
+      "Documented data sources and methods support accurate interpretation and proper citation.",
     position: 1,
   },
   {
@@ -517,7 +508,7 @@ function RouteComponent() {
                 <div
                   key={key}
                   aria-hidden={key !== activeCategory}
-                  className={`md:max-w-80 lg:max-w-120 2xl:max-w-max col-start-1 row-start-1 flex flex-col gap-3 xl:gap-5 transition-opacity duration-200 ease-in-out
+                  className={`md:max-w-80 lg:max-w-120 2xl:max-w-max col-start-1 row-start-1 flex flex-col gap-3 xl:gap-5 transition-opacity duration-500 ease-in-out
                                     ${/* gap: the title sets leading-none, so title and subtitle otherwise touch */ ""}
                                     ${key === activeCategory ? "opacity-100" : "opacity-0 pointer-events-none"}`}
                 >
@@ -605,11 +596,12 @@ function RouteComponent() {
                 </div>
                 {e.description}
                 {mapButton(
-                  "bg-(--accentdarkblue-90)",
-                  "text-white",
-                  <GlobeIcon color={"var(--primarywhite)"} />,
-                  <ArrowRight color={"var(--primarywhite)"} />,
-                  e.link,
+                    "bg-(--accentdarkblue-90)",
+                    "text-white",
+                    <GlobeIcon color={"var(--primarywhite)"} />,
+                    <ArrowRight color={"var(--primarywhite)"} />,
+                    e.link,
+                    e.title === "Data Foundation" ? "Access the Data" : "Explore the Map",
                 )}
               </div>
             </div>
@@ -675,26 +667,32 @@ function RouteComponent() {
           Advancing Global Data Standards
         </div>
         <span className="leading-[140%] text-[20px] text-center text-white w-9/10 max-w-220 pb-10">
-          The G20 Data Gaps Initiative (DGI‑3) sets out 14 recommendations
-          across four statistical areas. GeoPulse addresses{" "}
-          <b>Recommendation 5 — climate physical and transition risks</b> —
-          bringing IMF‑generated indicators into a consistent, accessible format
-          for surveillance and policy analysis.
+          The G20 Data Gaps Initiative (DGI-3) aims to improve economic and financial statistics, including data on climate-related risks.
+        </span>  
+        <span className="leading-[140%] text-[20px] text-center text-white w-9/10 max-w-220 pb-10">
+          GeoPulse supports <b>Recommendation 5 — climate physical and transition risks</b> —
+          by developing high-resolution gridded macroeconomic data and indicators of exposure to physical hazards, and making them accessible for surveillance and policy analysis.
         </span>
         {externalButton(
           "bg-white",
           "text-(--accentdarkblue-90)",
-          "About the Data Gaps Initiative",
+          "Learn More",
           <ArrowRight color={"var(--accentdarkblue-90)"} />,
           "https://www.imf.org/en/news/seminars/conferences/g20-data-gaps-initiative",
         )}
         <div className="w-full flex justify-center items-center py-25">
           <div className="flex w-9/10 flex-col items-center gap-9.25">
             <img src={IMFLogo}></img>
-            <span className="text-white font-bold leading-[140%]">
+            <div className="text-white font-bold leading-[140%]">
               © 2026 INTERNATIONAL MONETARY FUND. ALL RIGHTS RESERVED |{" "}
-              <u>Privacy Policy</u> | <u>Copyright & Usage</u>
-            </span>
+                <a href="https://www.imf.org/en/about/privacy-notice" target="_blank" rel="noopener noreferrer" className="text-inherit no-underline hover:underline focus-visible:underline">
+                  Privacy Policy
+                </a>
+                {" | "}
+                <a href="https://www.imf.org/en/about/copyright-and-terms" target="_blank" rel="noopener noreferrer" className="text-inherit no-underline hover:underline focus-visible:underline">
+                  Copyright &amp; Usage
+                </a>
+            </div>
           </div>
         </div>
       </div>
