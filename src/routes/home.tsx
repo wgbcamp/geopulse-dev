@@ -669,7 +669,7 @@ function RouteComponent() {
         <span className="leading-[140%] text-[20px] text-center text-white w-9/10 max-w-220 pb-10">
           The G20 Data Gaps Initiative (DGI-3) aims to improve economic and financial statistics, including data on climate-related risks.
         </span>  
-        <span>
+        <span className="leading-[140%] text-[20px] text-center text-white w-9/10 max-w-220 pb-10">
           GeoPulse supports <b>Recommendation 5 — climate physical and transition risks</b> —
           by developing high-resolution gridded macroeconomic data and indicators of exposure to physical hazards, and making them accessible for surveillance and policy analysis.
         </span>
@@ -685,11 +685,11 @@ function RouteComponent() {
             <img src={IMFLogo}></img>
             <div className="text-white font-bold leading-[140%]">
               © 2026 INTERNATIONAL MONETARY FUND. ALL RIGHTS RESERVED |{" "}
-                <a href="https://www.imf.org/en/about/privacy-notice" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-80">
+                <a href="https://www.imf.org/en/about/privacy-notice" target="_blank" rel="noopener noreferrer" className="text-inherit no-underline hover:underline focus-visible:underline">
                   Privacy Policy
                 </a>
                 {" | "}
-                <a href="https://www.imf.org/en/about/copyright-and-terms" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-80">
+                <a href="https://www.imf.org/en/about/copyright-and-terms" target="_blank" rel="noopener noreferrer" className="text-inherit no-underline hover:underline focus-visible:underline">
                   Copyright &amp; Usage
                 </a>
             </div>
