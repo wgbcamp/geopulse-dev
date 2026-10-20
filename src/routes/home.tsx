@@ -91,9 +91,7 @@ const categoryDetails: Record<
     // exposure layers GeoPulse consumes, not IMF products, so they are deliberately not claimed here
     subtitle: (
       <span className={heroSubtitle}>
-        Access the <b>gridded macroeconomic statistics</b> behind GeoPulse: new
-        layers for GDP and capital stock, built on 1 km spatial disaggregation
-        of official macroeconomic data.
+        Explore the economic data behind GeoPulse with detailed map layers showing where economic activity and assets are concentrated, including GDP and capital stock, at <b>1 km resolution</b>.
       </span>
     ),
   },
@@ -101,12 +99,8 @@ const categoryDetails: Record<
 
 // the hero rests on this entry; the cards below cycle through the rest while the user is idle
 const mainCategory = "Overview";
-// Tuned for pace over full readability: a card window carries the headline and the gist of its
-// subtitle (~32 words in 6s is well above a comprehension read), on the assumption that anyone who
-// wants the whole thing hovers, which pauses the rotation. Note the 700ms fade eats into the front
-// of every window, so the legible time is shorter than the interval.
-const idleMs = 8500; // Overview: most copy of the four, and the resting state, so it holds longest
-const rotationMs = 6000; // each card, kept identical so the rotation does not feel erratic
+const idleMs = 12000;     // 12 seconds for the main overview
+const rotationMs = 10000; // 10 seconds for each feature card
 
 // `category` keys the hero copy in categoryDetails; `title`/`misc` are all the card shows.
 // `link` must stay in step with the matching entry in overviewCategories below — the card and the
@@ -197,17 +191,13 @@ const overviewCategories: {
     description: (
       <div className="max-w-90 flex flex-col gap-5">
         <span>
-          Monitor disaster events as they unfold on an interactive global map,
-          or revisit past events.
+          Monitor disaster events as they unfold on an interactive global map, or revisit past events.
         </span>
         <span>
-          Overlay event footprints with exposure layers to see where hazards
-          intersect with populations, GDP, capital stock, agriculture, and
-          critical infrastructure.
+          Map disaster footprints to see where and to what extent people, economic activity, and assets are exposed.
         </span>
         <span>
-          Open an event’s detail card to explore its timeline, severity, and
-          detailed exposure metrics by country, with access to supporting data.
+          Learn more about each event, including its timeline and detailed exposure metrics by country, with access to supporting data.
         </span>
       </div>
     ),
@@ -268,7 +258,7 @@ const featureCategories: {
     icon: exportable,
     title: "Exportable Charts",
     subtitle:
-      "Communicate findings fast and pull publication-ready charts straight from any view.",
+      "Download publication-ready charts to communicate your findings in reports and presentations.",
     position: 0,
   },
   {
@@ -282,7 +272,7 @@ const featureCategories: {
     icon: transparentMethodology,
     title: "Transparent Methodology",
     subtitle:
-      "Documented data sources and methods support correct interpretation and citation.",
+      "Documented data sources and methods support accurate interpretation and proper citation.",
     position: 1,
   },
   {
@@ -517,7 +507,7 @@ function RouteComponent() {
                 <div
                   key={key}
                   aria-hidden={key !== activeCategory}
-                  className={`md:max-w-80 lg:max-w-120 2xl:max-w-max col-start-1 row-start-1 flex flex-col gap-3 xl:gap-5 transition-opacity duration-200 ease-in-out
+                  className={`md:max-w-80 lg:max-w-120 2xl:max-w-max col-start-1 row-start-1 flex flex-col gap-3 xl:gap-5 transition-opacity duration-500 ease-in-out
                                     ${/* gap: the title sets leading-none, so title and subtitle otherwise touch */ ""}
                                     ${key === activeCategory ? "opacity-100" : "opacity-0 pointer-events-none"}`}
                 >
