@@ -254,25 +254,8 @@ function GridView() {
 
   useEffect(() => {
     if (!map.current) return;
-
-    if (vtlayer.current) {
-      map.current.remove(vtlayer.current);
-      vtlayer.current.destroy();
-      vtlayer.current = null;
-    }
-    setIsolatedField(null);
-
-    const url = state ? buildGridUrl(state) : undefined;
-    if (!url) return;
-
-    vtlayer.current = new ImageryTileLayer({
-      url,
-      renderer: new UniqueValueRenderer({
-        field: "Value",
-        uniqueValueInfos: valuesArray
-      }),
-    });
-    map.current.add(vtlayer.current);
+    
+    isolateField(isolatedField, "dimension");
   }, [
     state.currentTime,
     state.currentHazard,
@@ -313,17 +296,30 @@ function GridView() {
     };
   },[vtlayer.current])
 
-  function isolateField(value: number) {
-    if (map.current && vtlayer.current) {
-      map.current.remove(vtlayer.current);
-      let isolatedValues = valuesArray;
-      if (isolatedField !== value) {
-        // look up in the full list, not the current renderer (which may already be filtered)
-        isolatedValues = valuesArray.filter((v) => v.value == value);
-        setIsolatedField(value);
-      } else {
-        setIsolatedField(null);
+  function isolateField(value: number | null, type: string) {
+    if (map.current) {
+      if (vtlayer.current) {
+        map.current.remove(vtlayer.current);
+        vtlayer.current.destroy();
+        vtlayer.current = null;
       }
+      let isolatedValues = valuesArray;
+      if (type == "dimension") {
+        if (isolatedField) {
+          isolatedValues = valuesArray.filter((v) => v.value == value);
+        }
+      }
+
+      if (type == "exposure") {
+        if (isolatedField !== value) {
+          // look up in the full list, not the current renderer (which may already be filtered)
+          isolatedValues = valuesArray.filter((v) => v.value == value);
+          setIsolatedField(value);
+        } else {
+          setIsolatedField(null);
+        }
+      }
+
       vtlayer.current = new ImageryTileLayer({
         url: state ? buildGridUrl(state) : undefined,
         renderer: new UniqueValueRenderer({
@@ -373,7 +369,14 @@ function GridView() {
             <div className="">
               <div className='flex w-30 h-30 flex-wrap flex-row-reverse'>
                 {Object.values(colors).map((value) => (
-                  <div key={value.field} style={{ backgroundColor: value.colorValue, borderColor: (hoveredField == value.field) ? "#e08b84" : (isolatedField == value.field) ? "#e15449" : value.colorValue}} className={`cursor-pointer w-10 h-10 border-2 transition-all duration-100`} onClick={() => isolateField(value.field)} onMouseOver={() => { showTooltip(cellLabel(value.field)); setHoveredField(value.field); }} onMouseOut={() => setHoveredField(null)} onTouchStart={() => showTooltip(cellLabel(value.field))}></div>
+                  <div key={value.field}
+                    style={{ backgroundColor: value.colorValue, borderColor: (hoveredField == value.field) ? "#e08b84" : (isolatedField == value.field) ? "#e15449" : value.colorValue}} 
+                    className={`cursor-pointer w-10 h-10 border-2 transition-all duration-100`} 
+                    onClick={() => isolateField(value.field, "exposure")} 
+                    onMouseOver={() => { showTooltip(cellLabel(value.field)); setHoveredField(value.field); }} 
+                    onMouseOut={() => setHoveredField(null)} 
+                    onTouchStart={() => showTooltip(cellLabel(value.field))}>
+                  </div>
                 ))}
               </div>
               <div className='w-full h-10 flex justify-center items-center'>
