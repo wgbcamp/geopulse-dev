@@ -32,7 +32,6 @@ type ComboBoxProps = {
 export const ComboBox = ({ iso3, setIso3, regionId }: ComboBoxProps) => {
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
-  let queryParameter: any;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -57,6 +56,7 @@ export const ComboBox = ({ iso3, setIso3, regionId }: ComboBoxProps) => {
                 <CommandItem
                   key={country.iso3}
                   value={country.name}
+                  className="text-left"
                   onSelect={() => {
                     setOpen(false);
                     setIso3(country.iso3);

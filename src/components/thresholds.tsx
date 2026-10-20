@@ -151,7 +151,7 @@ export const Thresholds = () => {
         <Item className="w-9/10 py-0 px-2 -translate-x-1/2 -translate-y-1/2 absolute left-1/2 top-1/2">
           <div className="w-full flex flex-col items-center">
             <Slider
-              className="w-75 z-1 cursor-pointer [&_[data-slot=slider-range]]:bg-transparent [&_[data-slot=slider-track]]:bg-gradient-to-r [&_[data-slot=slider-track]]:from-[#004C97] [&_[data-slot=slider-track]]:via-[#FDBB33] [&_[data-slot=slider-track]]:to-[#FF0000]"
+              className="w-75 z-1 cursor-pointer [&_[data-slot=slider-range]]:bg-transparent [&_[data-slot=slider-track]]:bg-gray-600"
               min={0}
               max={Object.values(thresholdGroup).length - 1}
               step={1}
@@ -231,7 +231,7 @@ export const Thresholds = () => {
           </div>
           <div className="w-full flex flex-col items-center">
             <Slider
-              className="w-75 z-1 cursor-pointer [&_[data-slot=slider-range]]:bg-transparent [&_[data-slot=slider-track]]:bg-gradient-to-r [&_[data-slot=slider-track]]:from-[rgb(16,48,80)] [&_[data-slot=slider-track]]:to-[rgb(116,221,208)]"
+              className="w-75 z-1 cursor-pointer [&_[data-slot=slider-range]]:bg-transparent [&_[data-slot=slider-track]]:bg-gray-600"
               min={0}
               max={Object.values(thresholdGroup).length - 1}
               step={1}
