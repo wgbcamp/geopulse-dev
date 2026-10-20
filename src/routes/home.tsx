@@ -149,6 +149,7 @@ export const mapButton = (
   icon1: ReactElement,
   icon2: ReactElement,
   link: string,
+  label = "Explore the Map",
 ) => (
   <Link
     to={link}
@@ -156,7 +157,7 @@ export const mapButton = (
     className={`${background} ${foreground} rounded-[100px] h-15 flex items-center justify-center py-5 px-10 gap-2 cursor-pointer`}
   >
     {icon1}
-    <span className="font-bold text-[18px]">Explore the Map</span>
+    <span className="font-bold text-[18px]">{label}</span>
     {icon2}
   </Link>
 );
@@ -595,11 +596,12 @@ function RouteComponent() {
                 </div>
                 {e.description}
                 {mapButton(
-                  "bg-(--accentdarkblue-90)",
-                  "text-white",
-                  <GlobeIcon color={"var(--primarywhite)"} />,
-                  <ArrowRight color={"var(--primarywhite)"} />,
-                  e.link,
+                    "bg-(--accentdarkblue-90)",
+                    "text-white",
+                    <GlobeIcon color={"var(--primarywhite)"} />,
+                    <ArrowRight color={"var(--primarywhite)"} />,
+                    e.link,
+                    e.title === "Data Foundation" ? "Access the Data" : "Explore the Map",
                 )}
               </div>
             </div>
