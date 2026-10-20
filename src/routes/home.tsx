@@ -667,11 +667,11 @@ function RouteComponent() {
           Advancing Global Data Standards
         </div>
         <span className="leading-[140%] text-[20px] text-center text-white w-9/10 max-w-220 pb-10">
-          The G20 Data Gaps Initiative (DGI‑3) sets out 14 recommendations
-          across four statistical areas. GeoPulse addresses{" "}
-          <b>Recommendation 5 — climate physical and transition risks</b> —
-          bringing IMF‑generated indicators into a consistent, accessible format
-          for surveillance and policy analysis.
+          The G20 Data Gaps Initiative (DGI-3) aims to improve economic and financial statistics, including data on climate-related risks.
+        </span>  
+        <span>
+          GeoPulse supports <b>Recommendation 5 — climate physical and transition risks</b> —
+          by developing high-resolution gridded macroeconomic data and indicators of exposure to physical hazards, and making them accessible for surveillance and policy analysis.
         </span>
         {externalButton(
           "bg-white",
@@ -683,10 +683,16 @@ function RouteComponent() {
         <div className="w-full flex justify-center items-center py-25">
           <div className="flex w-9/10 flex-col items-center gap-9.25">
             <img src={IMFLogo}></img>
-            <span className="text-white font-bold leading-[140%]">
+            <div className="text-white font-bold leading-[140%]">
               © 2026 INTERNATIONAL MONETARY FUND. ALL RIGHTS RESERVED |{" "}
-              <u>Privacy Policy</u> | <u>Copyright & Usage</u>
-            </span>
+                <a href="https://www.imf.org/en/about/privacy-notice" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-80">
+                  Privacy Policy
+                </a>
+                {" | "}
+                <a href="https://www.imf.org/en/about/copyright-and-terms" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-80">
+                  Copyright &amp; Usage
+                </a>
+            </div>
           </div>
         </div>
       </div>
