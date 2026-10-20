@@ -676,7 +676,7 @@ function RouteComponent() {
         {externalButton(
           "bg-white",
           "text-(--accentdarkblue-90)",
-          "About the Data Gaps Initiative",
+          "Learn More",
           <ArrowRight color={"var(--accentdarkblue-90)"} />,
           "https://www.imf.org/en/news/seminars/conferences/g20-data-gaps-initiative",
         )}
