@@ -91,7 +91,7 @@ const categoryDetails: Record<
     // exposure layers GeoPulse consumes, not IMF products, so they are deliberately not claimed here
     subtitle: (
       <span className={heroSubtitle}>
-        Explore the economic data behind GeoPulse with detailed map layers showing where economic activity and assets are concentrated, including GDP and capital stock, at <b>1 km resolution</b>.
+        Explore the economic data behind GeoPulse with detailed map layers showing where economic activity and assets are concentrated at <b>1 km resolution</b>.
       </span>
     ),
   },
