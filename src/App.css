@@ -26,6 +26,11 @@ html {
   --cyan: #00b0b9;
 }
 
+html {
+  text-box-trim: trim-both;
+  text-box-edge: cap alphabetic;
+}
+
 a {
   text-decoration: none;
 }

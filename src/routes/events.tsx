@@ -59,6 +59,8 @@ import { countryByIso3 } from "@/config/isoCountries";
 //import loading overlay component
 import LoadingOverlay from "@/components/loadingOverlay";
 
+import { format } from "date-fns";
+
 // provide search schema for query string parameters
 const searchSchema = z.object({
   eventid: z.coerce
@@ -1239,7 +1241,7 @@ function Events() {
           </div>
         </div>
         <div
-          className={`absolute z-2 bottom-65 md:bottom-0 md:transition-[right] md:duration-300 md:ease-in-out ${eventPopup == "all events" ? "md:right-0" : "md:-right-100 invisible"} md:visible max-h-full md:h-85/100 w-full md:w-[350px] flex flex-col bg-white md:shadow-[inset_0px_-16px_10px_-10px_rgba(0,0,0,0.35)] cursor-default draggable`}
+          className={`absolute z-2 bottom-65 md:bottom-0 rounded-lg rounded-t-xl md:transition-[right] md:duration-300 md:ease-in-out ${eventPopup == "all events" ? "md:right-0" : "md:-right-100 invisible"} md:visible max-h-full md:h-85/100 w-full md:w-[350px] flex flex-col bg-white cursor-default draggable`}
           style={{
             "--drag-y": `${y}px`,
             touchAction: "none",
@@ -1250,29 +1252,57 @@ function Events() {
             onPointerMove={onPointerMove}
             onPointerUp={(e) => onPointerUp(e)}
           >
-            <div className="h-4 w-full flex items-end justify-center md:hidden">
-              <div className="w-15 h-1 bg-(--accentcoolgray-60) rounded-xl"></div>
-            </div>
-            <div className="h-[32px] shadow-[0px_4px_5.8px_0px_#00000024] flex items-center justify-start">
-              <b className="ml-2">
-                {
-                  events?.filter(
-                    (element: Record<string, any>) =>
-                      (element.attributes.eventtype == state?.eventFilter ||
-                        state?.eventFilter == "AL") &&
-                      (element.attributes.affectedcountries?.includes(
-                        state?.countryFilter,
-                      ) ||
-                        state?.countryFilter == "All countries"),
-                  ).length
-                }{" "}
-                {state?.eventFilter == "AL"
-                  ? "Events"
-                  : eventTypes[state?.eventFilter].type}
-                {state?.countryFilter == "All countries"
-                  ? ""
-                  : ` in ${countryByIso3[state?.countryFilter]}`}
-              </b>
+            <div className="h-18.5 rounded-t-lg px-5 shadow-[0px_4px_5.8px_0px_#00000024] bg-[#242558] text-white flex flex-row items-center justify-between">
+              <div className="w-full flex flex-col items-start justify-center">
+                <div className="h-4 w-full flex items-end justify-center md:hidden">
+                  <div className="w-15 h-1 bg-(--accentcoolgray-60) rounded-xl"></div>
+                </div>
+                <div className="w-full flex justify-between">
+                  <b className="text-[20px]">
+                    {state?.eventFilter == "AL"
+                      ? "Events"
+                      : eventTypes[state?.eventFilter].type}
+                    {state?.countryFilter == "All countries"
+                      ? ""
+                      : ` in ${countryByIso3[state?.countryFilter]}`}
+                  </b>
+                  <div className="h-8 w-8 bg-[#FFFFFF24] rounded-full flex items-center justify-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 14 14"
+                      fill="white"
+                    >
+                      <path
+                        d="M2.1001 6.9999C2.1001 6.8039 2.2541 6.6499 2.4501 6.6499H11.5501C11.6429 6.6499 11.7319 6.68678 11.7976 6.75241C11.8632 6.81805 11.9001 6.90708 11.9001 6.9999C11.9001 7.09273 11.8632 7.18175 11.7976 7.24739C11.7319 7.31303 11.6429 7.3499 11.5501 7.3499H2.4501C2.35727 7.3499 2.26825 7.31303 2.20261 7.24739C2.13697 7.18175 2.1001 7.09273 2.1001 6.9999Z"
+                        fill="#FFFFFF"
+                      />
+                    </svg>
+                  </div>
+                </div>
+                <div className="text-[12px]">
+                  {
+                    events?.filter(
+                      (element: Record<string, any>) =>
+                        (element.attributes.eventtype == state?.eventFilter ||
+                          state?.eventFilter == "AL") &&
+                        (element.attributes.affectedcountries?.includes(
+                          state?.countryFilter,
+                        ) ||
+                          state?.countryFilter == "All countries"),
+                    ).length
+                  }{" "}
+                  {" in date range · "}
+                  {state?.dateRange.from
+                    ? format(state?.dateRange.from, "MMM d")
+                    : null}
+                  {" — "}
+                  {state?.dateRange.to
+                    ? format(state?.dateRange.to, "MMM d, yyyy")
+                    : null}
+                </div>
+              </div>
             </div>
           </div>
           <div
@@ -1292,55 +1322,84 @@ function Events() {
               ?.map((event: any) => (
                 <div
                   key={event.attributes.htmldescription}
-                  className="p-2 border-b border-gray-300 items-start flex flex-col text-left"
+                  className="flex flex-col gap-1.5 py-4 px-5 border-b border-gray-300 items-start flex flex-col text-left"
                 >
-                  <h3 className="font-bold text-[14px] text-[var(--accentblue-100)]">
-                    {event.attributes.country.toUpperCase()}
-                  </h3>
-                  <h3 className="font-bold text-[16px]">
-                    {event.attributes.description}
-                  </h3>
-                  <p className="text-[14px]">
-                    {new Date(event.attributes.fromdate).toLocaleDateString(
-                      "en-US",
-                      {
-                        month: "long",
-                        day: "numeric",
-                        year: "numeric",
-                      },
-                    )}{" "}
-                    -{" "}
-                    {event.attributes.todate == Date.now()
-                      ? "Present"
-                      : new Date(event.attributes.todate).toLocaleDateString(
-                          "en-US",
-                          {
-                            month: "long",
-                            day: "numeric",
-                            year: "numeric",
-                          },
-                        )}
-                  </p>
-                  <div className="flex w-full justify-between ">
-                    <div
-                      className="flex h-6.25 [text-box:trim-both_cap_alphabetic] items-center justify-center font-bold cursor-pointer bg-(--accentblue-100) text-white rounded-sm shadow-lg/10 px-[5px] mb-[6px] mt-[9px] text-[11px]"
-                      onClick={() =>
-                        focusOnEvent(event.geometry, event.attributes)
-                      }
-                    >
-                      DETAILS
+                  <h3 className="w-full flex items-start justify-between font-bold text-[10px] text-[#6B7A90] tracking-[1px]">
+                    <div className="w-55">
+                      {event.attributes.country.toUpperCase()}
                     </div>
                     {event.attributes.iscurrent == 1 ? (
-                      <div className="flex justify-center items-center text-(--accentred-100) gap-1.5 font-bold px-[5px] my-[6px] text-[11px]">
+                      <div className="flex justify-center items-center text-(--accentred-100) gap-1.5 font-bold px-[5px] text-[11px]">
                         <span className="relative flex w-[7px] h-[7px] items-center">
                           <span className="absolute inset-0 rounded-full bg-current opacity-70  transition-all duration-12500 motion-safe:animate-ping" />
                           <span className="relative inline-flex w-[7px] h-[7px] rounded-full bg-current" />
                         </span>
-                        <div className="[text-box:trim-both_cap_alphabetic]">
-                          ONGOING
-                        </div>
+                        <div className="">Ongoing</div>
                       </div>
                     ) : null}
+                  </h3>
+                  <h3 className="font-bold text-[16px]">
+                    {event.attributes.description}
+                  </h3>
+                  <p className="text-[14px] flex items-center">
+                    <svg
+                      className="mr-1.5"
+                      width="13"
+                      height="13"
+                      viewBox="0 0 13 13"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M4.54995 7.14995C4.72234 7.14995 4.88767 7.08147 5.00957 6.95957C5.13147 6.83767 5.19995 6.67234 5.19995 6.49995C5.19995 6.32756 5.13147 6.16223 5.00957 6.04033C4.88767 5.91843 4.72234 5.84995 4.54995 5.84995C4.37756 5.84995 4.21223 5.91843 4.09033 6.04033C3.96843 6.16223 3.89995 6.32756 3.89995 6.49995C3.89995 6.67234 3.96843 6.83767 4.09033 6.95957C4.21223 7.08147 4.37756 7.14995 4.54995 7.14995ZM5.19995 8.44995C5.19995 8.62234 5.13147 8.78767 5.00957 8.90957C4.88767 9.03147 4.72234 9.09995 4.54995 9.09995C4.37756 9.09995 4.21223 9.03147 4.09033 8.90957C3.96843 8.78767 3.89995 8.62234 3.89995 8.44995C3.89995 8.27756 3.96843 8.11223 4.09033 7.99033C4.21223 7.86843 4.37756 7.79995 4.54995 7.79995C4.72234 7.79995 4.88767 7.86843 5.00957 7.99033C5.13147 8.11223 5.19995 8.27756 5.19995 8.44995ZM6.49995 7.14995C6.67234 7.14995 6.83767 7.08147 6.95957 6.95957C7.08147 6.83767 7.14995 6.67234 7.14995 6.49995C7.14995 6.32756 7.08147 6.16223 6.95957 6.04033C6.83767 5.91843 6.67234 5.84995 6.49995 5.84995C6.32756 5.84995 6.16223 5.91843 6.04033 6.04033C5.91843 6.16223 5.84995 6.32756 5.84995 6.49995C5.84995 6.67234 5.91843 6.83767 6.04033 6.95957C6.16223 7.08147 6.32756 7.14995 6.49995 7.14995ZM7.14995 8.44995C7.14995 8.62234 7.08147 8.78767 6.95957 8.90957C6.83767 9.03147 6.67234 9.09995 6.49995 9.09995C6.32756 9.09995 6.16223 9.03147 6.04033 8.90957C5.91843 8.78767 5.84995 8.62234 5.84995 8.44995C5.84995 8.27756 5.91843 8.11223 6.04033 7.99033C6.16223 7.86843 6.32756 7.79995 6.49995 7.79995C6.67234 7.79995 6.83767 7.86843 6.95957 7.99033C7.08147 8.11223 7.14995 8.27756 7.14995 8.44995ZM8.44995 7.14995C8.62234 7.14995 8.78767 7.08147 8.90957 6.95957C9.03147 6.83767 9.09995 6.67234 9.09995 6.49995C9.09995 6.32756 9.03147 6.16223 8.90957 6.04033C8.78767 5.91843 8.62234 5.84995 8.44995 5.84995C8.27756 5.84995 8.11223 5.91843 7.99033 6.04033C7.86843 6.16223 7.79995 6.32756 7.79995 6.49995C7.79995 6.67234 7.86843 6.83767 7.99033 6.95957C8.11223 7.08147 8.27756 7.14995 8.44995 7.14995ZM11.05 3.57495C11.05 3.14397 10.8787 2.73065 10.574 2.4259C10.2693 2.12116 9.85593 1.94995 9.42495 1.94995H3.57495C3.14397 1.94995 2.73065 2.12116 2.4259 2.4259C2.12116 2.73065 1.94995 3.14397 1.94995 3.57495V9.42495C1.94995 9.85593 2.12116 10.2693 2.4259 10.574C2.73065 10.8787 3.14397 11.05 3.57495 11.05H9.42495C9.85593 11.05 10.2693 10.8787 10.574 10.574C10.8787 10.2693 11.05 9.85593 11.05 9.42495V3.57495ZM2.59995 4.54995H10.4V9.42495C10.4 9.96445 9.96445 10.4 9.42495 10.4H3.57495C3.31637 10.4 3.06837 10.2972 2.88552 10.1144C2.70267 9.93153 2.59995 9.68354 2.59995 9.42495V4.54995ZM3.57495 2.59995H9.42495C9.96445 2.59995 10.4 3.03545 10.4 3.57495V3.89995H2.59995V3.57495C2.59995 3.03545 3.03545 2.59995 3.57495 2.59995Z"
+                        fill="#6B7A90"
+                      />
+                    </svg>
+                    <span className="[text-box:trim-both_cap_alphabetic]">
+                      {new Date(event.attributes.fromdate).toLocaleDateString(
+                        "en-US",
+                        {
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric",
+                        },
+                      )}{" "}
+                      -{" "}
+                      {event.attributes.todate == Date.now()
+                        ? "Present"
+                        : new Date(event.attributes.todate).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "long",
+                              day: "numeric",
+                              year: "numeric",
+                            },
+                          )}
+                    </span>
+                  </p>
+                  <div className="flex w-full justify-between ">
+                    <div
+                      className="flex h-6.25 gap-1.5 px-2.25 [text-box:trim-both_cap_alphabetic] items-center justify-center font-bold cursor-pointer bg-[#234E90] text-white rounded-sm shadow-lg/10 mb-[6px] mt-[9px] text-[12px]"
+                      onClick={() =>
+                        focusOnEvent(event.geometry, event.attributes)
+                      }
+                    >
+                      <span className="[text-box:trim-both_cap_alphabetic]">
+                        View details
+                      </span>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 12 12"
+                        fill="none"
+                      >
+                        <path
+                          d="M6.50395 1.87784C6.44507 1.82373 6.36711 1.79523 6.28722 1.79861C6.20733 1.80198 6.13206 1.83696 6.07795 1.89584C6.02385 1.95471 5.99535 2.03267 5.99872 2.11256C6.0021 2.19245 6.03707 2.26773 6.09595 2.32184L9.79795 5.69984H1.49995C1.42039 5.69984 1.34408 5.73144 1.28782 5.7877C1.23156 5.84397 1.19995 5.92027 1.19995 5.99984C1.19995 6.0794 1.23156 6.15571 1.28782 6.21197C1.34408 6.26823 1.42039 6.29984 1.49995 6.29984H9.79795L6.09595 9.67783C6.03707 9.73194 6.0021 9.80722 5.99872 9.88711C5.99535 9.967 6.02385 10.045 6.07795 10.1038C6.13206 10.1627 6.20733 10.1977 6.28722 10.2011C6.36711 10.2044 6.44507 10.1759 6.50395 10.1218L10.65 6.32984C10.6954 6.28771 10.7316 6.23666 10.7564 6.17987C10.7812 6.12309 10.794 6.0618 10.794 5.99984C10.794 5.93788 10.7812 5.87658 10.7564 5.8198C10.7316 5.76301 10.6954 5.71196 10.65 5.66984L6.50395 1.87784Z"
+                          fill="white"
+                        />
+                      </svg>
+                    </div>
                   </div>
                 </div>
               ))}
