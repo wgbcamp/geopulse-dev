@@ -107,9 +107,7 @@ export function App() {
   });
   const [dataExplainerOpen, setDataExplainerState] = useState(false);
   const [dataExplainerView, setDataExplainerView] = useState("Event Tracking");
-  const [loadingOverlay, setLoadingOverlay] = useState<string | boolean>(
-    true,
-  );
+  const [loadingOverlay, setLoadingOverlay] = useState<string | boolean>(true);
 
   const state = {
     currentView,
@@ -146,12 +144,12 @@ export function App() {
   };
 
   return (
-    <>
+    <div className={`${dataExplainerOpen ? "overflow-hidden" : ""} h-full`}>
       <AppActionsContext.Provider value={actions}>
         <AppStateContext.Provider value={state}>
           <RouterProvider router={router} />
         </AppStateContext.Provider>
       </AppActionsContext.Provider>
-    </>
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 // creates file-based routing for tanstack react router
-import { createFileRoute, Link } from "@tanstack/react-router"
-import { z } from 'zod'
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { z } from "zod";
 
 // react hooks holding state, context, and references
 import { AppStateContext, AppActionsContext } from "../app";
@@ -27,7 +27,6 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 
 // imf icons
-import DataIcon from "../assets/data_icon.svg";
 import Exposures from "../assets/Layers.svg";
 
 // 3rd party icons
@@ -62,12 +61,15 @@ import LoadingOverlay from "@/components/loadingOverlay";
 
 // provide search schema for query string parameters
 const searchSchema = z.object({
-  eventid: z.coerce.number().catch(0).transform((val) => (val === 0 ? undefined : val))
+  eventid: z.coerce
+    .number()
+    .catch(0)
+    .transform((val) => (val === 0 ? undefined : val)),
 });
 
 export const Route = createFileRoute("/events")({
   component: Events,
-  validateSearch: searchSchema
+  validateSearch: searchSchema,
 });
 
 function Events() {
@@ -187,23 +189,24 @@ function Events() {
   useEffect(() => {
     // When the query string parameter matches an eventid, load the event only once when page loads
     if (events && !eventsList) {
-      if (eventid !== 0 && eventid!== undefined) {
+      if (eventid !== 0 && eventid !== undefined) {
         events.forEach((e: any) => {
           if (e.attributes.eventid == eventid) {
-            focusOnEvent({
-              longitude: e.geometry.longitude,
-              latitude: e.geometry.latitude,
-            },
-              e.attributes)
+            focusOnEvent(
+              {
+                longitude: e.geometry.longitude,
+                latitude: e.geometry.latitude,
+              },
+              e.attributes,
+            );
           }
-        })
+        });
       } else {
         actions?.setLoadingOverlay(false);
       }
       setEventsList(true);
     }
-  }, [events])
-
+  }, [events]);
 
   // Every time the eventPopup changes, return the results of the query of the events feature
   // layer, sorted by end date, then set the events on the events sidebar and the mapView.
@@ -213,7 +216,7 @@ function Events() {
       !view.current ||
       !pulseContainerRef.current
     )
-    return;
+      return;
 
     const query = eventFeatureLayer.current!.createQuery();
     query.returnGeometry = true;
@@ -357,8 +360,8 @@ function Events() {
             buttonEnabled: false,
           },
           visibleElements: {
-            closeButton: false
-          }
+            closeButton: false,
+          },
         },
       });
 
@@ -911,11 +914,11 @@ function Events() {
   const updateURL = (newURL: string) => {
     navigate({
       search: (prev) => ({
-        ...prev,          // Keep existing search params
-        eventid: newURL // Update or add a specific parameter
-      })
-    })
-  }
+        ...prev, // Keep existing search params
+        eventid: newURL, // Update or add a specific parameter
+      }),
+    });
+  };
 
   useEffect(() => {
     setFocusedSliderValue([focusedFeatures?.length - 1]);
@@ -1093,14 +1096,17 @@ function Events() {
 
   useEffect(() => {
     unfocusEvent();
-  },[state?.dateRange, state?.eventFilter, state?.countryFilter])
+  }, [state?.dateRange, state?.eventFilter, state?.countryFilter]);
 
   return (
     <div className="w-full h-full">
       <LoadingOverlay />
       <div className="w-full h-full relative overflow-hidden">
         <div className="w-full h-full">
-          <div className="w-full h-full flex justify-start pt-15" ref={ref}></div>
+          <div
+            className="w-full h-full flex justify-start pt-15"
+            ref={ref}
+          ></div>
           <div
             className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden"
             ref={pulseContainerRef}
@@ -1175,7 +1181,9 @@ function Events() {
                     }
                   >
                     <div className="h-9/10 flex justify-center items-center overflow-hidden">
-                      <div className="text-white text-[12px] font-bold">{f}</div>
+                      <div className="text-white text-[12px] font-bold">
+                        {f}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -1207,22 +1215,24 @@ function Events() {
                   EXPOSURES
                 </section>
                 <div className="flex flex-row flex-wrap gap-3">
-                  {Object.entries(realtimeObject).map(([key, layer], index: number)  => (
-                    <div
-                      key={key}
-                      className={`w-25 h-25 bg-black border-2 rounded-2xl cursor-pointer ${realtimeExposure.exposure == key ? "border-(--accentcyan-100)" : "border-(--accentdarkblue-50)"}`}
-                      onClick={() => {
-                        setRealtimeExposure({ exposure: key, filter: key });
-                        setLayerSettingsPopup(false);
-                      }}
-                    >
-                      <div className="h-full flex justify-center items-end">
-                        <div className="text-white text-[12px] font-bold">
-                          {key}
+                  {Object.entries(realtimeObject).map(
+                    ([key, layer], index: number) => (
+                      <div
+                        key={key}
+                        className={`w-25 h-25 bg-black border-2 rounded-2xl cursor-pointer ${realtimeExposure.exposure == key ? "border-(--accentcyan-100)" : "border-(--accentdarkblue-50)"}`}
+                        onClick={() => {
+                          setRealtimeExposure({ exposure: key, filter: key });
+                          setLayerSettingsPopup(false);
+                        }}
+                      >
+                        <div className="h-full flex justify-center items-end">
+                          <div className="text-white text-[12px] font-bold">
+                            {key}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ),
+                  )}
                 </div>
               </div>
             </div>
@@ -1256,8 +1266,12 @@ function Events() {
                         state?.countryFilter == "All countries"),
                   ).length
                 }{" "}
-                {state?.eventFilter == "AL" ? "Events" : eventTypes[state?.eventFilter].type } 
-                {state?.countryFilter == "All countries" ? "" : ` in ${countryByIso3[state?.countryFilter]}`}
+                {state?.eventFilter == "AL"
+                  ? "Events"
+                  : eventTypes[state?.eventFilter].type}
+                {state?.countryFilter == "All countries"
+                  ? ""
+                  : ` in ${countryByIso3[state?.countryFilter]}`}
               </b>
             </div>
           </div>
@@ -1299,13 +1313,13 @@ function Events() {
                     {event.attributes.todate == Date.now()
                       ? "Present"
                       : new Date(event.attributes.todate).toLocaleDateString(
-                        "en-US",
-                        {
-                          month: "long",
-                          day: "numeric",
-                          year: "numeric",
-                        },
-                      )}
+                          "en-US",
+                          {
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric",
+                          },
+                        )}
                   </p>
                   <div className="flex w-full justify-between ">
                     <div
@@ -1322,7 +1336,9 @@ function Events() {
                           <span className="absolute inset-0 rounded-full bg-current opacity-70  transition-all duration-12500 motion-safe:animate-ping" />
                           <span className="relative inline-flex w-[7px] h-[7px] rounded-full bg-current" />
                         </span>
-                        <div className="[text-box:trim-both_cap_alphabetic]">ONGOING</div>
+                        <div className="[text-box:trim-both_cap_alphabetic]">
+                          ONGOING
+                        </div>
                       </div>
                     ) : null}
                   </div>
@@ -1340,15 +1356,26 @@ function Events() {
               </div>
             ) : (
               <b className="flex h-6.25 justify-center  items-center bg-(--accentblue-100) rounded-sm shadow-lg/10 font-bold text-white px-[5px] mb-[6px] mt-[9px] text-[11px]">
-                <span className="[text-box:trim-both_cap_alphabetic]">PAST EVENT</span>
+                <span className="[text-box:trim-both_cap_alphabetic]">
+                  PAST EVENT
+                </span>
               </b>
             )}
             <div
               className="text-[14px] mr-2 text-(--accentblue-100) font-bold cursor-pointer"
               onClick={() => unfocusEvent()}
             >
-             
-              <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M0.390625 1.67969C0 1.32812 0 0.703125 0.390625 0.351562C0.742188 0 1.32812 0 1.67969 0.351562L7.57812 6.25L13.4766 0.351562C13.8672 0 14.4531 0 14.8047 0.351562C15.1953 0.742188 15.1953 1.32812 14.8047 1.67969L8.90625 7.57812L14.8047 13.4766C15.1953 13.8281 15.1953 14.4531 14.8047 14.8047C14.4531 15.1562 13.8672 15.1562 13.4766 14.8047L7.57812 8.90625L1.67969 14.8047C1.32812 15.1562 0.742188 15.1562 0.390625 14.8047C0 14.4531 0 13.8281 0.390625 13.4766L6.28906 7.57812L0.390625 1.67969Z" fill="var(--accentblue-100)"></path></svg>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M0.390625 1.67969C0 1.32812 0 0.703125 0.390625 0.351562C0.742188 0 1.32812 0 1.67969 0.351562L7.57812 6.25L13.4766 0.351562C13.8672 0 14.4531 0 14.8047 0.351562C15.1953 0.742188 15.1953 1.32812 14.8047 1.67969L8.90625 7.57812L14.8047 13.4766C15.1953 13.8281 15.1953 14.4531 14.8047 14.8047C14.4531 15.1562 13.8672 15.1562 13.4766 14.8047L7.57812 8.90625L1.67969 14.8047C1.32812 15.1562 0.742188 15.1562 0.390625 14.8047C0 14.4531 0 13.8281 0.390625 13.4766L6.28906 7.57812L0.390625 1.67969Z"
+                  fill="var(--accentblue-100)"
+                ></path>
+              </svg>
             </div>
           </div>
           <div className="text-[20px] font-bold text-left flex w-full px-4">
@@ -1380,7 +1407,10 @@ function Events() {
                       xmlns="http://www.w3.org/2000/svg"
                       className="ml-1"
                     >
-                      <path d="M0 0L6.44985 6.44985L0 12.8997V0Z" fill="white" />
+                      <path
+                        d="M0 0L6.44985 6.44985L0 12.8997V0Z"
+                        fill="white"
+                      />
                     </svg>
                   </div>
                 )}
@@ -1415,23 +1445,23 @@ function Events() {
                           <span className={`text-xs w-10 mt-3`}>
                             {index == 0
                               ? new Date(
-                                focusedEvent.fromdate,
-                              ).toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                                year: "numeric",
-                              }) + " "
+                                  focusedEvent.fromdate,
+                                ).toLocaleDateString("en-US", {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                }) + " "
                               : index == focusedFeatures.length - 1
                                 ? focusedEvent.todate == Date.now()
                                   ? "Present"
                                   : " " +
-                                  new Date(
-                                    focusedEvent.todate,
-                                  ).toLocaleDateString("en-US", {
-                                    month: "short",
-                                    day: "numeric",
-                                    year: "numeric",
-                                  })
+                                    new Date(
+                                      focusedEvent.todate,
+                                    ).toLocaleDateString("en-US", {
+                                      month: "short",
+                                      day: "numeric",
+                                      year: "numeric",
+                                    })
                                 : ""}
                           </span>
                         </div>
@@ -1485,9 +1515,9 @@ function Events() {
                 >
                   <div className="text-wrap max-w-40 flex justify-between cursor-pointer">
                     {currentCountryExposure !== "ALL" &&
-                      focusedEvent?.affectedcountries
-                        ?.split(",")
-                        ?.find((a, i) => a == currentCountryExposure && i > 2)
+                    focusedEvent?.affectedcountries
+                      ?.split(",")
+                      ?.find((a, i) => a == currentCountryExposure && i > 2)
                       ? countryByIso3[currentCountryExposure]
                       : "Other"}
                   </div>
@@ -1569,13 +1599,13 @@ function Events() {
               {Object.entries(realtimeObject)
                 .filter(([key]) => key !== "Nightlights")
                 .map(([key, layer], index: number) => (
-                    <div
-                      key={key}
-                      className="h-[45px] text-[14px] font-medium border-solid border-b-1 flex items-center "
-                    >
-                      {key}
-                    </div>
-                  ))}
+                  <div
+                    key={key}
+                    className="h-[45px] text-[14px] font-medium border-solid border-b-1 flex items-center "
+                  >
+                    {key}
+                  </div>
+                ))}
             </div>
             <div className="w-full text-left">
               <div className="pb-2 border-solid border-b-1 pl-3">EXPOSURE</div>
@@ -1588,17 +1618,17 @@ function Events() {
                   >
                     {focusedCountryExposures
                       ? fmt.format(
-                        focusedCountryExposures[
-                          focusedCountryExposures.indexOf(
-                            focusedCountryExposures.find(
-                              (c: any) =>
-                                c.attributes.areaid == currentCountryExposure,
-                            ),
-                          )
-                        ]?.attributes[layer.eventAttribute],
-                      ) +
-                      " " +
-                      layer.suffix
+                          focusedCountryExposures[
+                            focusedCountryExposures.indexOf(
+                              focusedCountryExposures.find(
+                                (c: any) =>
+                                  c.attributes.areaid == currentCountryExposure,
+                              ),
+                            )
+                          ]?.attributes[layer.eventAttribute],
+                        ) +
+                        " " +
+                        layer.suffix
                       : "N/A"}
                   </div>
                 ))}
@@ -1609,25 +1639,26 @@ function Events() {
                   PERCENTAGE
                 </div>
                 {Object.entries(realtimeObject)
-                .filter(([key]) => key !== "Nightlights")
-                .map(([key, layer], index: number) => (
+                  .filter(([key]) => key !== "Nightlights")
+                  .map(([key, layer], index: number) => (
                     <div
                       key={key + "_pct"}
                       className="h-[45px] text-[14px] font-medium border-solid border-b-1 flex items-center border-l-1 pl-3"
                     >
                       {focusedCountryExposures
                         ? fmt.format(
-                          focusedCountryExposures[
-                            focusedCountryExposures.indexOf(
-                              focusedCountryExposures.find(
-                                (c: any) =>
-                                  c.attributes.areaid == currentCountryExposure,
-                              ),
-                            )
-                          ]?.attributes[layer.eventAttribute + "_pct"],
-                        ) +
-                        " " +
-                        "%"
+                            focusedCountryExposures[
+                              focusedCountryExposures.indexOf(
+                                focusedCountryExposures.find(
+                                  (c: any) =>
+                                    c.attributes.areaid ==
+                                    currentCountryExposure,
+                                ),
+                              )
+                            ]?.attributes[layer.eventAttribute + "_pct"],
+                          ) +
+                          " " +
+                          "%"
                         : "N/A"}
                     </div>
                   ))}
@@ -1676,17 +1707,6 @@ function Events() {
           bar-style="line"
           unit="metric"
         ></arcgis-scale-bar>
-        <div
-          className="flex flex-col items-center justify-center -z-1 xl:z-3 h-14.75 w-15.25 absolute top-20 2xl:top-1 right-3 gap-y-1 cursor-pointer bg-(--accentdarkblue-80) rounded-sm"
-          onClick={() => {
-            actions?.setDataExplainerState(true);
-          }}
-        >
-          <img src={DataIcon} width={15}></img>
-          <span className="font-bold text-white text-xs text-base/5">
-            Data Explainer
-          </span>
-        </div>
       </div>
     </div>
   );

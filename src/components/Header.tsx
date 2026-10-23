@@ -4,6 +4,8 @@ import { useRouterState, Link } from "@tanstack/react-router";
 
 import { AppStateContext, AppActionsContext } from "../app";
 
+import DataIcon from "../assets/data_icon.svg";
+
 import { Button } from "@/components/ui/button";
 import {
   Item,
@@ -38,6 +40,7 @@ import {
   scenarioMapper,
   measureMapper,
   eventTypes,
+  timePeriods,
 } from "@/config/datasets";
 import { isoCountries, countryByIso3 } from "@/config/isoCountries";
 
@@ -256,7 +259,10 @@ export const Header = () => {
             <div className="w-4/10 flex py-5 justify-around gap-2">
               <Button
                 className={`w-5/10 font-bold bg-(--accentblue-100) cursor-pointer`}
-                onClick={() => {actions?.setDateRange(temporaryDate); setCalendarOpened(false);}}
+                onClick={() => {
+                  actions?.setDateRange(temporaryDate);
+                  setCalendarOpened(false);
+                }}
               >
                 Apply
               </Button>
@@ -315,10 +321,10 @@ export const Header = () => {
 
   return (
     <div
-      className={`grid ${location.pathname == "/home" ? "mt-10.5 grid-cols-[316px_1fr]" : "grid-cols-[1fr] xl:grid-cols-[232px_1fr]"} xl:h-14.75 fixed w-full top-0 z-3 ${dataOptions || menuOptions ? "" : "overflow-hidden h-14.75"} ${location.pathname == "/home" ? "overflow-visible" : ""} xl:h-[unset]`}
+      className={`grid ${location.pathname == "/home" ? "mt-10.5 grid-cols-[316px_1fr]" : "grid-cols-[1fr] xl:grid-cols-[200px_1fr]"} xl:h-14.75 fixed w-full top-0 z-3 ${dataOptions || menuOptions ? "" : "overflow-hidden h-14.75"} ${location.pathname == "/home" ? "overflow-visible" : ""} xl:h-[unset]`}
     >
       <div
-        className={`${location.pathname == "/home" ? "ml-8" : ""} flex flex-col ${menuOptions ? "z-2 " : "-z-10 h-0 overflow-hidden"} ${location.pathname == "/home" ? "w-71" : "w-full xl:w-58"} bg-(--accentdarkblue-90) xl:bg-[unset] absolute shadow-xl/40`}
+        className={`${location.pathname == "/home" ? "ml-8" : ""} flex flex-col ${menuOptions ? "z-2 " : "-z-10 h-0 overflow-hidden"} ${location.pathname == "/home" ? "w-71" : "w-full xl:w-50"} bg-(--accentdarkblue-90) xl:bg-[unset] absolute shadow-xl/40`}
       >
         <div
           className={`flex w-16.75 ${location.pathname == "/home" ? "h-16" : "h-14.75"} justify-center items-center bg-(--accentdarkblue-90) cursor-pointer`}
@@ -400,31 +406,30 @@ export const Header = () => {
         </div>
       ) : (
         <div
-          className={`flex w-full xl:w-58 justify-between xl:justify-start bg-(--fundblue) ${dataOptions ? "h-0" : "h-14.75"} overflow-hidden xl:h-14.75`}
+          className={`flex w-full xl:w-50 justify-between xl:justify-start bg-(--fundblue) ${dataOptions ? "h-0" : "h-14.75"} overflow-hidden xl:h-14.75`}
         >
           <div
             className="flex cursor-pointer"
             onClick={() => setMenuOptions(!menuOptions)}
           >
             <div className="flex h-14.75 w-full">
-              <div className="relative flex items-center rounded-none h-full w-16.75 bg-(--fundblue) xl:bg-(--accentdarkblue-90) text-white">
-                <img className="absolute right-4" src={Hamburger}></img>
-                <div className="absolute text-[11px] top-8.5 right-6.5 font-bold">
+              <div className="relative flex pl-2 items-center justify-start rounded-none h-full w-40 xl:w-16.75 bg-(--fundblue) xl:bg-(--accentdarkblue-90) text-white">
+                <img className="absolute pl-3.5" src={Hamburger}></img>
+                <div className="absolute text-[11px] top-8.5  font-bold">
                   MENU
                 </div>
               </div>
             </div>
           </div>
-          <div className="w-23 xl:w-0"></div>
           <Link
             to="/home"
             activeOptions={{ exact: true }}
-            className="rounded-none w-full xl:w-120 mx-3 flex flex-row items-center justify-center font-semibold bg-(--fundblue) text-white border-none"
+            className="rounded-none w-30 mx-3 flex flex-row items-center justify-center font-semibold bg-(--fundblue) text-white border-none"
           >
             <img src={Lockup}></img>
           </Link>
           <div
-            className={`flex items-center w-60 xl:w-0 xl:h-0 overflow-hidden justify-center cursor-pointer bg-(--fundblue) rounded-none border-0 border-none`}
+            className={`flex items-center w-35 xl:w-0 xl:h-0 overflow-hidden justify-center cursor-pointer bg-(--fundblue) rounded-none border-0 border-none`}
           >
             <div
               className="h-7/10 flex w-9/10 items-center justify-evenly rounded-lg bg-(--accentblue-30)"
@@ -462,7 +467,7 @@ export const Header = () => {
         </div>
       ) : (
         <div
-          className={`w-full xl:h-14.75 grid grid-cols-[1fr_1fr_50px] ${location.pathname === "/compare" || location.pathname === "/grid" ? "xl:grid-cols-[180px_300px_1fr]" : location.pathname == "/events" ? "xl:grid-cols-[180px_600px_300px]" : "xl:grid-cols-[180px_360px_1fr]"}  xl:col-start-2 xl:col-end-3`}
+          className={`w-full xl:h-14.75 grid grid-cols-[1fr_1fr_50px] ${location.pathname === "/compare" || location.pathname === "/grid" ? "xl:grid-cols-[180px_300px_600px_1fr]" : location.pathname == "/events" ? "xl:grid-cols-[180px_600px_245px_1fr]" : "xl:grid-cols-[180px_360px_1fr]"}  xl:col-start-2 xl:col-end-3`}
         >
           <div className="flex w-full xl:col-start-1 xl:col-end-2">
             <Card
@@ -636,7 +641,7 @@ export const Header = () => {
             </div>
           ) : null}
           <div
-            className={`shadow-[0_1px_3px_0_rgb(0_0_0/0.1),0_1px_2px_-1px_rgb(0_0_0/0.1)]  h-14.75 flex col-start-2 row-start-1 border-r ${location.pathname == "/compare" || location.pathname == "/grid" ? "xl:col-start-2 xl:col-end-3" : location.pathname == "/events" ? "xl:col-start-3 xl:col-end-4" : "xl:col-start-2 xl:col-end-3"}`}
+            className={`shadow-[0_1px_3px_0_rgb(0_0_0/0.1),0_1px_2px_-1px_rgb(0_0_0/0.1)] w-full h-14.75 flex col-start-2 row-start-1 border-r ${location.pathname == "/compare" || location.pathname == "/grid" ? "xl:col-start-2 xl:col-end-3" : location.pathname == "/events" ? "xl:col-start-3 xl:col-end-4" : "xl:col-start-2 xl:col-end-3"}`}
           >
             <Card
               className={`shadow-none rounded-none xl:grow p-0 w-full h-full flex flex-col items-center justify-end gap-0 hover:bg-white transition-colors duration-200 ${location.pathname == "/compare" || location.pathname == "/grid" ? "bg-white" : "bg-(--accentblue-30)"} border-0`}
@@ -860,44 +865,62 @@ export const Header = () => {
               </Card>
               <Card
                 id="scenario"
-                className="border-0 border-l border-r shadow-none rounded-none p-0 flex flex-col h-22 xl:h-auto xl:w-50 items-center justify-center gap-0 px-2"
+                className="w-full border-0 border-l border-r shadow-none rounded-none p-0 flex flex-row h-22 xl:h-auto xl:w-90 items-center justify-center gap-0 px-2"
               >
-                <div className="w-95/100 border-b-2">
+                <div className="w-95/100 xl:w-100 flex bg-white">
+                  <div
+                    id="timePeriods"
+                    className="h-22 xl:h-auto w-full flex justify-center items-center px-2"
+                  >
+                    <div className="w-full flex gap-0.5">
+                      {timePeriods.map((x) => (
+                        <div className="flex flex-col">
+                          <div
+                            className={`cursor-pointer min-w-[47px] max-w-[80px] h-[25px] px-1 flex justify-center items-center ${state?.currentTime == x.year ? "bg-white" : "bg-[#DFDFDF]"}`}
+                            onClick={() => actions?.setTime(x.year)}
+                          >
+                            <div className="font-bold text-xs">{x.period}</div>
+                          </div>
+                          <div
+                            className={` h-1 ${state?.currentTime == x.year ? "bg-[#ff8200]" : "bg-[#BABABA]"} `}
+                          ></div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div className="w-95/100">
                   <Popover
                     open={scenarioOpened}
                     onOpenChange={() => setScenarioOpened(!scenarioOpened)}
                   >
                     <PopoverTrigger asChild>
-                      <div className="flex flex-row items-center w-95/100 h-14.75 justify-between cursor-pointer">
-                        <div className="flex items-center">
-                          <svg
-                            id="scenariosIcon"
-                            width="20"
-                            height="21"
-                            viewBox="0 0 20 21"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M10.3906 1.40625C10.1562 1.28906 9.84375 1.28906 9.60938 1.40625L1.67969 5.07812L9.60938 8.75C9.84375 8.86719 10.1562 8.86719 10.3906 8.75L18.3203 5.07812L10.3906 1.40625ZM10.9375 0.273438L19.4531 4.21875C19.8047 4.375 20 4.72656 20 5.07812C20 5.42969 19.8047 5.78125 19.4531 5.9375L10.9375 9.88281C10.3516 10.1562 9.64844 10.1562 9.10156 9.88281L0.546875 5.9375C0.195312 5.78125 0 5.42969 0 5.07812C0 4.72656 0.195312 4.375 0.546875 4.21875L9.10156 0.273438C9.64844 0 10.3516 0 10.9375 0.273438ZM1.875 8.59375L3.35938 9.29688L1.67969 10.0781L9.60938 13.75C9.84375 13.8672 10.1562 13.8672 10.3906 13.75L18.3203 10.0781L16.6406 9.29688L18.125 8.59375L19.4531 9.21875C19.8047 9.375 20 9.72656 20 10.0781C20 10.4297 19.8047 10.7812 19.4531 10.9375L10.9375 14.8828C10.3516 15.1562 9.64844 15.1562 9.10156 14.8828L0.546875 10.9375C0.195312 10.7812 0 10.4297 0 10.0781C0 9.72656 0.195312 9.375 0.546875 9.21875L1.875 8.59375ZM0.546875 14.2188L1.875 13.5938L3.35938 14.2969L1.67969 15.0781L9.60938 18.75C9.84375 18.8672 10.1562 18.8672 10.3906 18.75L18.3203 15.0781L16.6406 14.2969L18.125 13.5938L19.4531 14.2188C19.8047 14.375 20 14.7266 20 15.0781C20 15.4297 19.8047 15.7812 19.4531 15.9375L10.9375 19.8828C10.3516 20.1562 9.64844 20.1562 9.10156 19.8828L0.546875 15.9375C0.195312 15.7812 0 15.4297 0 15.0781C0 14.7266 0.195312 14.375 0.546875 14.2188Z"
-                              fill="var(--orange)"
-                            />
-                          </svg>
-                          <div className="text-[14px] font-bold text-end flex items-center pl-2">
+                      <div className="flex flex-row items-center w-full h-14.75 justify-around cursor-pointer">
+                        <div className="flex h-full items-center">
+                          <div
+                            className="border-[#9B9B9B] border h-5/10"
+                            id="divider"
+                          ></div>
+                          <div className="text-[14px] w-20 font-bold text-end flex items-center pl-2">
                             {scenarioMapper[state?.currentScenario]}
                           </div>
                         </div>
                         <svg
-                          width="12"
-                          height="12"
-                          viewBox="0 0 8 5"
+                          width="17"
+                          height="18"
+                          viewBox="0 0 17 18"
+                          fill="none"
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <g
-                            transform={`rotate(${scenarioOpened ? "180" : "0"}, 3.9375, 2.1753)`}
+                            transform={`rotate(${scenarioOpened ? "180" : "0"}, 8.5, 8.5)`}
                           >
                             <path
-                              d="M3.64746 4.23193L0.131836 0.716309C-0.0439453 0.558105 -0.0439453 0.294434 0.131836 0.118652C0.290039 -0.0395508 0.553711 -0.0395508 0.729492 0.118652L3.94629 3.33545L7.16309 0.118652C7.32129 -0.0395508 7.58496 -0.0395508 7.74316 0.118652C7.91895 0.276855 7.91895 0.558105 7.74316 0.716309L4.22754 4.23193C4.06934 4.39014 3.80566 4.39014 3.64746 4.23193Z"
+                              d="M16.5 8.5C16.5 12.9183 12.9183 16.5 8.5 16.5C4.08172 16.5 0.5 12.9183 0.5 8.5C0.5 4.08172 4.08172 0.5 8.5 0.5C12.9183 0.5 16.5 4.08172 16.5 8.5Z"
+                              stroke="black"
+                            />
+                            <path
+                              d="M12.4609 7.58594L8.89844 10.9375C8.78125 11.0547 8.64063 11.125 8.5 11.125C8.38281 11.125 8.24219 11.0547 8.125 10.9609L4.5625 7.60937C4.32813 7.39844 4.32813 7.04687 4.53906 6.8125C4.75 6.57812 5.10156 6.57812 5.33594 6.78906L8.52344 9.78906L11.6875 6.78906C11.9219 6.57812 12.2734 6.57812 12.4844 6.8125C12.6953 7.02344 12.6953 7.375 12.4609 7.58594Z"
                               fill="black"
                             />
                           </g>
@@ -932,36 +955,23 @@ export const Header = () => {
                   </Popover>
                 </div>
               </Card>
-              <div className="w-full xl:w-100 flex bg-white">
-                <div
-                  id="timeline"
-                  className="h-22 xl:h-auto w-full flex justify-center items-center px-2"
-                >
-                  <div className="w-95/100 h-5/10">
-                    <div className="rounded-none flex w-9/10  items-start flex-row gap-0 h-14.75 ">
-                      <svg
-                        className="mr-7"
-                        width="23"
-                        height="24"
-                        viewBox="0 0 23 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M5.57363 3.50475e-05C6.02151 3.50475e-05 6.36986 0.348387 6.36986 0.796268V3.18497H15.9247V0.796268C15.9247 0.348387 16.273 3.50475e-05 16.7209 3.50475e-05C17.1688 3.50475e-05 17.5171 0.348387 17.5171 0.796268V3.18497H19.1096C20.8513 3.18497 22.2945 4.62814 22.2945 6.3699V20.7021C22.2945 22.4438 20.8513 23.887 19.1096 23.887H3.18493C1.44317 23.887 0 22.4438 0 20.7021V6.3699C0 4.62814 1.44317 3.18497 3.18493 3.18497H4.7774V0.796268C4.7774 0.348387 5.12575 3.50475e-05 5.57363 3.50475e-05ZM19.1096 4.77743H3.18493C2.28917 4.77743 1.59247 5.47414 1.59247 6.3699V7.96236H20.7021V6.3699C20.7021 5.47414 20.0054 4.77743 19.1096 4.77743ZM20.7021 9.55483H1.59247V20.7021C1.59247 21.5979 2.28917 22.2946 3.18493 22.2946H19.1096C20.0054 22.2946 20.7021 21.5979 20.7021 20.7021V9.55483Z"
-                          fill="#FF8200"
-                        />
-                      </svg>
-                      <Timeline
-                        currentTime={state?.currentTime}
-                        setTime={actions?.setTime}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           ) : null}
+          <div
+            className={`overflow-hidden h-0 w-0 xl:h-auto xl:w-full flex justify-start`}
+          >
+            <div
+              className="flex flex-col items-center justify-center ml-2 xl:z-3 w-18.25 gap-y-1 cursor-pointer bg-white"
+              onClick={() => {
+                actions?.setDataExplainerState(true);
+              }}
+            >
+              <img src={DataIcon} width={15}></img>
+              <span className="font-bold text-black text-xs text-base/5">
+                Data Explainer
+              </span>
+            </div>
+          </div>
         </div>
       )}
     </div>

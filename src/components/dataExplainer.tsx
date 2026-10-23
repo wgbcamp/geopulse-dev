@@ -169,8 +169,12 @@ export default function () {
                       </p>
 
                       <p>
-                        <Link to="/datamethodology">
-                          <b>Read More</b>
+                        <Link
+                          to="/datamethodology"
+                          onClick={() => actions?.setDataExplainerState(false)}
+                          className="underline"
+                        >
+                          <b className="underline">Read More</b>
                         </Link>{" "}
                         for additional information on the methodology and data
                         sources behind this analysis.
@@ -335,8 +339,14 @@ export default function () {
                         </ul>
 
                         <p>
-                          <Link to="/datamethodology">
-                            <b>Read More</b>
+                          <Link
+                            to="/datamethodology"
+                            onClick={() =>
+                              actions?.setDataExplainerState(false)
+                            }
+                            className="underline"
+                          >
+                            <b className="underline">Read More</b>
                           </Link>{" "}
                           for additional information on the methodology and data
                           sources behind this analysis.
@@ -535,8 +545,12 @@ export default function () {
                       </p>
 
                       <p>
-                        <Link to="/datamethodology">
-                          <b>Read More</b>
+                        <Link
+                          to="/datamethodology"
+                          onClick={() => actions?.setDataExplainerState(false)}
+                          className="underline"
+                        >
+                          <b className="underline">Read More</b>
                         </Link>{" "}
                         for additional information on the methodology and data
                         sources behind this analysis.

@@ -26,6 +26,10 @@ html {
   --cyan: #00b0b9;
 }
 
+a {
+  text-decoration: none;
+}
+
 #dataExplainer td,
 th {
   padding: 10px;
