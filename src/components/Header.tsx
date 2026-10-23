@@ -42,7 +42,7 @@ import {
 import { isoCountries, countryByIso3 } from "@/config/isoCountries";
 
 import Hamburger from "../assets/Group 51.png";
-import Lockup from "../assets/lockup.svg";
+import Lockup from "../assets/geopulse-logo.svg";
 import DropdownArrow from "../assets/Dropdown-arrow.svg";
 
 import { mapButton } from "../routes/home";
@@ -419,7 +419,7 @@ export const Header = () => {
           <Link
             to="/home"
             activeOptions={{ exact: true }}
-            className="rounded-none w-full xl:w-120 flex flex-row items-center justify-center font-semibold bg-(--fundblue) text-white border-none"
+            className="rounded-none w-full xl:w-120 mx-3 flex flex-row items-center justify-center font-semibold bg-(--fundblue) text-white border-none"
           >
             <img src={Lockup}></img>
           </Link>

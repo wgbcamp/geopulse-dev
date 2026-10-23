@@ -50,6 +50,7 @@ function GridView() {
 
       map.current = new Map({
         layers: [baseLayer, boundariesLayer],
+        // basemap: "dark-gray"
       });
 
       view.current = new MapView({
