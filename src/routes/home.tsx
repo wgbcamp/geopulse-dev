@@ -41,7 +41,7 @@ export const Route = createFileRoute("/home")({
 // The title's slope is steeper than a plain svh value (≈45px at 630 tall, ≈70px at 860, ≈87px at
 // 1020) so short screens give up the most size while 13"–16" laptops barely change.
 const heroTitle =
-  "font-bold text-[40px] xl:text-[clamp(40px,calc(10.9svh_-_24px),88px)] leading-none tracking-[-1.816px]";
+  "font-bold text-[40px] pb-5 xl:text-[clamp(40px,calc(10.9svh_-_24px),88px)] leading-none tracking-[-1.816px]";
 const heroSubtitle =
   "tracking-[-1.089px] text-[16px] md:text-[29px] xl:text-[clamp(17px,2.8svh,28px)]";
 
@@ -91,7 +91,9 @@ const categoryDetails: Record<
     // exposure layers GeoPulse consumes, not IMF products, so they are deliberately not claimed here
     subtitle: (
       <span className={heroSubtitle}>
-        Explore the economic data behind GeoPulse with detailed map layers showing where economic activity and assets are concentrated at <b>1 km resolution</b>.
+        Explore the economic data behind GeoPulse with detailed map layers
+        showing where economic activity and assets are concentrated at{" "}
+        <b>1 km resolution</b>.
       </span>
     ),
   },
@@ -99,7 +101,7 @@ const categoryDetails: Record<
 
 // the hero rests on this entry; the cards below cycle through the rest while the user is idle
 const mainCategory = "Overview";
-const idleMs = 12000;     // 12 seconds for the main overview
+const idleMs = 12000; // 12 seconds for the main overview
 const rotationMs = 10000; // 10 seconds for each feature card
 
 // `category` keys the hero copy in categoryDetails; `title`/`misc` are all the card shows.
@@ -192,13 +194,16 @@ const overviewCategories: {
     description: (
       <div className="max-w-90 flex flex-col gap-5">
         <span>
-          Monitor disaster events as they unfold on an interactive global map, or revisit past events.
+          Monitor disaster events as they unfold on an interactive global map,
+          or revisit past events.
         </span>
         <span>
-          Map disaster footprints to see where and to what extent people, economic activity, and assets are exposed.
+          Map disaster footprints to see where and to what extent people,
+          economic activity, and assets are exposed.
         </span>
         <span>
-          Learn more about each event, including its timeline and detailed exposure metrics by country, with access to supporting data.
+          Learn more about each event, including its timeline and detailed
+          exposure metrics by country, with access to supporting data.
         </span>
       </div>
     ),
@@ -596,12 +601,14 @@ function RouteComponent() {
                 </div>
                 {e.description}
                 {mapButton(
-                    "bg-(--accentdarkblue-90)",
-                    "text-white",
-                    <GlobeIcon color={"var(--primarywhite)"} />,
-                    <ArrowRight color={"var(--primarywhite)"} />,
-                    e.link,
-                    e.title === "Data Foundation" ? "Access the Data" : "Explore the Map",
+                  "bg-(--accentdarkblue-90)",
+                  "text-white",
+                  <GlobeIcon color={"var(--primarywhite)"} />,
+                  <ArrowRight color={"var(--primarywhite)"} />,
+                  e.link,
+                  e.title === "Data Foundation"
+                    ? "Access the Data"
+                    : "Explore the Map",
                 )}
               </div>
             </div>
@@ -667,11 +674,15 @@ function RouteComponent() {
           Advancing Global Data Standards
         </div>
         <span className="leading-[140%] text-[20px] text-center text-white w-9/10 max-w-220 pb-10">
-          The G20 Data Gaps Initiative (DGI-3) aims to improve economic and financial statistics, including data on climate-related risks.
-        </span>  
+          The G20 Data Gaps Initiative (DGI-3) aims to improve economic and
+          financial statistics, including data on climate-related risks.
+        </span>
         <span className="leading-[140%] text-[20px] text-center text-white w-9/10 max-w-220 pb-10">
-          GeoPulse supports <b>Recommendation 5 — climate physical and transition risks</b> —
-          by developing high-resolution gridded macroeconomic data and indicators of exposure to physical hazards, and making them accessible for surveillance and policy analysis.
+          GeoPulse supports{" "}
+          <b>Recommendation 5 — climate physical and transition risks</b> — by
+          developing high-resolution gridded macroeconomic data and indicators
+          of exposure to physical hazards, and making them accessible for
+          surveillance and policy analysis.
         </span>
         {externalButton(
           "bg-white",
@@ -685,13 +696,23 @@ function RouteComponent() {
             <img src={IMFLogo}></img>
             <div className="text-white font-bold leading-[140%]">
               © 2026 INTERNATIONAL MONETARY FUND. ALL RIGHTS RESERVED |{" "}
-                <a href="https://www.imf.org/en/about/privacy-notice" target="_blank" rel="noopener noreferrer" className="text-inherit no-underline hover:underline focus-visible:underline">
-                  Privacy Policy
-                </a>
-                {" | "}
-                <a href="https://www.imf.org/en/about/copyright-and-terms" target="_blank" rel="noopener noreferrer" className="text-inherit no-underline hover:underline focus-visible:underline">
-                  Copyright &amp; Usage
-                </a>
+              <a
+                href="https://www.imf.org/en/about/privacy-notice"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-inherit no-underline hover:underline focus-visible:underline"
+              >
+                Privacy Policy
+              </a>
+              {" | "}
+              <a
+                href="https://www.imf.org/en/about/copyright-and-terms"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-inherit no-underline hover:underline focus-visible:underline"
+              >
+                Copyright &amp; Usage
+              </a>
             </div>
           </div>
         </div>
