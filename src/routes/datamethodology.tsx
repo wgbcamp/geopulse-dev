@@ -23,7 +23,7 @@ function RouteComponent() {
     "w-fit underline underline-offset-2 text-[#9ec5ff] hover:text-white";
   return (
     <div
-      className={`absolute flex justify-center overflow-auto w-full bg-[#1a2868] bg-fixed transition-all `}
+      className={` flex justify-center overflow-auto w-full bg-[#1a2868] bg-fixed transition-all `}
       style={{
         backgroundImage: `linear-gradient(90deg, rgba(26,40,104,0.95) 0%, rgba(26,40,104,0.95) 52%, rgba(26,40,104,0.74) 100%), url(${MenuBackground})`,
         backgroundSize: "cover",
@@ -173,7 +173,7 @@ function RouteComponent() {
                 <span className="text-white/60">(polygons)</span>
               </span>
               <div className="flex flex-col  items-center xl:flex-row gap-6 xl:gap-14">
-                <div className="flex justify-center xl:justify-start h-full shrink-0">
+                <div className="flex justify-center xl:justify-start shrink-0">
                   <img
                     src={Events}
                     className="w-[150px] h-[150px] rounded-full object-cover shrink-0"

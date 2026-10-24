@@ -371,10 +371,10 @@ export const Header = () => {
               Data Explainer
             </div>
           ) : null}
-          <div className="flex items-center w-full h-14.75 text-white cursor-not-allowed">
+          <div className="flex items-center w-full h-14.75 text-gray-400 cursor-not-allowed">
             FAQs
           </div>
-          <div className="flex items-center w-full h-14.75 text-white cursor-not-allowed">
+          <div className="flex items-center w-full h-14.75 text-gray-400 cursor-not-allowed">
             Team & Contact us
           </div>
         </div>
