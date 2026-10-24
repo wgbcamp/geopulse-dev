@@ -533,17 +533,39 @@ export const Header = () => {
                       <ItemGroup>
                         {Object.entries(eventTypes).map(([x, y]) => (
                           <div className="flex items-center">
-                            <div
-                              className="flex justify-center border-1 rounded-4xl w-4 h-4"
+                            {/* <div
+                              className="flex justify-center border-1 rounded-full w-4 h-4"
                               style={{ borderColor: eventTypes[x].color }}
                             >
                               <div className="flex items-center justify-center">
                                 <div
-                                  className="rounded-4xl w-[7px] h-[7px]"
+                                  className="rounded-sm w-1.75 h-1.75"
                                   style={{ background: eventTypes[x].color }}
                                 ></div>
                               </div>
-                            </div>
+                            </div> */}
+                            <svg
+                              className="overflow-visible"
+                              width="15"
+                              height="15"
+                              viewBox="0 0 16 16"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <circle
+                                cx="8"
+                                cy="8"
+                                r="7.5"
+                                stroke={eventTypes[x].color}
+                                stroke-width="1"
+                              />
+                              <circle
+                                cx="8"
+                                cy="8"
+                                r="3.5"
+                                fill={eventTypes[x].color}
+                              />
+                            </svg>
                             <Item
                               key={x}
                               className={`cursor-pointer py-3 ${eventTypes[state?.eventFilter].type === eventTypes[x].type ? "font-bold text-(--orange) underline underline-offset-1.25 decoration-0.5" : ""} transition-all duration-200 ease-in`}

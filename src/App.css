@@ -26,7 +26,7 @@ html {
   --cyan: #00b0b9;
 }
 
-html {
+div span {
   text-box-trim: trim-both;
   text-box-edge: cap alphabetic;
 }
@@ -214,6 +214,17 @@ th {
   100% {
     rotate: 360deg;
   }
+}
+
+@keyframes growAnimation {
+  0% {
+    width: 0;
+    opacity: 0;
+  }
+}
+
+.growAnimation {
+  animation: growAnimation 0.6s forwards ease-in-out;
 }
 
 .rotate {
